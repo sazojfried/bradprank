@@ -35,405 +35,1245 @@
       grid-template-columns: 2fr 1.2fr;
       gap: 16px;
     }
-(max-width: 900px) {
-.game-root {
-grid-template-columns: 1fr;
-}
-}
+
+    @media (max-width: 900px) {
+      .game-root {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .panel {
-  background: var(--card);
-  border-radius: 16px;
-  padding: 16px 18px;
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.65);
-}
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 18px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.65);
+    }
 
-.panel h2 {
-  margin: 0 0 4px 0;
-  font-size: 1.15rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--accent-soft);
-}
+    .panel h2 {
+      margin: 0 0 4px 0;
+      font-size: 1.15rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+    }
 
-.panel h3 {
-  margin: 0 0 8px 0;
-  font-size: 1rem;
-  color: var(--accent-soft);
-}
+    .panel h3 {
+      margin: 0 0 8px 0;
+      font-size: 1rem;
+      color: var(--accent-soft);
+    }
 
-.subtitle {
-  margin: 0 0 12px 0;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
+    .subtitle {
+      margin: 0 0 12px 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
 
-.map-wrapper {
-  margin: 8px 0 14px 0;
-  border-radius: 14px;
-  border: 1px solid var(--border-subtle);
-  background: radial-gradient(circle at top, #111827 0, #020617 60%);
-  padding: 6px;
-  position: relative;
-  overflow: hidden;
-}
+    .map-wrapper {
+      margin: 8px 0 14px 0;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top, #111827 0, #020617 60%);
+      padding: 6px;
+      position: relative;
+      overflow: hidden;
+    }
 
-#mapSvg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+    #mapSvg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 
-.map-college {
-  stroke: #0f172a;
-  stroke-width: 1.5;
-  fill: #1f2937;
-  transition: fill 0.15s ease-out, transform 0.1s ease-out;
-  cursor: pointer;
-}
+    .map-college {
+      stroke: #0f172a;
+      stroke-width: 1.5;
+      fill: #1f2937;
+      transition: fill 0.15s ease-out, transform 0.1s ease-out;
+      cursor: pointer;
+    }
 
-.map-college:hover {
-  transform: translateY(-1px);
-  stroke-width: 2;
-}
+    .map-college:hover {
+      transform: translateY(-1px);
+      stroke-width: 2;
+    }
 
-.map-label {
-  font-size: 8px;
-  fill: var(--text-muted);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-}
+    .map-label {
+      font-size: 8px;
+      fill: var(--text-muted);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
 
-/* student dots overlay */
-#studentsCanvas {
-  position: absolute;
-  left: 6px;
-  top: 6px;
-  width: calc(100% - 12px);
-  height: calc(100% - 12px);
-  pointer-events: none;
-}
+    /* student dots overlay */
+    #studentsCanvas {
+      position: absolute;
+      left: 6px;
+      top: 6px;
+      width: calc(100% - 12px);
+      height: calc(100% - 12px);
+      pointer-events: none;
+    }
 
-.colleges-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
-}
+    .colleges-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
 
-.college-card {
-  background: rgba(15, 23, 42, 0.9);
-  border-radius: 12px;
-  padding: 10px 11px;
-  border: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.85rem;
-}
+    .college-card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 12px;
+      padding: 10px 11px;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
 
-.college-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 6px;
-}
+    .college-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+    }
 
-.college-name {
-  font-weight: 600;
-}
+    .college-name {
+      font-weight: 600;
+    }
 
-.college-percent {
-  font-variant-numeric: tabular-nums;
-  font-size: 0.85rem;
-}
+    .college-percent {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.85rem;
+    }
 
-.bar-wrap {
-  width: 100%;
-  background: #020617;
-  border-radius: 999px;
-  overflow: hidden;
-  border: 1px solid #111827;
-  height: 8px;
-}
+    .bar-wrap {
+      width: 100%;
+      background: #020617;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #111827;
+      height: 8px;
+    }
 
-.bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent-soft), #a855f7);
-  transition: width 0.2s ease-out;
-}
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-soft), #a855f7);
+      transition: width 0.2s ease-out;
+    }
 
-.college-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
+    .college-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
 
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-  gap: 10px;
-}
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 10px;
+    }
 
-.stat-label {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
 
-.btn-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
 
-button {
-  border-radius: 999px;
-  border: none;
-  padding: 6px 10px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  background: var(--accent);
-  color: #020617;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
-    background 0.1s ease-out;
-  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
-  white-space: nowrap;
-}
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: var(--accent);
+      color: #020617;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+        background 0.1s ease-out;
+      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
+      white-space: nowrap;
+    }
 
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 22px rgba(56, 189, 248, 0.6);
-}
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(56, 189, 248, 0.6);
+    }
 
-button:disabled {
-  opacity: 0.35;
-  cursor: default;
-  box-shadow: none;
-  transform: none;
-}
+    button:disabled {
+      opacity: 0.35;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
 
-.btn-secondary {
-  background: transparent;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  box-shadow: none;
-}
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      box-shadow: none;
+    }
 
-.btn-danger {
-  background: var(--danger);
-  color: #f8fafc;
-  box-shadow: 0 6px 16px rgba(248, 113, 113, 0.5);
-}
+    .btn-danger {
+      background: var(--danger);
+      color: #f8fafc;
+      box-shadow: 0 6px 16px rgba(248, 113, 113, 0.5);
+    }
 
-.traits-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 4px;
-  margin-bottom: 8px;
-}
+    .traits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
 
-.trait-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
+    .trait-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
 
-.trait-name {
-  font-size: 0.82rem;
-}
+    .trait-name {
+      font-size: 0.82rem;
+    }
 
-.trait-bar-wrap {
-  flex: 1;
-  height: 7px;
-  border-radius: 999px;
-  background: #020617;
-  border: 1px solid #0f172a;
-  overflow: hidden;
-}
+    .trait-bar-wrap {
+      flex: 1;
+      height: 7px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #0f172a;
+      overflow: hidden;
+    }
 
-.trait-bar {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent-soft), #22c55e);
-  transition: width 0.15s ease-out;
-}
+    .trait-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-soft), #22c55e);
+      transition: width 0.15s ease-out;
+    }
 
-.meta-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.8rem;
-  margin-top: 6px;
-  margin-bottom: 4px;
-  color: var(--text-muted);
-  flex-wrap: wrap;
-}
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      margin-top: 6px;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
 
-.meta-highlight {
-  color: var(--accent-soft);
-  font-weight: 500;
-}
+    .meta-highlight {
+      color: var(--accent-soft);
+      font-weight: 500;
+    }
 
-.log-box {
-  margin-top: 8px;
-  padding: 8px;
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.85);
-  border: 1px solid var(--border-subtle);
-  height: 170px;
-  overflow-y: auto;
-  font-size: 0.78rem;
-  line-height: 1.3;
-}
+    .log-box {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-subtle);
+      height: 170px;
+      overflow-y: auto;
+      font-size: 0.78rem;
+      line-height: 1.3;
+    }
 
-.log-entry {
-  margin-bottom: 4px;
-}
+    .log-entry {
+      margin-bottom: 4px;
+    }
 
-.log-entry span {
-  color: var(--text-muted);
-}
+    .footer-note {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
 
-.footer-note {
-  margin-top: 8px;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
+    .tolerance-wrap {
+      margin-top: 6px;
+      margin-bottom: 4px;
+    }
 
-.tolerance-wrap {
-  margin-top: 6px;
-  margin-bottom: 4px;
-}
+    .tolerance-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
 
-.tolerance-label {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 2px;
-}
+    .tolerance-bar-outer {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #111827;
+      overflow: hidden;
+    }
 
-.tolerance-bar-outer {
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: #020617;
-  border: 1px solid #111827;
-  overflow: hidden;
-}
+    .tolerance-bar-inner {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #f97316, #f97373);
+      transition: width 0.2s ease-out;
+    }
 
-.tolerance-bar-inner {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #22c55e, #f97316, #f97373);
-  transition: width 0.2s ease-out;
-}
-</style> </head> <body> <div class="game-root"> <div class="panel"> <h2>Meme Outbreak: Yale Edition</h2> <p class="subtitle"> A tiny, slightly cursed simulation of how a meme spreads across Yale's 14 residential colleges. Each turn is one hour in a 24-hour day; you choose one <strong>upgrade</strong> to tweak your meme's traits, then watch it propagate. </p>
-  <div class="meta-row">
-    <div>
-      Day <span class="meta-highlight" id="dayNumber">1</span>,
-      <span class="meta-highlight" id="timeOfDay">09:00</span>
+    .speed-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.8rem;
+      align-items: center;
+    }
+
+    .speed-label {
+      color: var(--text-muted);
+    }
+
+    .speed-btn {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      box-shadow: none;
+      padding-inline: 10px;
+    }
+
+    .speed-btn.active {
+      background: var(--accent);
+      color: #020617;
+      border-color: var(--accent-soft);
+      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
+    }
+
+    .upgrades-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .upgrade-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      padding: 6px 8px;
+      font-size: 0.75rem;
+      color: var(--text-main);
+      box-shadow: none;
+      height: 80px;
+      justify-content: space-between;
+    }
+
+    .upgrade-card:hover {
+      box-shadow: 0 8px 22px rgba(56, 189, 248, 0.4);
+    }
+
+    .upgrade-title {
+      font-weight: 600;
+      font-size: 0.78rem;
+      margin-bottom: 2px;
+    }
+
+    .upgrade-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .upgrade-meta {
+      font-size: 0.7rem;
+      color: var(--accent-soft);
+    }
+  </style>
+</head>
+<body>
+  <div class="game-root">
+    <div class="panel">
+      <h2>Meme Outbreak: Yale Edition</h2>
+      <p class="subtitle">
+        A tiny, slightly cursed simulation of how a meme spreads across Yale's
+        14 residential colleges. Time flows continuously; every in-game hour
+        the meme evolves and you earn one upgrade point.
+      </p>
+
+      <div class="meta-row">
+        <div>
+          Day <span class="meta-highlight" id="dayNumber">1</span>,
+          <span class="meta-highlight" id="timeOfDay">09:00</span>
+        </div>
+        <div>
+          Overall Infection:
+          <span class="meta-highlight" id="overallInfection">0%</span>
+        </div>
+        <div>
+          Upgrade Points:
+          <span class="meta-highlight" id="upgradePoints">1</span>
+        </div>
+      </div>
+
+      <div class="tolerance-wrap">
+        <div class="tolerance-label">
+          Admin Tolerance:
+          <span class="meta-highlight" id="toleranceText">100%</span>
+        </div>
+        <div class="tolerance-bar-outer">
+          <div
+            class="tolerance-bar-inner"
+            id="toleranceBar"
+            style="width: 100%"
+          ></div>
+        </div>
+      </div>
+
+      <div class="speed-row">
+        <div class="speed-label">Time speed:</div>
+        <button class="speed-btn" id="speed0" onclick="setSpeed(0)">Pause</button>
+        <button class="speed-btn" id="speed1" onclick="setSpeed(1)">1x</button>
+        <button class="speed-btn" id="speed2" onclick="setSpeed(2)">2x</button>
+        <button class="speed-btn" id="speed4" onclick="setSpeed(4)">4x</button>
+      </div>
+
+      <!-- SVG MAP -->
+      <div class="map-wrapper">
+        <svg id="mapSvg" viewBox="0 0 260 320">
+          <rect x="0" y="0" width="260" height="320" fill="#020617" />
+
+          <!-- 14 building shapes -->
+          <rect class="map-college" id="college-0" x="20" y="230" width="40" height="40" rx="4" />
+          <rect class="map-college" id="college-1" x="80" y="230" width="40" height="40" rx="4" />
+          <rect class="map-college" id="college-2" x="140" y="230" width="40" height="40" rx="4" />
+          <rect class="map-college" id="college-3" x="200" y="230" width="40" height="40" rx="4" />
+
+          <rect class="map-college" id="college-4" x="20" y="170" width="40" height="36" rx="4" />
+          <rect class="map-college" id="college-5" x="80" y="170" width="32" height="50" rx="4" />
+          <rect class="map-college" id="college-6" x="140" y="170" width="48" height="34" rx="4" />
+          <rect class="map-college" id="college-7" x="208" y="170" width="28" height="50" rx="4" />
+
+          <rect class="map-college" id="college-8" x="20" y="110" width="50" height="32" rx="4" />
+          <rect class="map-college" id="college-9" x="100" y="110" width="40" height="32" rx="4" />
+          <rect class="map-college" id="college-10" x="160" y="110" width="40" height="32" rx="4" />
+          <rect class="map-college" id="college-11" x="220" y="110" width="26" height="36" rx="4" />
+
+          <rect class="map-college" id="college-12" x="60" y="40" width="60" height="38" rx="4" />
+          <rect class="map-college" id="college-13" x="150" y="40" width="60" height="38" rx="4" />
+
+          <text x="10" y="20" class="map-label">Grove-ish</text>
+          <text x="10" y="305" class="map-label">Near Green-ish</text>
+        </svg>
+        <canvas id="studentsCanvas"></canvas>
+      </div>
+
+      <div class="colleges-grid" id="collegesGrid"></div>
     </div>
-    <div>
-      Overall Infection:
-      <span class="meta-highlight" id="overallInfection">0%</span>
+
+    <div class="panel">
+      <h3>Meme Traits & Upgrades</h3>
+      <p class="subtitle">
+        Every in-game hour, you gain 1 upgrade point. Spend them on themed
+        upgrades that tweak <strong>Virality</strong>, <strong>Relatability</strong>,
+        <strong>Edginess</strong>, and how quickly Admin Tolerance melts down.
+      </p>
+
+      <div class="traits-list" id="traitsList"></div>
+
+      <div id="upgradesGrid" class="upgrades-grid"></div>
+
+      <div class="log-box" id="logBox"></div>
+
+      <div class="footer-note">
+        Win by infecting at least <strong>80%</strong> of the overall
+        population before Admin Tolerance hits zero or campus moves on to a new
+        drama (after Day 7). Student dots are people walking between colleges—
+        traffic peaks during the day.
+      </div>
     </div>
-    <div>
-      Upgrade Points:
-      <span class="meta-highlight" id="upgradePoints">1</span>
-    </div>
   </div>
 
-  <div class="tolerance-wrap">
-    <div class="tolerance-label">
-      Admin Tolerance:
-      <span class="meta-highlight" id="toleranceText">100%</span>
-    </div>
-    <div class="tolerance-bar-outer">
-      <div
-        class="tolerance-bar-inner"
-        id="toleranceBar"
-        style="width: 100%"
-      ></div>
-    </div>
-  </div>
+  <script>
+    const COLLEGE_NAMES = [
+      "Benjamin Franklin",
+      "Berkeley",
+      "Branford",
+      "Davenport",
+      "Ezra Stiles",
+      "Grace Hopper",
+      "Jonathan Edwards",
+      "Morse",
+      "Pauli Murray",
+      "Pierson",
+      "Saybrook",
+      "Silliman",
+      "Timothy Dwight",
+      "Trumbull",
+    ];
 
-  <!-- SVG MAP -->
-  <div class="map-wrapper">
-    <svg id="mapSvg" viewBox="0 0 260 320">
-      <rect x="0" y="0" width="260" height="320" fill="#020617" />
+    // 30 upgrades, 3 columns x 10 rows
+    const UPGRADES = [
+      {
+        id: "trumpify",
+        name: "Trumpify",
+        desc: "Your meme now applies to Trump; virality and edginess spike, admins panic.",
+        v: 2, r: 0, e: 2, tol: -8,
+      },
+      {
+        id: "commons-feature",
+        name: "Commons Feature",
+        desc: "The meme hits the screens in The Schwarzman Center.",
+        v: 2, r: 1, e: 0, tol: -4,
+      },
+      {
+        id: "ydn-article",
+        name: "YDN Article",
+        desc: "Yale Daily News writes a think-piece about your meme.",
+        v: 1, r: 2, e: 0, tol: -3,
+      },
+      {
+        id: "stonks",
+        name: "Stonks",
+        desc: "You lean into the 'stonks' template. Easy shares.",
+        v: 2, r: 1, e: 1, tol: -2,
+      },
+      {
+        id: "six-seven",
+        name: "Six–Seven Chant",
+        desc: "Students adopt your meme as a chant in the Bowl.",
+        v: 3, r: 1, e: 0, tol: -5,
+      },
+      {
+        id: "bulldog-days",
+        name: "Bulldog Days Leak",
+        desc: "Prefrosh see the meme before they even enroll.",
+        v: 2, r: 2, e: 0, tol: -4,
+      },
+      {
+        id: "froco-endorsement",
+        name: "FroCo Endorsement",
+        desc: "FroCos ironically include your meme in group emails.",
+        v: 1, r: 2, e: 0, tol: -1,
+      },
+      {
+        id: "section-meme-page",
+        name: "Section Meme Page",
+        desc: "Your meme becomes the default language of a section meme page.",
+        v: 1, r: 3, e: 1, tol: -3,
+      },
+      {
+        id: "sig-blast",
+        name: "SIG Blast",
+        desc: "A big student org sends it out in a listserv blast.",
+        v: 2, r: 1, e: 0, tol: -2,
+      },
+      {
+        id: "yale-facebook",
+        name: "Yale Facebook Group",
+        desc: "The old guard picks it up on Facebook.",
+        v: 1, r: 1, e: 0, tol: -1,
+      },
+      {
+        id: "bass-whiteboard",
+        name: "Bass Whiteboard",
+        desc: "Someone draws your meme on a Bass study room whiteboard.",
+        v: 1, r: 2, e: 0, tol: -1,
+      },
+      {
+        id: "lecture-slide",
+        name: "Lecture Slide Cameo",
+        desc: "A professor uses your meme in their lecture slides.",
+        v: 1, r: 2, e: 0, tol: +2,
+      },
+      {
+        id: "groupme-stickers",
+        name: "GroupMe Stickers",
+        desc: "Your meme becomes a cursed sticker pack.",
+        v: 1, r: 3, e: 1, tol: -2,
+      },
+      {
+        id: "yalies-tiktok",
+        name: "Yalies on TikTok",
+        desc: "The meme jumps to TikTok with a trending sound.",
+        v: 3, r: 2, e: 1, tol: -5,
+      },
+      {
+        id: "cs-piazza",
+        name: "CS Piazza Thread",
+        desc: "CS majors turn a Piazza post into a meme thread.",
+        v: 1, r: 2, e: 1, tol: -2,
+      },
+      {
+        id: "econ-pset",
+        name: "Econ Pset Joke",
+        desc: "Your meme features in an Econ pset hint.",
+        v: 1, r: 1, e: 0, tol: +1,
+      },
+      {
+        id: "beinecke-projection",
+        name: "Beinecke Projection",
+        desc: "A meme variant gets projected on Beinecke in a stunt.",
+        v: 2, r: 1, e: 2, tol: -6,
+      },
+      {
+        id: "td-buttery",
+        name: "TD Buttery Graffiti",
+        desc: "It appears in TD buttery graffiti and menu names.",
+        v: 1, r: 2, e: 1, tol: -2,
+      },
+      {
+        id: "hopper-courtyard",
+        name: "Hopper Courtyard Projector",
+        desc: "Hopper plays the meme on a projector at night.",
+        v: 2, r: 1, e: 1, tol: -3,
+      },
+      {
+        id: "gheav-sighting",
+        name: "GHeav Sighting",
+        desc: "Someone captures the meme at GHeav at 2 a.m.",
+        v: 2, r: 1, e: 2, tol: -4,
+      },
+      {
+        id: "woads-night",
+        name: "Woads Theme Night",
+        desc: "The meme becomes a Woads pregame theme.",
+        v: 3, r: 1, e: 2, tol: -6,
+      },
+      {
+        id: "secret-society",
+        name: "Secret Society Cameo",
+        desc: "A secret-society tap joke references your meme.",
+        v: 1, r: 1, e: 2, tol: -3,
+      },
+      {
+        id: "ycc-referendum",
+        name: "YCC Referendum",
+        desc: "Someone proposes a serious YCC resolution framed by your meme.",
+        v: 1, r: 2, e: 1, tol: -3,
+      },
+      {
+        id: "reddit-frontpage",
+        name: "Yale Reddit Front Page",
+        desc: "It hits the front page of /r/yale.",
+        v: 2, r: 2, e: 1, tol: -4,
+      },
+      {
+        id: "dining-hall",
+        name: "Dining Hall Announcements",
+        desc: "Dining staff adopt the meme in menu announcements.",
+        v: 1, r: 2, e: 0, tol: 0,
+      },
+      {
+        id: "im-trash-talk",
+        name: "IM Trash Talk",
+        desc: "Intramural captains weaponize your meme in trash talk.",
+        v: 2, r: 1, e: 2, tol: -3,
+      },
+      {
+        id: "acappella-beef",
+        name: "A Cappella Beef",
+        desc: "Competing groups subtweet each other using your meme.",
+        v: 1, r: 2, e: 2, tol: -3,
+      },
+      {
+        id: "alumni-twitter",
+        name: "Alumni Twitter",
+        desc: "Alumni discover the meme and misinterpret it slightly.",
+        v: 1, r: 1, e: 0, tol: +1,
+      },
+      {
+        id: "ct-news",
+        name: "CT News Pickup",
+        desc: "Local news runs a lighthearted segment on the meme.",
+        v: 2, r: 1, e: 0, tol: -2,
+      },
+      {
+        id: "national-media",
+        name: "National Media Moment",
+        desc: "A national outlet uses your meme as shorthand for campus culture.",
+        v: 3, r: 1, e: 1, tol: -7,
+      },
+    ];
 
-      <!-- 14 building shapes -->
-      <rect class="map-college" id="college-0" x="20" y="230" width="40" height="40" rx="4" />
-      <rect class="map-college" id="college-1" x="80" y="230" width="40" height="40" rx="4" />
-      <rect class="map-college" id="college-2" x="140" y="230" width="40" height="40" rx="4" />
-      <rect class="map-college" id="college-3" x="200" y="230" width="40" height="40" rx="4" />
+    const gameState = {
+      day: 1,
+      hour: 9,
+      maxDays: 7,
+      turn: 1,
+      upgradePoints: 1,
+      traits: {
+        virality: 2,
+        relatability: 2,
+        edginess: 2,
+      },
+      colleges: [],
+      log: [],
+      gameOver: false,
+      adminTolerance: 100,
+      speed: 1,
+      timeAccHours: 0,
+      purchased: {},
+      lastFrameTime: null,
+    };
 
-      <rect class="map-college" id="college-4" x="20" y="170" width="40" height="36" rx="4" />
-      <rect class="map-college" id="college-5" x="80" y="170" width="32" height="50" rx="4" />
-      <rect class="map-college" id="college-6" x="140" y="170" width="48" height="34" rx="4" />
-      <rect class="map-college" id="college-7" x="208" y="170" width="28" height="50" rx="4" />
+    const studentsState = {
+      dots: [],
+      lastSpawn: 0,
+    };
 
-      <rect class="map-college" id="college-8" x="20" y="110" width="50" height="32" rx="4" />
-      <rect class="map-college" id="college-9" x="100" y="110" width="40" height="32" rx="4" />
-      <rect class="map-college" id="college-10" x="160" y="110" width="40" height="32" rx="4" />
-      <rect class="map-college" id="college-11" x="220" y="110" width="26" height="36" rx="4" />
+    function formatTime(h) {
+      const hh = h.toString().padStart(2, "0");
+      return `${hh}:00`;
+    }
 
-      <rect class="map-college" id="college-12" x="60" y="40" width="60" height="38" rx="4" />
-      <rect class="map-college" id="college-13" x="150" y="40" width="60" height="38" rx="4" />
+    function initGame() {
+      gameState.day = 1;
+      gameState.hour = 9;
+      gameState.turn = 1;
+      gameState.upgradePoints = 1;
+      gameState.traits = { virality: 2, relatability: 2, edginess: 2 };
+      gameState.gameOver = false;
+      gameState.adminTolerance = 100;
+      gameState.speed = 1;
+      gameState.timeAccHours = 0;
+      gameState.purchased = {};
+      gameState.lastFrameTime = null;
 
-      <text x="10" y="20" class="map-label">Grove-ish</text>
-      <text x="10" y="305" class="map-label">Near Green-ish</text>
-    </svg>
-    <canvas id="studentsCanvas"></canvas>
-  </div>
+      gameState.colleges = COLLEGE_NAMES.map((name, index) => {
+        const baseInfection = index === 0 ? 20 : 0;
+        const moderation = 0.2 + Math.random() * 0.4;
+        return {
+          name,
+          infection: baseInfection,
+          moderation,
+        };
+      });
+      gameState.log = [];
+      addLog(
+        "Day 1, 09:00 — New meme detected in Benjamin Franklin. It seems harmless. For now."
+      );
 
-  <div class="colleges-grid" id="collegesGrid"></div>
-</div>
+      attachMapClickHandlers();
+      initStudents();
+      updateSpeedButtons();
+      renderUI();
+    }
 
-<div class="panel">
-  <h3>Meme Traits & Upgrades</h3>
-  <p class="subtitle">
-    In Dawkins-speak, you're optimizing the meme's "fitness." In practice,
-    you're making it more cursed. Admin Tolerance drops as infection rises
-    and the meme gets edgier.
-  </p>
+    function addLog(message) {
+      const prefix = `Day ${gameState.day}, ${formatTime(gameState.hour)} — `;
+      const entry = message.startsWith("Day ") ? message : prefix + message;
+      gameState.log.unshift(entry);
+      if (gameState.log.length > 80) gameState.log.pop();
+      renderLog();
+    }
 
-  <div class="traits-list" id="traitsList"></div>
+    function renderLog() {
+      const logBox = document.getElementById("logBox");
+      logBox.innerHTML = "";
+      gameState.log.forEach((line) => {
+        const div = document.createElement("div");
+        div.className = "log-entry";
+        div.textContent = line;
+        logBox.appendChild(div);
+      });
+    }
 
-  <div class="btn-row">
-    <button onclick="buyUpgrade('virality')" id="btnVirality">
-      Upgrade Virality
-    </button>
-    <button onclick="buyUpgrade('relatability')" id="btnRelatability">
-      Upgrade Relatability
-    </button>
-    <button onclick="buyUpgrade('edginess')" id="btnEdginess">
-      Upgrade Edginess
-    </button>
-  </div>
+    function renderTraits() {
+      const traitsList = document.getElementById("traitsList");
+      traitsList.innerHTML = "";
 
-  <div class="btn-row" style="margin-top: 10px">
-    <button class="btn-danger" onclick="nextTurn()" id="btnNextTurn">
-      Next Hour
-    </button>
-    <button class="btn-secondary" onclick="resetGame()">Reset</button>
-  </div>
+      const traitMeta = {
+        virality: "How quickly the meme jumps into new colleges.",
+        relatability: "How much already-infected students keep sharing it.",
+        edginess:
+          "Helps bypass social norms & moderation, but melts Admin Tolerance.",
+      };
 
-  <div class="log-box" id="logBox"></div>
+      Object.entries(gameState.traits).forEach(([key, value]) => {
+        const row = document.createElement("div");
+        row.className = "trait-row";
 
-  <div class="footer-note">
-    Win by infecting at least <strong>80%</strong> of the overall
-    population before Admin Tolerance hits zero or campus moves on to a new
-    drama (after Day 7). Student dots approximate people walking between
-    colleges—traffic peaks during the day.
-  </div>
-</div>
-</div> <script> const COLLEGE_NAMES = [ "Benjamin Franklin", "Berkeley", "Branford", "Davenport", "Ezra Stiles", "Grace Hopper", "Jonathan Edwards", "Morse", "Pauli Murray", "Pierson", "Saybrook", "Silliman", "Timothy Dwight", "Trumbull", ]; const gameState = { day: 1, hour: 9, // 24h clock maxDays: 7, turn: 1, upgradePoints: 1, traits: { virality: 2, relatability: 2, edginess: 2, }, colleges: [], log: [], gameOver: false, adminTolerance: 100, // 0–100 }; // student animation state const studentsState = { dots: [], lastSpawn: 0, }; function formatTime(h) { const hh = h.toString().padStart(2, "0"); return `${hh}:00`; } function initGame() { gameState.day = 1; gameState.hour = 9; gameState.turn = 1; gameState.upgradePoints = 1; gameState.traits = { virality: 2, relatability: 2, edginess: 2 }; gameState.gameOver = false; gameState.adminTolerance = 100; gameState.colleges = COLLEGE_NAMES.map((name, index) => { const baseInfection = index === 0 ? 20 : 0; const moderation = 0.2 + Math.random() * 0.4; return { name, infection: baseInfection, moderation, }; }); gameState.log = []; addLog( "Day 1, 09:00 — New meme detected in Benjamin Franklin. It seems harmless. For now." ); attachMapClickHandlers(); initStudents(); renderUI(); } function addLog(message) { const entry = message.includes("Day") ? message : `Day ${gameState.day}, ${formatTime(gameState.hour)} — ${message}`; gameState.log.unshift(entry); if (gameState.log.length > 80) { gameState.log.pop(); } renderLog(); } function renderLog() { const logBox = document.getElementById("logBox"); logBox.innerHTML = ""; gameState.log.forEach((line) => { const div = document.createElement("div"); div.className = "log-entry"; div.textContent = line; logBox.appendChild(div); }); } function renderTraits() { const traitsList = document.getElementById("traitsList"); traitsList.innerHTML = ""; const traitMeta = { virality: "How quickly the meme jumps into new colleges.", relatability: "How much already-infected students keep sharing it.", edginess: "Helps bypass social norms & moderation, but draws admin scrutiny.", }; Object.entries(gameState.traits).forEach(([key, value]) => { const row = document.createElement("div"); row.className = "trait-row"; const left = document.createElement("div"); const nameSpan = document.createElement("div"); nameSpan.className = "trait-name"; nameSpan.textContent = key.charAt(0).toUpperCase() + key.slice(1) + ` (${value})`; const label = document.createElement("div"); label.className = "stat-label"; label.textContent = traitMeta[key]; left.appendChild(nameSpan); left.appendChild(label); const center = document.createElement("div"); center.className = "trait-bar-wrap"; const bar = document.createElement("div"); bar.className = "trait-bar"; const width = Math.min(100, (value / 10) * 100); bar.style.width = width + "%"; center.appendChild(bar); row.appendChild(left); row.appendChild(center); traitsList.appendChild(row); }); document.getElementById("upgradePoints").textContent = gameState.upgradePoints; } function renderMap() { for (let i = 0; i < gameState.colleges.length; i++) { const c = gameState.colleges[i]; const el = document.getElementById(`college-${i}`); if (!el) continue; const t = c.infection / 100; const hue = 200 - 60 * t; const light = 20 + 40 * (1 - t); el.style.fill = `hsl(${hue}, 80%, ${light}%)`; } } function renderColleges() { const grid = document.getElementById("collegesGrid"); grid.innerHTML = ""; gameState.colleges.forEach((c) => { const card = document.createElement("div"); card.className = "college-card"; const header = document.createElement("div"); header.className = "college-header"; const name = document.createElement("div"); name.className = "college-name"; name.textContent = c.name; const percent = document.createElement("div"); percent.className = "college-percent"; const p = Math.round(c.infection); percent.textContent = p + "%"; header.appendChild(name); header.appendChild(percent); const barWrap = document.createElement("div"); barWrap.className = "bar-wrap"; const barFill = document.createElement("div"); barFill.className = "bar-fill"; barFill.style.width = p + "%"; barWrap.appendChild(barFill); const meta = document.createElement("div"); meta.className = "college-meta"; const mod = document.createElement("div"); mod.textContent = "Resistance: " + c.moderation.toFixed(2); const tag = document.createElement("div"); tag.textContent = p >= 80 ? "Fully memed" : p >= 20 ? "Contaminated" : "Mostly safe"; meta.appendChild(mod); meta.appendChild(tag); card.appendChild(header); card.appendChild(barWrap); card.appendChild(meta); grid.appendChild(card); }); renderMap(); } function renderMeta() { document.getElementById("dayNumber").textContent = gameState.day; document.getElementById("timeOfDay").textContent = formatTime( gameState.hour ); const avg = gameState.colleges.reduce((sum, c) => sum + c.infection, 0) / gameState.colleges.length; document.getElementById("overallInfection").textContent = Math.round(avg) + "%"; const tol = Math.max(0, Math.round(gameState.adminTolerance)); document.getElementById("toleranceText").textContent = tol + "%"; document.getElementById("toleranceBar").style.width = tol + "%"; const disabled = gameState.gameOver; ["btnVirality", "btnRelatability", "btnEdginess", "btnNextTurn"].forEach( (id) => { const btn = document.getElementById(id); if (btn) btn.disabled = disabled; } ); } function renderUI() { renderTraits(); renderColleges(); renderMeta(); renderLog(); } function buyUpgrade(traitKey) { if (gameState.gameOver) return; if (gameState.upgradePoints <= 0) return; if (!gameState.traits.hasOwnProperty(traitKey)) return; if (gameState.traits[traitKey] >= 10) { addLog(`Your ${traitKey} is already maxed out.`); return; } gameState.traits[traitKey] += 1; gameState.upgradePoints -= 1; let flavor; if (traitKey === "virality") { flavor = "You tweaked the format. It now fits perfectly in an IG story."; } else if (traitKey === "relatability") { flavor = "You added a painfully specific caption. Everyone feels personally attacked."; } else if (traitKey === "edginess") { flavor = "You made it just a bit more cursed. Campus admins are starting to notice."; } addLog(`Upgrade purchased: ${traitKey.toUpperCase()}. ${flavor}`); renderUI(); } function nextTurn() { if (gameState.gameOver) return; // Time advance gameState.hour += 1; if (gameState.hour >= 24) { gameState.hour = 0; gameState.day += 1; } gameState.turn += 1; if (gameState.upgradePoints < 3) { gameState.upgradePoints += 1; } const { virality, relatability, edginess } = gameState.traits; let newlyHigh = []; let moderationEvents = []; gameState.colleges.forEach((c) => { const baseSpread = virality * 0.8; const existingBoost = (relatability * c.infection) / 100; const resistance = c.moderation * 5; const edgyBonus = edginess * 0.4; const chaos = (Math.random() - 0.5) * 4; let delta = baseSpread + existingBoost + edgyBonus - resistance + chaos; if (c.infection < 5) { delta *= 0.6; } if (delta < -5) delta = -5; if (delta > 15) delta = 15; const oldInfection = c.infection; c.infection = Math.max(0, Math.min(100, c.infection + delta)); if (oldInfection < 50 && c.infection >= 50) { newlyHigh.push(c.name); } const moderationChance = (edginess * 0.04 + c.infection / 400) * c.moderation; if (Math.random() < moderationChance) { const reduction = 5 + Math.random() * 10; c.infection = Math.max(0, c.infection - reduction); moderationEvents.push(c.name); } }); const avg = gameState.colleges.reduce((sum, c) => sum + c.infection, 0) / gameState.colleges.length; // Admin tolerance decay: increases with infection & edginess const tolDecayBase = 0.3 + (avg / 100) * 1.2 + edginess * 0.2; // Slightly more decay in daytime const isDay = gameState.hour >= 8 && gameState.hour <= 22; const tolDecay = tolDecayBase * (isDay ? 1.1 : 0.8); gameState.adminTolerance -= tolDecay; if (newlyHigh.length > 0) { addLog( `${newlyHigh.join( ", " )} crossed 50% infection. People are starting to reference the meme offline.` ); } if (moderationEvents.length > 0) { addLog( `Admins/Group chats in ${moderationEvents.join( ", " )} tried to clamp down. Some posts disappeared, but the meme survived.` ); } if (avg >= 80) { addLog( `Campus is saturated (avg ${Math.round( avg )}%). In Gladwell terms, you've achieved a very cursed weak-tie revolution.` ); gameState.gameOver = true; } else if (gameState.adminTolerance <= 0) { addLog( "Admin Tolerance hit 0%. A campus-wide email goes out. Everyone has to click through a 'Community Standards' training. The meme is dead." ); gameState.gameOver = true; } else if (gameState.day > gameState.maxDays) { addLog( `It's Day ${gameState.day}. Campus attention has moved on to a new scandal. The meme topped out at ${Math.round( avg )}% average infection.` ); gameState.gameOver = true; } else { addLog( `The meme continues to circulate. Overall infection now ~${Math.round( avg )}%.` ); } renderUI(); } function attachMapClickHandlers() { for (let i = 0; i < COLLEGE_NAMES.length; i++) { const el = document.getElementById(`college-${i}`); if (!el) continue; el.onclick = () => { const c = gameState.colleges[i]; addLog( `${c.name} currently at ~${Math.round( c.infection )}% infection (resistance ${c.moderation.toFixed(2)}).` ); }; } } // --- student dots animation --- function initStudents() { const canvas = document.getElementById("studentsCanvas"); const svg = document.getElementById("mapSvg"); if (!canvas || !svg) return; resizeCanvas(); window.addEventListener("resize", resizeCanvas); studentsState.dots = []; studentsState.lastSpawn = performance.now(); requestAnimationFrame(stepStudents); } function resizeCanvas() { const canvas = document.getElementById("studentsCanvas"); if (!canvas) return; const rect = canvas.getBoundingClientRect(); canvas.width = rect.width; canvas.height = rect.height; } function getCollegeCenters() { const svg = document.getElementById("mapSvg"); const canvas = document.getElementById("studentsCanvas"); if (!svg || !canvas) return []; const svgRect = svg.getBoundingClientRect(); const canvasRect = canvas.getBoundingClientRect(); const sx = canvasRect.width / svg.viewBox.baseVal.width; const sy = canvasRect.height / svg.viewBox.baseVal.height; const centers = []; for (let i = 0; i < COLLEGE_NAMES.length; i++) { const el = document.getElementById(`college-${i}`); if (!el) { centers.push({ x: 0, y: 0 }); continue; } const x = parseFloat(el.getAttribute("x")); const y = parseFloat(el.getAttribute("y")); const w = parseFloat(el.getAttribute("width")); const h = parseFloat(el.getAttribute("height")); centers.push({ x: (x + w / 2) * sx, y: (y + h / 2) * sy, }); } return centers; } function spawnStudents(now) { const centers = getCollegeCenters(); if (!centers.length) return; const canvas = document.getElementById("studentsCanvas"); if (!canvas) return; const isDay = gameState.hour >= 8 && gameState.hour <= 22; const baseRate = isDay ? 0.0025 : 0.0007; // per ms const elapsed = now - studentsState.lastSpawn; const expected = baseRate * elapsed * COLLEGE_NAMES.length; const numNew = Math.floor(expected); if (numNew <= 0) return; for (let n = 0; n < numNew; n++) { const from = Math.floor(Math.random() * centers.length); let to = Math.floor(Math.random() * centers.length); if (to === from) { to = (to + 1) % centers.length; } const start = centers[from]; const end = centers[to]; studentsState.dots.push({ x0: start.x, y0: start.y, x1: end.x, y1: end.y, t: 0, speed: 0.0005 + Math.random() * 0.0008, // per ms size: 2 + Math.random() * 1.5, }); } studentsState.lastSpawn = now; } function stepStudents(now) { const canvas = document.getElementById("studentsCanvas"); if (!canvas) return; const ctx = canvas.getContext("2d"); const dt = 16; // approximate frame step spawnStudents(now); const remaining = []; ctx.clearRect(0, 0, canvas.width, canvas.height); studentsState.dots.forEach((dot) => { dot.t += dot.speed * dt; if (dot.t >= 1) return; const x = dot.x0 + (dot.x1 - dot.x0) * dot.t; const y = dot.y0 + (dot.y1 - dot.y0) * dot.t; const alpha = 0.3 + 0.7 * (1 - Math.abs(dot.t - 0.5) * 2); ctx.beginPath(); ctx.arc(x, y, dot.size, 0, Math.PI * 2); ctx.fillStyle = `rgba(148, 236, 255, ${alpha})`; ctx.fill(); remaining.push(dot); }); studentsState.dots = remaining; requestAnimationFrame(stepStudents); } function resetGame() { initGame(); } initGame(); </script> </body> </html> ```
+        const left = document.createElement("div");
+        const nameSpan = document.createElement("div");
+        nameSpan.className = "trait-name";
+        nameSpan.textContent =
+          key.charAt(0).toUpperCase() + key.slice(1) + ` (${value})`;
+        const label = document.createElement("div");
+        label.className = "stat-label";
+        label.textContent = traitMeta[key];
+        left.appendChild(nameSpan);
+        left.appendChild(label);
+
+        const center = document.createElement("div");
+        center.className = "trait-bar-wrap";
+        const bar = document.createElement("div");
+        bar.className = "trait-bar";
+        const width = Math.min(100, (value / 12) * 100);
+        bar.style.width = width + "%";
+        center.appendChild(bar);
+
+        row.appendChild(left);
+        row.appendChild(center);
+        traitsList.appendChild(row);
+      });
+
+      document.getElementById("upgradePoints").textContent =
+        gameState.upgradePoints;
+    }
+
+    function renderUpgrades() {
+      const grid = document.getElementById("upgradesGrid");
+      grid.innerHTML = "";
+      UPGRADES.forEach((u) => {
+        const btn = document.createElement("button");
+        btn.className = "upgrade-card";
+        const taken = !!gameState.purchased[u.id];
+        btn.disabled =
+          gameState.gameOver || taken || gameState.upgradePoints <= 0;
+
+        const title = document.createElement("div");
+        title.className = "upgrade-title";
+        title.textContent = u.name;
+
+        const desc = document.createElement("div");
+        desc.className = "upgrade-desc";
+        desc.textContent = u.desc;
+
+        const meta = document.createElement("div");
+        meta.className = "upgrade-meta";
+        const parts = [];
+        if (u.v) parts.push(`V+${u.v}`);
+        if (u.r) parts.push(`R+${u.r}`);
+        if (u.e) parts.push(`E+${u.e}`);
+        if (u.tol) {
+          parts.push(u.tol > 0 ? `Tolerance +${u.tol}` : `Tolerance ${u.tol}`);
+        }
+        meta.textContent =
+          (taken ? "[Taken] " : "") + (parts.length ? parts.join(" · ") : "");
+
+        btn.appendChild(title);
+        btn.appendChild(desc);
+        btn.appendChild(meta);
+
+        btn.onclick = () => tryPurchaseUpgrade(u.id);
+
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderMap() {
+      for (let i = 0; i < gameState.colleges.length; i++) {
+        const c = gameState.colleges[i];
+        const el = document.getElementById(`college-${i}`);
+        if (!el) continue;
+        const t = c.infection / 100;
+        const hue = 200 - 60 * t;
+        const light = 20 + 40 * (1 - t);
+        el.style.fill = `hsl(${hue}, 80%, ${light}%)`;
+      }
+    }
+
+    function renderColleges() {
+      const grid = document.getElementById("collegesGrid");
+      grid.innerHTML = "";
+
+      gameState.colleges.forEach((c) => {
+        const card = document.createElement("div");
+        card.className = "college-card";
+
+        const header = document.createElement("div");
+        header.className = "college-header";
+
+        const name = document.createElement("div");
+        name.className = "college-name";
+        name.textContent = c.name;
+
+        const percent = document.createElement("div");
+        percent.className = "college-percent";
+        const p = Math.round(c.infection);
+        percent.textContent = p + "%";
+
+        header.appendChild(name);
+        header.appendChild(percent);
+
+        const barWrap = document.createElement("div");
+        barWrap.className = "bar-wrap";
+        const barFill = document.createElement("div");
+        barFill.className = "bar-fill";
+        barFill.style.width = p + "%";
+        barWrap.appendChild(barFill);
+
+        const meta = document.createElement("div");
+        meta.className = "college-meta";
+        const mod = document.createElement("div");
+        mod.textContent = "Resistance: " + c.moderation.toFixed(2);
+        const tag = document.createElement("div");
+        tag.textContent =
+          p >= 80 ? "Fully memed" : p >= 20 ? "Contaminated" : "Mostly safe";
+        meta.appendChild(mod);
+        meta.appendChild(tag);
+
+        card.appendChild(header);
+        card.appendChild(barWrap);
+        card.appendChild(meta);
+
+        grid.appendChild(card);
+      });
+
+      renderMap();
+    }
+
+    function renderMeta() {
+      document.getElementById("dayNumber").textContent = gameState.day;
+      document.getElementById("timeOfDay").textContent = formatTime(
+        gameState.hour
+      );
+
+      const avg =
+        gameState.colleges.reduce((sum, c) => sum + c.infection, 0) /
+        gameState.colleges.length;
+      document.getElementById("overallInfection").textContent =
+        Math.round(avg) + "%";
+
+      const tol = Math.max(0, Math.round(gameState.adminTolerance));
+      document.getElementById("toleranceText").textContent = tol + "%";
+      document.getElementById("toleranceBar").style.width = tol + "%";
+    }
+
+    function renderUI() {
+      renderTraits();
+      renderUpgrades();
+      renderColleges();
+      renderMeta();
+      renderLog();
+    }
+
+    function clampTrait(x) {
+      return Math.max(0, Math.min(12, x));
+    }
+
+    function tryPurchaseUpgrade(id) {
+      if (gameState.gameOver) return;
+      const u = UPGRADES.find((x) => x.id === id);
+      if (!u) return;
+      if (gameState.purchased[id]) {
+        addLog(`${u.name} is already in play.`);
+        return;
+      }
+      if (gameState.upgradePoints <= 0) {
+        addLog("No upgrade points available right now.");
+        return;
+      }
+
+      gameState.upgradePoints -= 1;
+      gameState.purchased[id] = true;
+
+      gameState.traits.virality = clampTrait(
+        gameState.traits.virality + (u.v || 0)
+      );
+      gameState.traits.relatability = clampTrait(
+        gameState.traits.relatability + (u.r || 0)
+      );
+      gameState.traits.edginess = clampTrait(
+        gameState.traits.edginess + (u.e || 0)
+      );
+      if (u.tol) {
+        gameState.adminTolerance = Math.max(
+          0,
+          Math.min(100, gameState.adminTolerance + u.tol)
+        );
+      }
+
+      addLog(`Upgrade unlocked: ${u.name} — ${u.desc}`);
+      renderUI();
+    }
+
+    function advanceHour() {
+      if (gameState.gameOver) return;
+
+      // time bookkeeping
+      gameState.hour += 1;
+      if (gameState.hour >= 24) {
+        gameState.hour = 0;
+        gameState.day += 1;
+      }
+      gameState.turn += 1;
+
+      // 1 upgrade point per hour
+      gameState.upgradePoints += 1;
+
+      const { virality, relatability, edginess } = gameState.traits;
+
+      let newlyHigh = [];
+      let moderationEvents = [];
+
+      gameState.colleges.forEach((c) => {
+        const baseSpread = virality * 0.8;
+        const existingBoost = (relatability * c.infection) / 100;
+        const resistance = c.moderation * 5;
+        const edgyBonus = edginess * 0.4;
+        const chaos = (Math.random() - 0.5) * 4;
+
+        let delta = baseSpread + existingBoost + edgyBonus - resistance + chaos;
+
+        if (c.infection < 5) delta *= 0.6;
+        if (delta < -5) delta = -5;
+        if (delta > 15) delta = 15;
+
+        const oldInfection = c.infection;
+        c.infection = Math.max(0, Math.min(100, c.infection + delta));
+
+        if (oldInfection < 50 && c.infection >= 50) {
+          newlyHigh.push(c.name);
+        }
+
+        const moderationChance =
+          (edginess * 0.04 + c.infection / 400) * c.moderation;
+        if (Math.random() < moderationChance) {
+          const reduction = 5 + Math.random() * 10;
+          c.infection = Math.max(0, c.infection - reduction);
+          moderationEvents.push(c.name);
+        }
+      });
+
+      const avg =
+        gameState.colleges.reduce((sum, c) => sum + c.infection, 0) /
+        gameState.colleges.length;
+
+      const isDay = gameState.hour >= 8 && gameState.hour <= 22;
+      const tolDecayBase = 0.3 + (avg / 100) * 1.2 + edginess * 0.2;
+      const tolDecay = tolDecayBase * (isDay ? 1.1 : 0.8);
+      gameState.adminTolerance -= tolDecay;
+
+      if (newlyHigh.length > 0) {
+        addLog(
+          `${newlyHigh.join(
+            ", "
+          )} crossed 50% infection. People are starting to reference the meme offline.`
+        );
+      }
+
+      if (moderationEvents.length > 0) {
+        addLog(
+          `Admins/Group chats in ${moderationEvents.join(
+            ", "
+          )} tried to clamp down. Some posts disappeared, but the meme survived.`
+        );
+      }
+
+      if (avg >= 80) {
+        addLog(
+          `Campus is saturated (avg ${Math.round(
+            avg
+          )}%). In Gladwell terms, you've achieved a very cursed weak-tie revolution.`
+        );
+        gameState.gameOver = true;
+        gameState.speed = 0;
+      } else if (gameState.adminTolerance <= 0) {
+        addLog(
+          "Admin Tolerance hit 0%. A campus-wide email goes out. Everyone has to click through a 'Community Standards' training. The meme is dead."
+        );
+        gameState.gameOver = true;
+        gameState.speed = 0;
+      } else if (gameState.day > gameState.maxDays) {
+        addLog(
+          `It's Day ${gameState.day}. Campus attention has moved on to a new scandal. The meme topped out at ${Math.round(
+            avg
+          )}% average infection.`
+        );
+        gameState.gameOver = true;
+        gameState.speed = 0;
+      } else {
+        addLog(
+          `The meme continues to circulate. Overall infection now ~${Math.round(
+            avg
+          )}%.`
+        );
+      }
+
+      renderUI();
+    }
+
+    function attachMapClickHandlers() {
+      for (let i = 0; i < COLLEGE_NAMES.length; i++) {
+        const el = document.getElementById(`college-${i}`);
+        if (!el) continue;
+        el.onclick = () => {
+          const c = gameState.colleges[i];
+          addLog(
+            `${c.name} currently at ~${Math.round(
+              c.infection
+            )}% infection (resistance ${c.moderation.toFixed(2)}).`
+          );
+        };
+      }
+    }
+
+    function setSpeed(s) {
+      if (gameState.gameOver) {
+        gameState.speed = 0;
+      } else {
+        gameState.speed = s;
+      }
+      updateSpeedButtons();
+    }
+
+    function updateSpeedButtons() {
+      [0, 1, 2, 4].forEach((s) => {
+        const btn = document.getElementById(`speed${s}`);
+        if (!btn) return;
+        btn.classList.toggle("active", gameState.speed === s);
+      });
+    }
+
+    // --- student animation ---
+
+    function initStudents() {
+      const canvas = document.getElementById("studentsCanvas");
+      if (!canvas) return;
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+
+      studentsState.dots = [];
+      studentsState.lastSpawn = performance.now();
+    }
+
+    function resizeCanvas() {
+      const canvas = document.getElementById("studentsCanvas");
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    function getCollegeCenters() {
+      const svg = document.getElementById("mapSvg");
+      const canvas = document.getElementById("studentsCanvas");
+      if (!svg || !canvas) return [];
+
+      const sx = canvas.width / svg.viewBox.baseVal.width;
+      const sy = canvas.height / svg.viewBox.baseVal.height;
+
+      const centers = [];
+      for (let i = 0; i < COLLEGE_NAMES.length; i++) {
+        const el = document.getElementById(`college-${i}`);
+        if (!el) {
+          centers.push({ x: 0, y: 0 });
+          continue;
+        }
+        const x = parseFloat(el.getAttribute("x"));
+        const y = parseFloat(el.getAttribute("y"));
+        const w = parseFloat(el.getAttribute("width"));
+        const h = parseFloat(el.getAttribute("height"));
+        centers.push({
+          x: (x + w / 2) * sx,
+          y: (y + h / 2) * sy,
+        });
+      }
+      return centers;
+    }
+
+    function spawnStudents(now) {
+      const centers = getCollegeCenters();
+      if (!centers.length) return;
+      const canvas = document.getElementById("studentsCanvas");
+      if (!canvas) return;
+
+      const isDay = gameState.hour >= 8 && gameState.hour <= 22;
+      const baseRate = isDay ? 0.0025 : 0.0007; // per ms per college
+      const elapsed = now - studentsState.lastSpawn;
+      const expected = baseRate * elapsed * COLLEGE_NAMES.length;
+      const numNew = Math.floor(expected);
+      if (numNew <= 0) return;
+
+      for (let n = 0; n < numNew; n++) {
+        const from = Math.floor(Math.random() * centers.length);
+        let to = Math.floor(Math.random() * centers.length);
+        if (to === from) to = (to + 1) % centers.length;
+        const start = centers[from];
+        const end = centers[to];
+        studentsState.dots.push({
+          x0: start.x,
+          y0: start.y,
+          x1: end.x,
+          y1: end.y,
+          t: 0,
+          speed: 0.0005 + Math.random() * 0.0008,
+          size: 2 + Math.random() * 1.5,
+        });
+      }
+
+      studentsState.lastSpawn = now;
+    }
+
+    function stepStudents(now, dt) {
+      const canvas = document.getElementById("studentsCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      spawnStudents(now);
+
+      const remaining = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      studentsState.dots.forEach((dot) => {
+        dot.t += dot.speed * dt;
+        if (dot.t >= 1) return;
+        const x = dot.x0 + (dot.x1 - dot.x0) * dot.t;
+        const y = dot.y0 + (dot.y1 - dot.y0) * dot.t;
+        const alpha = 0.3 + 0.7 * (1 - Math.abs(dot.t - 0.5) * 2);
+
+        ctx.beginPath();
+        ctx.arc(x, y, dot.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(148, 236, 255, ${alpha})`;
+        ctx.fill();
+
+        remaining.push(dot);
+      });
+
+      studentsState.dots = remaining;
+    }
+
+    // main loop
+    function gameLoop(timestamp) {
+      if (gameState.lastFrameTime == null) {
+        gameState.lastFrameTime = timestamp;
+      }
+      const dt = timestamp - gameState.lastFrameTime;
+      gameState.lastFrameTime = timestamp;
+
+      if (!gameState.gameOver && gameState.speed > 0) {
+        const hoursToAdd = (dt / 1000) * gameState.speed; // 1 in-game hour per real second at 1x
+        gameState.timeAccHours += hoursToAdd;
+        while (gameState.timeAccHours >= 1) {
+          gameState.timeAccHours -= 1;
+          advanceHour();
+        }
+      }
+
+      stepStudents(timestamp, dt);
+      requestAnimationFrame(gameLoop);
+    }
+
+    // boot
+    initGame();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
