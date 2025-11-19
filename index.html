@@ -1,1261 +1,891 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Meme Outbreak: Yale Edition (Pandemic Style)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <title>Meme Outbreak: Pandemic Legacy</title>
     <style>
-        /* PANDEMIC-INSPIRED COLOR PALETTE */
+        /* --- THEME & RESET --- */
         :root {
-            --bg: #121212; /* Very dark background */
-            --card: #1f1f1f; /* Dark panel background */
-            --accent: #cd3a3a; /* Deep Red/Maroon for primary accents (like GO button) */
-            --accent-soft: #ff5555; /* Brighter Red for text/glows */
-            --danger: #ff0000; /* Pure Red for loss/critical state */
-            --text-main: #e8e8e8; /* Off-White for main text */
-            --text-muted: #aaaaaa; /* Gray for subtle text */
-            --border-subtle: #444444; /* Dark Gray for borders and structure */
-            --green-active: #22c55e;
-            --purple-glow: #a855f7;
-            --yellow-glow: #facc15;
-            --structure-border: 1px solid var(--border-subtle);
+            --bg-body: #050505;
+            --bg-panel: #111;
+            --border: #333;
+            --accent-red: #b91c1c;   /* Disease/Infection */
+            --accent-blue: #3b82f6;  /* Cure/Ban */
+            --accent-gold: #eab308;  /* DNA/Points */
+            --text-main: #eee;
+            --text-dim: #888;
+            --font-ui: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            --font-mono: "Courier New", Courier, monospace;
         }
+
+        * { box-sizing: border-box; user-select: none; }
 
         body {
             margin: 0;
-            font-family: Arial, Helvetica, sans-serif; /* Simpler, retro font */
-            background: var(--bg);
+            background: var(--bg-body);
             color: var(--text-main);
-            min-height: 100vh;
+            font-family: var(--font-ui);
+            height: 100vh;
             display: flex;
             justify-content: center;
-            padding: 12px; /* Reduced padding */
-            box-sizing: border-box; 
-            font-size: 14px;
+            align-items: center;
+            overflow: hidden;
         }
 
-        .game-root {
-            max-width: 1400px;
-            width: 100%;
+        /* --- MAIN LAYOUT --- */
+        #gameContainer {
+            width: 1024px;
+            height: 768px;
+            background: var(--bg-panel);
+            border: 2px solid #444;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            display: grid;
+            grid-template-rows: 40px 1fr 160px; /* Header, Map, HUD */
+            position: relative;
+        }
+
+        /* --- HEADER / TICKER --- */
+        header {
+            background: #1a1a1a;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            padding: 0 10px;
+        }
+        .news-badge {
+            background: var(--accent-red);
+            color: #fff;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        #newsTicker {
+            white-space: nowrap;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: #ccc;
+            animation: ticker 25s linear infinite;
+        }
+        @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+        /* --- MAP AREA --- */
+        #mapStage {
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, #1a202c 0%, #000 100%);
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        
+        svg { width: 100%; height: 100%; display: block; }
+        
+        .college-rect {
+            fill: #333;
+            stroke: #555;
+            stroke-width: 1;
+            transition: fill 0.3s;
+        }
+        .college-rect:hover { stroke: #fff; }
+        
+        /* College Labels */
+        .map-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            fill: #888;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
+
+        /* Visual Effects Layers */
+        #particleCanvas {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        
+        /* DNA Bubbles */
+        .bubble {
+            position: absolute;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            cursor: pointer;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            box-shadow: 0 0 15px currentColor;
+        }
+        .bubble-dna {
+            background: radial-gradient(circle at 30% 30%, #fef08a, #ca8a04);
+            color: #422006;
+            color: var(--accent-gold);
+        }
+        .bubble-cure {
+            background: radial-gradient(circle at 30% 30%, #bfdbfe, #2563eb);
+            color: white;
+            box-shadow: 0 0 15px var(--accent-blue);
+        }
+
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
+
+        /* --- HUD --- */
+        #hud {
+            background: linear-gradient(to bottom, #222, #0d0d0d);
+            border-top: 1px solid #444;
+            display: grid;
+            grid-template-columns: 220px 1fr 220px;
+            padding: 15px;
+            gap: 20px;
+        }
+
+        /* Stats Column */
+        .stat-box {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-dim);
             display: flex;
             flex-direction: column;
-            gap: 12px; /* Reduced gap */
+            justify-content: center;
+            gap: 5px;
+        }
+        .stat-row { display: flex; justify-content: space-between; }
+        .val-dna { color: var(--accent-gold); font-weight: bold; font-size: 1.1rem; }
+        .val-inf { color: var(--accent-red); font-weight: bold; }
+        .val-dead { color: #555; }
+
+        /* Middle Controls */
+        .controls-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        /* Header Styles - Mimic STATS panel */
-        .header {
-            background: var(--card);
-            border-radius: 4px; /* Sharper corners */
-            padding: 8px 12px; 
-            border: var(--structure-border);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        .progress-container { width: 100%; }
+        .bar-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        
+        .progress-track {
+            background: #000;
+            border: 1px solid #333;
+            height: 14px;
+            border-radius: 7px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.2s linear;
+        }
+        #barBan { background: linear-gradient(90deg, #1e40af, #60a5fa); }
+        #barInf { background: linear-gradient(90deg, #7f1d1d, #ef4444); }
+
+        .time-controls {
             display: flex;
-            flex-wrap: wrap;
+            gap: 5px;
+            background: #111;
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+        .btn-time {
+            background: transparent;
+            border: none;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 2px;
+        }
+        .btn-time.active { background: #333; color: #fff; }
+        .btn-time:hover { color: #fff; }
+
+        /* Actions Column */
+        .actions-box {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        .big-btn {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #333, #000);
+            border: 2px solid #555;
+            color: #ddd;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.1s, border-color 0.2s;
+        }
+        .big-btn:hover { transform: scale(1.05); border-color: #999; }
+        .btn-disease { color: var(--accent-red); border-color: #7f1d1d; }
+        .btn-disease:hover { border-color: var(--accent-red); box-shadow: 0 0 15px rgba(185, 28, 28, 0.3); }
+
+        /* --- MODAL (EVOLUTION) --- */
+        .modal-backdrop {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-window {
+            width: 800px; height: 600px;
+            background: #0a0a0a;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,1);
+        }
+        .modal-header {
+            background: #151515;
+            border-bottom: 1px solid #333;
+            height: 50px;
+            display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 5px 20px;
+            padding: 0 20px;
+        }
+        .tab-group { display: flex; height: 100%; }
+        .tab-btn {
+            background: transparent; border: none;
+            color: #666; font-weight: bold;
+            padding: 0 20px; height: 100%;
+            cursor: pointer;
+            border-right: 1px solid #222;
             text-transform: uppercase;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--accent-soft);
-            letter-spacing: 0.1em;
-            font-weight: 700;
-        }
-
-        .header-stats {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0 20px;
             font-size: 0.85rem;
-            color: var(--text-muted);
-            align-items: center;
         }
-
-        .header-stat span {
-            color: var(--text-main);
-            font-weight: 700;
-        }
-
-        .tolerance-display {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 150px;
-        }
-
-        .tolerance-bar-outer {
-            flex-grow: 1;
-            height: 6px; /* Thinner bar */
-            border-radius: 2px;
-            background: #2b2b2b;
-            border: 1px solid #666666;
-            overflow: hidden;
-        }
-
-        .tolerance-bar-inner {
-            height: 100%;
-            border-radius: 2px;
-            /* Use a gradient from green (safe) to red (danger) */
-            background: linear-gradient(90deg, var(--green-active), var(--yellow-glow), var(--danger));
-            transition: width 0.2s ease-out;
-        }
-
-        .main-content {
+        .tab-btn.active { background: #222; color: #fff; border-bottom: 3px solid var(--accent-red); }
+        
+        .modal-body { flex: 1; padding: 20px; overflow-y: auto; }
+        
+        .upgrade-grid {
             display: grid;
-            grid-template-columns: 2fr 1.3fr;
-            gap: 12px;
-            flex-grow: 1;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
         }
-
-        /* Base Panel Style - Dark and Structured */
-        .panel {
-            background: var(--card);
-            border-radius: 4px;
-            padding: 12px 14px;
-            border: var(--structure-border);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel h2, .panel h3 {
-            margin: 0 0 6px 0;
-            font-size: 1rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--accent-soft);
-            border-bottom: 1px dashed var(--border-subtle);
-            padding-bottom: 4px;
-        }
-
-        .subtitle {
-            margin: 0 0 10px 0;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* Map Section */
-        .map-wrapper {
-            background: #000000;
-            border: 2px solid #555555;
-            border-radius: 4px;
-            padding: 4px;
-            position: relative;
-            overflow: hidden;
-            flex-grow: 1;
-        }
-
-        .map-college {
-            stroke-width: 2;
-            fill: #333333;
-            transition: fill 0.15s ease-out, transform 0.1s ease-out, stroke 0.15s ease-out;
-            cursor: pointer;
-        }
-
-        /* College Detail Panel (Pop-up/Overlay) */
-        .college-details-panel {
-            background: rgba(31, 31, 31, 0.95);
-            border-left: 2px solid var(--accent); /* Red line emphasis */
-            border-radius: 0 4px 4px 0;
-            padding: 16px;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-        }
-        
-        .college-detail-row {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-        }
-        .college-detail-row span:last-child {
-            color: var(--text-main);
-        }
-        .access-list {
-            margin-top: 5px;
-            font-size: 0.8rem;
-            color: var(--text-main);
-        }
-        .access-item.required .status {
-            color: var(--accent-soft);
-        }
-        .access-item.unlocked .status {
-            color: var(--green-active);
-        }
-        .access-item.locked .status {
-            color: var(--yellow-glow);
-        }
-
-
-        /* Tab Navigation - Mimicking button structure */
-        .tab-navigation {
-            display: flex;
-            margin-bottom: 10px;
-            border-bottom: none;
-        }
-
-        .tab-button {
-            background: #2b2b2b;
-            border: var(--structure-border);
-            border-bottom: none;
-            padding: 8px 14px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            border-radius: 4px 4px 0 0;
-            margin-right: 4px;
-            cursor: pointer;
-            transition: background 0.1s ease-out, color 0.1s ease-out;
-        }
-
-        .tab-button.active {
-            background: var(--accent); /* Active tab is bright red */
-            color: var(--card); /* Dark text on red */
-            font-weight: 700;
-        }
-
-        .tab-button:hover {
-            background: #3a3a3a;
-        }
-        .tab-button.active:hover {
-            background: var(--accent);
-        }
-
-        .tab-content {
-            border: var(--structure-border);
-            padding: 10px;
-            background: #252525;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        /* Traits List */
-        .trait-name {
-            color: var(--accent-soft);
-        }
-        .trait-description {
-            font-size: 0.7rem;
-        }
-
-        /* Upgrades Grid - Structured cards */
         .upgrade-card {
-            background: #303030;
-            border: var(--structure-border);
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 10px;
             border-radius: 4px;
-            padding: 6px 8px;
-            transition: border-color 0.1s;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-
-        .upgrade-card:hover:not(:disabled) {
-            border-color: var(--accent-soft);
-        }
+        .upgrade-card:hover { background: #222; border-color: #555; }
+        .upgrade-card.owned { background: #2a1212; border-color: var(--accent-red); opacity: 0.8; }
+        .upgrade-card.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
         
-        .upgrade-title {
-            color: var(--text-main);
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        .card-name { font-weight: bold; color: #fff; font-size: 0.9rem; }
+        .card-cost { color: var(--accent-gold); font-family: var(--font-mono); font-size: 0.85rem; }
+        .card-desc { font-size: 0.75rem; color: #888; line-height: 1.3; }
 
-        .upgrade-meta {
-            color: var(--accent-soft);
+        .close-btn {
+            background: #333; border: none; color: #fff;
+            width: 30px; height: 30px; cursor: pointer; font-weight: bold;
         }
-        .upgrade-card.purchased {
-            background: #102a1d; /* Dark green purchased */
-            border-color: var(--green-active);
-        }
-        .upgrade-card.locked {
-            filter: brightness(0.5); /* Dim locked items */
-            opacity: 0.8;
-        }
+        .close-btn:hover { background: var(--accent-red); }
 
-        /* Log Box - Mimic Breaking News/Game Status box */
-        .log-box {
-            background: #000000;
-            border: 1px solid var(--accent); /* Red border for emphasis */
-            padding: 6px;
-            color: #d4d4d4;
-            height: 100%;
+        /* --- GAME OVER --- */
+        #screenGameOver {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
-
-        .log-entry.event {
-            color: var(--accent-soft);
+        .go-title { font-size: 4rem; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 5px; }
+        .go-win { color: var(--accent-red); text-shadow: 0 0 20px var(--accent-red); }
+        .go-lose { color: var(--accent-blue); text-shadow: 0 0 20px var(--accent-blue); }
+        .go-desc { max-width: 500px; color: #aaa; font-size: 1.2rem; margin-bottom: 40px; line-height: 1.5; }
+        .btn-restart {
+            background: transparent; border: 2px solid #fff; color: #fff;
+            padding: 10px 40px; font-size: 1.2rem; cursor: pointer;
+            text-transform: uppercase; font-weight: bold;
+            transition: all 0.2s;
         }
-        
-        .log-entry.moderation {
-            color: var(--danger);
-        }
-
-        /* Buttons */
-        button {
-            border-radius: 4px;
-            padding: 6px 10px;
-            font-size: 0.8rem;
-            background: #5a5a5a;
-            color: var(--text-main);
-            border: 1px solid #aaaaaa;
-            text-transform: uppercase;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-            transition: background 0.1s, color 0.1s;
-        }
-
-        button:hover:not(:disabled) {
-            background: #7a7a7a;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-        }
-
-        .speed-btn.active {
-            background: var(--accent);
-            color: var(--card);
-            border-color: var(--accent-soft);
-            box-shadow: 0 0 8px rgba(255, 85, 85, 0.6);
-        }
-        
-        .game-over-content {
-            background: #000000;
-            border: 2px solid var(--danger);
-        }
-        .game-over-content h2 {
-            font-size: 2.2rem;
-            color: var(--accent-soft);
-        }
-        .game-over-content button {
-            background: var(--accent);
-            color: var(--card);
-            border-color: var(--danger);
-        }
-
-        /* Responsive adjustments for mobile view */
-        @media (max-width: 900px) {
-            body { padding: 8px; }
-            .header { font-size: 0.9rem; }
-            .main-content { grid-template-columns: 1fr; gap: 8px; }
-            .map-section { min-height: 400px; }
-            .tab-button { padding: 6px 10px; font-size: 0.75rem; }
-        }
+        .btn-restart:hover { background: #fff; color: #000; }
 
     </style>
 </head>
 <body>
-    <div class="game-root">
-        <div class="header">
-            <h1>Meme Outbreak: Yale Edition</h1>
-            <div class="header-stats">
-                <div class="header-stat">Day <span id="dayNumber">1</span>, <span id="timeOfDay">09:00</span></div>
-                <div class="header-stat">Infection: <span id="overallInfection">0%</span></div>
-                <div class="header-stat tolerance-display">
-                    Tolerance: <span id="toleranceText">120%</span>
-                    <div class="tolerance-bar-outer">
-                        <div class="tolerance-bar-inner" id="toleranceBar" style="width: 100%"></div>
-                    </div>
-                </div>
-                <div class="header-stat">Points: <span id="upgradePoints">1</span></div>
-            </div>
-        </div>
 
-        <div class="main-content">
-            <div class="panel map-section">
-                <h2>Campus Map</h2>
-                <div class="speed-row">
-                    <div class="speed-label">Time speed:</div>
-                    <button class="speed-btn" id="speed1" onclick="setSpeed(1)">1X</button>
-                    <button class="speed-btn" id="speed2" onclick="setSpeed(2)">2X</button>
-                    <button class="speed-btn" id="speed4" onclick="setSpeed(4)">4X</button>
-                </div>
-
-                <div class="map-wrapper">
-                    <svg id="mapSvg" viewBox="0 0 260 320">
-                        <rect x="0" y="0" width="260" height="320" fill="#000000" />
-                        
-                        <rect class="map-college" id="college-0" x="20" y="230" width="40" height="40" rx="4" />
-                        <rect class="map-college" id="college-1" x="80" y="230" width="40" height="40" rx="4" />
-                        <rect class="map-college" id="college-2" x="140" y="230" width="40" height="40" rx="4" />
-                        <rect class="map-college" id="college-3" x="200" y="230" width="40" height="40" rx="4" />
-
-                        <rect class="map-college" id="college-4" x="20" y="170" width="40" height="36" rx="4" />
-                        <rect class="map-college" id="college-5" x="80" y="170" width="32" height="50" rx="4" />
-                        <rect class="map-college" id="college-6" x="140" y="170" width="48" height="34" rx="4" />
-                        <rect class="map-college" id="college-7" x="208" y="170" width="28" height="50" rx="4" />
-
-                        <rect class="map-college" id="college-8" x="20" y="110" width="50" height="32" rx="4" />
-                        <rect class="map-college" id="college-9" x="100" y="110" width="40" height="32" rx="4" />
-                        <rect class="map-college" id="college-10" x="160" y="110" width="40" height="32" rx="4" />
-                        <rect class="map-college" id="college-11" x="220" y="110" width="26" height="36" rx="4" />
-
-                        <rect class="map-college" id="college-12" x="60" y="40" width="60" height="38" rx="4" />
-                        <rect class="map-college" id="college-13" x="150" y="40" width="60" height="38" rx="4" />
-
-                        <text class="map-label" x="10" y="20">GROVE</text>
-                        <text class="map-label" x="10" y="305">GREEN</text>
-
-                        <text class="college-label" x="22" y="278">Ben Frank</text>
-                        <text class="college-label" x="82" y="278">Berkeley</text>
-                        <text class="college-label" x="142" y="278">Branford</text>
-                        <text class="college-label" x="202" y="278">Davenport</text>
-
-                        <text class="college-label" x="22" y="205">Ezra Stiles</text>
-                        <text class="college-label" x="82" y="205">Hopper</text>
-                        <text class="college-label" x="142" y="205">JE</text>
-                        <text class="college-label" x="210" y="205">Morse</text>
-
-                        <text class="college-label" x="22" y="140">Pauli</text>
-                        <text class="college-label" x="100" y="140">Pierson</text>
-                        <text class="college-label" x="160" y="140">Saybrook</text>
-                        <text class="college-label" x="220" y="145">Silliman</text>
-
-                        <text class="college-label" x="62" y="70">TD</text>
-                        <text class="college-label" x="152" y="70">Trumbull</text>
-                    </svg>
-                    <canvas id="studentsCanvas"></canvas>
-                    
-                    <div id="collegeDetailsPanel" class="college-details-panel">
-                        <button class="close-btn" onclick="hideCollegeDetails()">×</button>
-                        <h3 id="detailCollegeName">College Name</h3>
-                        <div class="college-detail-row">Infection Rate: <span id="detailInfectionRate">0%</span></div>
-                        <div class="college-detail-bar-wrap">
-                            <div class="college-detail-bar-fill" id="detailInfectionBar" style="width: 0%"></div>
-                        </div>
-                        <div class="college-detail-row">Base Moderation: <span id="detailModeration">0.00</span></div>
-                        <div class="college-detail-row">Virality Multiplier: <span id="detailSpreadMod">1.0x</span></div>
-                        <div class="college-detail-row">Relatability Multiplier: <span id="detailStickinessMod">1.0x</span></div>
-                        <div class="college-detail-row">Current Status: <span id="detailStatus">Mostly Safe</span></div>
-                        
-                        <div class="footer-note" style="margin-top: 10px; border-top: 1px solid #555555; padding-top: 8px;">
-                            Access Points (Required Vectors):
-                        </div>
-                        <div class="access-list" id="detailAccessList">
-                            </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="tab-navigation">
-                    <button class="tab-button active" onclick="switchTab('traits')">Traits</button>
-                    <button class="tab-button" onclick="switchTab('upgrades')">Vectors</button>
-                    <button class="tab-button" onclick="switchTab('log')">News</button>
-                </div>
-
-                <div id="tabContent" class="tab-content">
-                    <div id="traits" class="tab-panel active">
-                        <p class="subtitle">
-                            Spend UP to evolve **V**irality (Spread Rate), **R**elatability (Stickiness), and **E**dginess (Risk/Power).
-                        </p>
-                        <div class="traits-list" id="traitsList"></div>
-                    </div>
-
-                    <div id="upgrades" class="tab-panel">
-                        <h3>Available Transmission Vectors & Upgrades</h3>
-                        <div id="upgradesGrid" class="upgrades-grid"></div>
-                    </div>
-
-                    <div id="log" class="tab-panel">
-                        <h3>Breaking News</h3>
-                        <div class="log-box" id="logBox"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer-note">
-            Win by infecting 80% of the overall population before Admin Tolerance hits zero or campus moves on (Day 7). Uninfected colleges must be exposed via an unlocked **Transmission Vector**.
-        </div>
-    </div>
+<div id="gameContainer">
     
-    <div id="gameOverOverlay" class="game-over-overlay">
-        <div class="game-over-content">
-            <h2 id="gameOverTitle">GAME OVER</h2>
-            <p id="gameOverMessage">The outcome will be displayed here.</p>
-            <button onclick="initGame()">Restart</button>
+    <header>
+        <div class="news-badge">NEWS</div>
+        <div id="newsTicker">Local meme seen on Reddit... Administrators concerned about productivity...</div>
+    </header>
+
+    <div id="mapStage">
+        <svg id="svgMap" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice"></svg>
+        <canvas id="particleCanvas"></canvas>
+        <div id="bubbleLayer"></div>
+    </div>
+
+    <div id="hud">
+        <div class="stat-box">
+            <div class="stat-row">
+                <span>DNA POINTS</span>
+                <span class="val-dna" id="valDNA">0</span>
+            </div>
+            <div style="height: 10px;"></div>
+            <div class="stat-row">
+                <span>INFECTED</span>
+                <span class="val-inf" id="valInf">0</span>
+            </div>
+            <div class="stat-row">
+                <span>HEALTHY</span>
+                <span class="val-dead" id="valSafe">100%</span>
+            </div>
+            <div class="stat-row" style="margin-top:10px;">
+                <span>DAY</span>
+                <span id="valDay">1</span>
+            </div>
+        </div>
+
+        <div class="controls-box">
+            <div class="progress-container">
+                <div class="bar-label">
+                    <span style="color:var(--accent-blue)">Admin Ban Progress</span>
+                    <span id="lblBan">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="barBan"></div>
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="bar-label">
+                    <span style="color:var(--accent-red)">Campus Saturation</span>
+                    <span id="lblInf">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="barInf"></div>
+                </div>
+            </div>
+
+            <div class="time-controls">
+                <button class="btn-time" onclick="Game.setSpeed(0)">||</button>
+                <button class="btn-time active" id="btnS1" onclick="Game.setSpeed(1)">1</button>
+                <button class="btn-time" id="btnS2" onclick="Game.setSpeed(2)">2</button>
+                <button class="btn-time" id="btnS3" onclick="Game.setSpeed(4)">3</button>
+            </div>
+        </div>
+
+        <div class="actions-box">
+            <div class="big-btn btn-disease" onclick="UI.toggleModal(true)">
+                <div>DISEASE</div>
+                <div style="font-size:0.6rem; font-weight:normal;">EVOLVE</div>
+            </div>
+            <div class="big-btn" style="border-color:#444; color:#666; cursor:default;">
+                <div>WORLD</div>
+                <div style="font-size:0.6rem; font-weight:normal;">DATA</div>
+            </div>
         </div>
     </div>
 
-    <script>
-        // All JavaScript logic from the previous, comprehensive file is retained here.
-        // I've ensured the JS references the new class names and UI elements (like "News" tab).
+    <div class="modal-backdrop" id="evoModal">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="tab-group">
+                    <button class="tab-btn active" onclick="UI.setTab('transmission')">Transmission</button>
+                    <button class="tab-btn" onclick="UI.setTab('symptoms')">Content</button>
+                    <button class="tab-btn" onclick="UI.setTab('abilities')">Abilities</button>
+                </div>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <span style="color:var(--accent-gold); font-weight:bold;">DNA: <span id="modalDNA">0</span></span>
+                    <button class="close-btn" onclick="UI.toggleModal(false)">X</button>
+                </div>
+            </div>
+            <div class="modal-body" id="evoBody">
+                </div>
+        </div>
+    </div>
 
-        const COLLEGE_NAMES = [
-            "Benjamin Franklin", "Berkeley", "Branford", "Davenport",
-            "Ezra Stiles", "Grace Hopper", "Jonathan Edwards", "Morse",
-            "Pauli Murray", "Pierson", "Saybrook", "Silliman",
-            "Timothy Dwight", "Trumbull",
-        ];
+    <div id="screenGameOver">
+        <h1 class="go-title" id="goTitle">VICTORY</h1>
+        <p class="go-desc" id="goDesc">Text goes here.</p>
+        <button class="btn-restart" onclick="location.reload()">Play Again</button>
+    </div>
 
-        const COLLEGE_COLORS = [
-            "#1d4ed8", "#15803d", "#1e40af", "#7f1d1d", 
-            "#f97316", "#facc15", "#6d28d9", "#0ea5e9", 
-            "#f59e0b", "#dc2626", "#2563eb", "#22c55e",
-            "#16a34a", "#047857",
-        ];
+</div>
+
+<script>
+/**
+ * MEME OUTBREAK: PANDEMIC LEGACY
+ * A vanilla JS clone of the flash classic.
+ */
+
+/* --- CONFIGURATION --- */
+const DATA = {
+    colleges: [
+        // X, Y percent coordinates on an 800x500 map
+        { id: "BF", name: "Ben Franklin", x: 0.10, y: 0.75, pop: 450, type: "Social" },
+        { id: "PM", name: "Pauli Murray", x: 0.10, y: 0.25, pop: 450, type: "Digital" },
+        { id: "BK", name: "Berkeley", x: 0.30, y: 0.75, pop: 400, type: "Social" },
+        { id: "GH", name: "Grace Hopper", x: 0.30, y: 0.55, pop: 380, type: "Digital" },
+        { id: "TC", name: "Trumbull", x: 0.50, y: 0.15, pop: 390, type: "Academic" },
+        { id: "BR", name: "Branford", x: 0.50, y: 0.75, pop: 410, type: "Physical" },
+        { id: "SY", name: "Saybrook", x: 0.55, y: 0.55, pop: 400, type: "Academic" },
+        { id: "JE", name: "Jonathan Edwards", x: 0.50, y: 0.55, pop: 380, type: "Academic" },
+        { id: "PC", name: "Pierson", x: 0.35, y: 0.25, pop: 420, type: "Digital" },
+        { id: "DC", name: "Davenport", x: 0.70, y: 0.75, pop: 430, type: "Academic" },
+        { id: "MC", name: "Morse", x: 0.70, y: 0.55, pop: 400, type: "Physical" },
+        { id: "ES", name: "Ezra Stiles", x: 0.10, y: 0.55, pop: 400, type: "Social" },
+        { id: "SM", name: "Silliman", x: 0.75, y: 0.25, pop: 440, type: "Social" },
+        { id: "TD", name: "Timothy Dwight", x: 0.25, y: 0.15, pop: 390, type: "Social" }
+    ],
+    upgrades: {
+        transmission: [
+            { id: "t_insta", name: "Instagram Page", cost: 3, type: "Digital", desc: "Allows infection in Digital colleges." },
+            { id: "t_woads", name: "Woads Night", cost: 5, type: "Social", desc: "Allows infection in Social colleges." },
+            { id: "t_chalk", name: "Sidealk Chalk", cost: 4, type: "Physical", desc: "Allows infection in Physical colleges." },
+            { id: "t_section", name: "Section Chatter", cost: 4, type: "Academic", desc: "Allows infection in Academic colleges." },
+            { id: "t_tiktok", name: "TikTok Trend", cost: 10, req: "t_insta", desc: "Massively boosts spread speed." },
+            { id: "t_party", name: "Frat Party Theme", cost: 12, req: "t_woads", desc: "Spread increases when people gather." },
+            { id: "t_sticker", name: "Laptop Stickers", cost: 8, req: "t_chalk", desc: "Passive spread increase." },
+            { id: "t_groupme", name: "GroupMe Spam", cost: 9, req: "t_section", desc: "High annoyance, high spread." }
+        ],
+        symptoms: [
+            { id: "s_cap", name: "Funny Caption", cost: 2, inf: 2, vis: 1, desc: "Slightly increases infectivity." },
+            { id: "s_img", name: "Cursed Image", cost: 4, inf: 5, vis: 3, desc: "People share it because it's weird." },
+            { id: "s_vid", name: "Video Format", cost: 8, inf: 8, vis: 5, desc: "Higher engagement." },
+            { id: "s_pol", name: "Political Take", cost: 10, inf: 15, vis: 20, desc: "Huge spread, but Admins act fast." },
+            { id: "s_prof", name: "Mocking Profs", cost: 12, inf: 10, vis: 15, desc: "Academic circles love it." },
+            { id: "s_deep", name: "Deep Fried", cost: 6, inf: 6, vis: 2, desc: "Harder for older admins to understand." }
+        ],
+        abilities: [
+            { id: "a_obs", name: "Obscurity", cost: 6, desc: "Reduces Visibility (Ban Speed) by 20%." },
+            { id: "a_vpn", name: "VPN Usage", cost: 10, desc: "Ban progress slows down by 15%." },
+            { id: "a_alumni", name: "Alumni Support", cost: 20, desc: "Massive reduction in Ban speed." },
+            { id: "a_mutate", name: "Rapid Mutation", cost: 15, desc: "Randomly gain free Content upgrades." }
+        ]
+    }
+};
+
+/* --- GAME ENGINE --- */
+const Game = {
+    dna: 10,
+    totalPop: 0,
+    infectedPop: 0,
+    day: 1,
+    tick: 0,
+    speed: 1,
+    banProgress: 0,
+    banRate: 0,
+    visibility: 0,
+    infectivity: 1,
+    paused: false,
+    ended: false,
+    
+    colleges: [],
+    ownedUpgrades: [],
+    
+    particles: [],
+
+    init() {
+        // Calculate total pop
+        DATA.colleges.forEach(c => {
+            Game.totalPop += c.pop;
+            Game.colleges.push({
+                ...c,
+                infected: 0,
+                color: 0 // 0 to 1 intensity
+            });
+        });
+
+        // Start Infection in Ben Franklin
+        Game.colleges[0].infected = 5; 
+
+        // Render Map
+        UI.renderMap();
         
-        // --- PANDEMIC MOD: COLLEGE ACCESS TYPES ---
-        const ACCESS_TYPES = {
-            Social: 'Social', 
-            Digital: 'Digital', 
-            Academic: 'Academic', 
-            Physical: 'Physical'
-        };
-
-        const collegeArchetypes = [
-            // Name: [V_Mod, R_Mod, Resistance, Access_Type]
-            { name: "Benjamin Franklin", mods: [1.0, 1.2, 0.4, ACCESS_TYPES.Physical] }, 
-            { name: "Berkeley", mods: [1.1, 1.0, 0.6, ACCESS_TYPES.Social] },
-            { name: "Branford", mods: [0.9, 1.1, 0.7, ACCESS_TYPES.Physical] },
-            { name: "Davenport", mods: [1.0, 0.9, 0.8, ACCESS_TYPES.Academic] },
-            { name: "Ezra Stiles", mods: [1.2, 0.8, 0.5, ACCESS_TYPES.Social] },
-            { name: "Grace Hopper", mods: [1.1, 1.1, 0.5, ACCESS_TYPES.Digital] },
-            { name: "Jonathan Edwards", mods: [0.8, 1.3, 0.9, ACCESS_TYPES.Academic] }, 
-            { name: "Morse", mods: [1.2, 0.9, 0.6, ACCESS_TYPES.Physical] },
-            { name: "Pauli Murray", mods: [1.0, 1.2, 0.4, ACCESS_TYPES.Digital] },
-            { name: "Pierson", mods: [1.1, 1.0, 0.7, ACCESS_TYPES.Digital] },
-            { name: "Saybrook", mods: [0.9, 1.1, 0.8, ACCESS_TYPES.Academic] },
-            { name: "Silliman", mods: [1.3, 0.8, 0.4, ACCESS_TYPES.Social] }, 
-            { name: "Timothy Dwight", mods: [1.1, 1.0, 0.7, ACCESS_TYPES.Social] },
-            { name: "Trumbull", mods: [0.9, 1.2, 0.9, ACCESS_TYPES.Academic] },
-        ];
-        // --- END PANDEMIC MOD: COLLEGE ACCESS TYPES ---
-
-        // --- PANDEMIC MOD: REDUCED & VECTOR-FOCUSED UPGRADES ---
-        const UPGRADES = [
-            // Tier 1: Core Trait Upgrades
-            { id: "froco-endorsement", name: "FroCo Endorsement", desc: "FroCos ironically include your meme in group emails.", v: 1, r: 2, e: 0, tol: -1, prerequisite: null, vector: null },
-            { id: "commons-feature", name: "Commons Feature", desc: "The meme hits screens in Schwarzman.", v: 2, r: 1, e: 0, tol: -4, prerequisite: null, vector: null },
-            
-            // Tier 2: Transmission Vectors (Unlocks Access Types)
-            { id: "Digital", name: "GroupMe Stickers (Vector: Digital)", desc: "Meme spreads across GroupMe/Instagram. Enables Digital access.", v: 1, r: 3, e: 1, tol: -3, prerequisite: "froco-endorsement", vector: ACCESS_TYPES.Digital },
-            { id: "Social", name: "Woads Theme Night (Vector: Social)", desc: "Meme becomes a party theme. Enables Social access.", v: 3, r: 1, e: 2, tol: -8, prerequisite: "commons-feature", vector: ACCESS_TYPES.Social },
-            { id: "Academic", name: "Lecture Slide Cameo (Vector: Academic)", desc: "Professor uses meme. Enables Academic access.", v: 1, r: 2, e: 0, tol: +2, prerequisite: "froco-endorsement", vector: ACCESS_TYPES.Academic },
-            { id: "Physical", name: "Bass Whiteboard (Vector: Physical)", desc: "Meme appears on campus whiteboards/graffiti. Enables Physical access.", v: 1, r: 2, e: 0, tol: -1, prerequisite: "commons-feature", vector: ACCESS_TYPES.Physical },
-            
-            // Tier 3: High-Impact / High-Risk Upgrades
-            { id: "trumpify", name: "Trumpify (Risk)", desc: "Meme applies to political figure; V/E spike, admins panic.", v: 2, r: 0, e: 3, tol: -10, prerequisite: "Social", vector: null },
-            { id: "national-media", name: "National Media Moment", desc: "Meme hits national news. Max Relatability boost.", v: 1, r: 4, e: 0, tol: -5, prerequisite: "Academic", vector: null },
-            { id: "reddit-frontpage", name: "Reddit Front Page", desc: "Hits /r/yale front page. Major Virality boost.", v: 4, r: 0, e: 1, tol: -4, prerequisite: "Digital", vector: null },
-            { id: "beinecke-projection", name: "Beinecke Projection (Max Risk)", desc: "Stunt projects meme on Beinecke. Massive Edginess.", v: 2, r: 1, e: 4, tol: -15, prerequisite: "Physical", vector: null },
-        ];
-        // --- END PANDEMIC MOD: REDUCED & VECTOR-FOCUSED UPGRADES ---
-
-
-        const gameState = {
-            day: 1,
-            hour: 9,
-            maxDays: 7,
-            turn: 1,
-            upgradePoints: 1,
-            traits: { virality: 2, relatability: 2, edginess: 2 },
-            colleges: [],
-            log: [],
-            gameOver: false,
-            adminTolerance: 120,
-            speed: 1,
-            timeAccHours: 0,
-            purchased: {},
-            unlockedVectors: {},
-            lastFrameTime: null,
-            activeTab: 'traits',
-            selectedCollegeIndex: null,
-        };
-
-        const studentsState = {
-            dots: [],
-            lastSpawn: 0,
-            infectedDotColor: 'rgba(34, 197, 94, 0.8)',
-            safeDotColor: 'rgba(148, 236, 255, 0.8)',
-        };
-
-        function formatTime(h) {
-            const hh = h.toString().padStart(2, "0");
-            return `${hh}:00`;
-        }
-
-        function switchTab(tabId) {
-            gameState.activeTab = tabId;
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            // Use contains check for onclick to match the button
-            document.querySelector(`.tab-button[onclick*="${tabId}"]`).classList.add('active');
-            
-            document.querySelectorAll('#tabContent > div').forEach(panel => {
-                panel.style.display = 'none';
-                panel.classList.remove('active');
-            });
-            const activePanel = document.getElementById(tabId);
-            if (activePanel) {
-                activePanel.style.display = 'block';
-                activePanel.classList.add('active');
-            }
-            renderUI();
-        }
-
-        function initGame() {
-            gameState.day = 1;
-            gameState.hour = 9;
-            gameState.turn = 1;
-            gameState.upgradePoints = 1;
-            gameState.traits = { virality: 2, relatability: 2, edginess: 2 };
-            gameState.gameOver = false;
-            gameState.adminTolerance = 120;
-            gameState.speed = 1;
-            gameState.timeAccHours = 0;
-            gameState.purchased = {};
-            gameState.unlockedVectors = {};
-            gameState.lastFrameTime = null;
-            gameState.activeTab = 'traits';
-            gameState.selectedCollegeIndex = null;
-            
-            gameState.colleges = collegeArchetypes.map((archetype, index) => {
-                const baseInfection = index === 0 ? 30 : 0; 
-                const [spreadModifier, stickinessModifier, resistance, accessType] = archetype.mods;
-
-                return { 
-                    name: COLLEGE_NAMES[index], 
-                    infection: baseInfection, 
-                    moderation: 0.2 + Math.random() * 0.4,
-                    spreadModifier: spreadModifier,
-                    stickinessModifier: stickinessModifier,
-                    resistance: resistance,
-                    accessType: accessType,
-                };
-            });
-
-            gameState.log = [];
-            addLog("New game started. Outbreak begins in Benjamin Franklin.", 'event');
-
-            hideGameOverOverlay();
-            hideCollegeDetails();
-            attachMapClickHandlers();
-            initStudents();
-            updateSpeedButtons();
-            switchTab(gameState.activeTab); 
-            renderUI();
-        }
-
-        function addLog(message, type = 'default') {
-            const prefix = `Day ${gameState.day}, ${formatTime(gameState.hour)} — `;
-            const entry = message.startsWith("Day ") ? message : prefix + message;
-            gameState.log.unshift({ text: entry, type: type });
-            if (gameState.log.length > 100) gameState.log.pop();
-            if (gameState.activeTab === 'log') renderLog();
-        }
-
-        function renderLog() {
-            const logBox = document.getElementById("logBox");
-            if (!logBox) return;
-            logBox.innerHTML = "";
-            
-            gameState.log.forEach((line) => {
-                const div = document.createElement("div");
-                div.className = `log-entry ${line.type}`;
-                div.textContent = line.text;
-                logBox.appendChild(div);
-            });
-        }
-
-        function renderTraits() {
-            const traitsList = document.getElementById("traitsList");
-            if (!traitsList) return;
-            traitsList.innerHTML = "";
-
-            const traitMeta = {
-                virality: { name: "Virality", desc: "How quickly the meme jumps into new colleges." },
-                relatability: { name: "Relatability", desc: "How much already-infected students keep sharing it." },
-                edginess: { name: "Edginess", desc: "Bypasses moderation, but melts Admin Tolerance (High Risk)." },
-            };
-
-            Object.entries(gameState.traits).forEach(([key, value]) => {
-                const meta = traitMeta[key];
-                const row = document.createElement("div");
-                row.className = "trait-row";
-
-                const info = document.createElement("div");
-                info.className = "trait-info";
-
-                const nameSpan = document.createElement("div");
-                nameSpan.className = "trait-name";
-                nameSpan.textContent = `${meta.name} (${value})`;
-
-                const desc = document.createElement("div");
-                desc.className = "trait-description";
-                desc.textContent = meta.desc;
-
-                info.appendChild(nameSpan);
-                info.appendChild(desc);
-
-                const center = document.createElement("div");
-                center.className = "trait-bar-wrap";
-                const bar = document.createElement("div");
-                bar.className = "trait-bar";
-                const width = Math.min(100, (value / 12) * 100);
-                bar.style.width = width + "%";
-                center.appendChild(bar);
-
-                row.appendChild(info);
-                row.appendChild(center);
-                traitsList.appendChild(row);
-            });
-
-            document.getElementById("upgradePoints").textContent = gameState.upgradePoints;
-        }
-
-        function isUpgradeAvailable(u) {
-            if (gameState.purchased[u.id]) return false;
-            if (u.prerequisite && !gameState.purchased[u.prerequisite]) return false;
-            return true;
-        }
+        // Start Loop
+        requestAnimationFrame(Game.loop);
         
-        function isVectorUnlocked(vectorType) {
-            return !!gameState.unlockedVectors[vectorType];
-        }
+        // Input Listeners
+        UI.initListeners();
+    },
 
-        function renderUpgrades() {
-            const grid = document.getElementById("upgradesGrid");
-            if (!grid) return;
-            grid.innerHTML = "";
-            
-            const sortedUpgrades = UPGRADES.sort((a, b) => {
-                const aAvailable = isUpgradeAvailable(a);
-                const bAvailable = isUpgradeAvailable(b);
-
-                if (aAvailable && !bAvailable) return -1;
-                if (!aAvailable && bAvailable) return 1;
-                return 0;
-            });
-
-            sortedUpgrades.forEach((u) => {
-                const btn = document.createElement("button");
-                btn.className = "upgrade-card";
-                const taken = !!gameState.purchased[u.id];
-                const available = isUpgradeAvailable(u);
-                
-                if (taken) {
-                    btn.classList.add('purchased');
-                } else if (!available) {
-                    btn.classList.add('locked');
-                }
-
-                btn.disabled = gameState.gameOver || taken || !available || gameState.upgradePoints <= 0;
-
-                const title = document.createElement("div");
-                title.className = "upgrade-title";
-                title.textContent = u.name;
-
-                const desc = document.createElement("div");
-                desc.className = "upgrade-desc";
-                desc.textContent = u.desc;
-
-                const meta = document.createElement("div");
-                meta.className = "upgrade-meta";
-                const parts = [];
-                if (u.v) parts.push(`V${u.v > 0 ? '+' : ''}${u.v}`);
-                if (u.r) parts.push(`R${u.r > 0 ? '+' : ''}${u.r}`);
-                if (u.e) parts.push(`E${u.e > 0 ? '+' : ''}${u.e}`);
-                if (u.tol) {
-                    parts.push(u.tol > 0 ? `Tolerance +${u.tol}` : `Tolerance ${u.tol}`);
-                }
-                
-                let metaText;
-                if (taken) {
-                    metaText = `[PURCHASED] ${parts.join(" · ")}`;
-                } else if (!available) {
-                    metaText = `[LOCKED] Requires ${UPGRADES.find(x => x.id === u.prerequisite)?.name || 'Previous Upgrade'}`;
-                } else {
-                    metaText = `Cost: 1 UP · ${parts.join(" · ")}`;
-                }
-                
-                meta.textContent = metaText;
-
-                btn.appendChild(title);
-                btn.appendChild(desc);
-                btn.appendChild(meta);
-
-                btn.onclick = () => tryPurchaseUpgrade(u.id);
-
-                grid.appendChild(btn);
-            });
-        }
-
-        function renderMap() {
-            for (let i = 0; i < gameState.colleges.length; i++) {
-                const c = gameState.colleges[i];
-                const el = document.getElementById(`college-${i}`);
-                if (!el) continue;
-                const t = c.infection / 100;
-                const hue = 220 - 160 * t; 
-                const light = 20 + 40 * (1 - t);
-                el.style.fill = `hsl(${hue}, 80%, ${light}%)`;
-                el.style.stroke = COLLEGE_COLORS[i] || "#e5e7eb";
-                
-                el.classList.toggle('selected', gameState.selectedCollegeIndex === i);
-            }
-        }
-        
-        function showCollegeDetails(index) {
-            const c = gameState.colleges[index];
-            if (!c) return;
-            gameState.selectedCollegeIndex = index;
-
-            document.getElementById('detailCollegeName').textContent = c.name;
-            document.getElementById('detailInfectionRate').textContent = `${Math.round(c.infection)}%`;
-            document.getElementById('detailInfectionBar').style.width = `${c.infection}%`;
-            document.getElementById('detailModeration').textContent = c.moderation.toFixed(2);
-            document.getElementById('detailSpreadMod').textContent = `${c.spreadModifier.toFixed(2)}x`;
-            document.getElementById('detailStickinessMod').textContent = `${c.stickinessModifier.toFixed(2)}x`;
-
-            let status;
-            if (c.infection >= 80) status = "Fully Saturated";
-            else if (c.infection >= 50) status = "Critical Contamination";
-            else if (c.infection >= 10) status = "Established Presence";
-            else status = "Mostly Safe";
-            document.getElementById('detailStatus').textContent = status;
-            
-            // Render Access List
-            const accessList = document.getElementById('detailAccessList');
-            accessList.innerHTML = '';
-            
-            Object.values(ACCESS_TYPES).forEach(type => {
-                const isUnlocked = isVectorUnlocked(type);
-                const isRequired = c.accessType === type;
-                
-                // Only show the required access type for this college
-                if (!isRequired) return; 
-
-                const item = document.createElement('div');
-                item.className = `access-item required ${isUnlocked ? 'unlocked' : 'locked'}`;
-                
-                item.innerHTML = `
-                    <div style="font-weight: 700;">${type} Access</div>
-                    <div class="status">${isUnlocked ? '✓ UNLOCKED' : '✗ REQUIRED'}</div>
-                `;
-                
-                accessList.appendChild(item);
-            });
-
-            document.getElementById('collegeDetailsPanel').classList.add('visible');
-            renderMap();
-        }
-
-        function hideCollegeDetails() {
-            gameState.selectedCollegeIndex = null;
-            document.getElementById('collegeDetailsPanel').classList.remove('visible');
-            renderMap();
-        }
-
-
-        function renderMeta() {
-            document.getElementById("dayNumber").textContent = gameState.day;
-            document.getElementById("timeOfDay").textContent = formatTime(gameState.hour);
-
-            const avg =
-                gameState.colleges.reduce((sum, c) => sum + c.infection, 0) /
-                gameState.colleges.length;
-            document.getElementById("overallInfection").textContent =
-                Math.round(avg) + "%";
-
-            const tol = Math.max(0, Math.round(gameState.adminTolerance));
-            const tolPercent = Math.min(100, (tol / 120) * 100); 
-            document.getElementById("toleranceText").textContent = tol + "%";
-            document.getElementById("toleranceBar").style.width = tolPercent + "%";
-        }
-
-        function renderUI() {
-            renderTraits();
-            renderUpgrades();
-            renderMeta();
-            renderMap();
-            if (gameState.selectedCollegeIndex !== null) showCollegeDetails(gameState.selectedCollegeIndex);
-            if (gameState.activeTab === 'log') renderLog(); 
-        }
-
-        function clampTrait(x) {
-            return Math.max(0, Math.min(12, x));
-        }
-
-        function tryPurchaseUpgrade(id) {
-            if (gameState.gameOver) return;
-            const u = UPGRADES.find((x) => x.id === id);
-            if (!u) return;
-            if (!isUpgradeAvailable(u)) {
-                addLog(`Cannot purchase ${u.name}. Prerequisite not met.`, 'default');
-                return;
-            }
-            if (gameState.purchased[id]) {
-                addLog(`${u.name} is already in play.`, 'default');
-                return;
-            }
-            if (gameState.upgradePoints <= 0) {
-                addLog("No upgrade points available right now.", 'default');
-                return;
-            }
-
-            gameState.upgradePoints -= 1;
-            gameState.purchased[id] = true;
-            
-            if (u.vector) {
-                gameState.unlockedVectors[u.vector] = true;
-                addLog(`Vector Unlocked: ${u.vector}. New infection path enabled!`, 'event');
-            }
-
-            gameState.traits.virality = clampTrait(gameState.traits.virality + (u.v || 0));
-            gameState.traits.relatability = clampTrait(gameState.traits.relatability + (u.r || 0));
-            gameState.traits.edginess = clampTrait(gameState.traits.edginess + (u.e || 0));
-            
-            if (u.tol) {
-                gameState.adminTolerance = Math.max(
-                    0, Math.min(120, gameState.adminTolerance + u.tol)
-                );
-            }
-
-            addLog(`Upgrade unlocked: ${u.name}. Traits: V:${gameState.traits.virality}, R:${gameState.traits.relatability}, E:${gameState.traits.edginess}.`, 'event');
-            renderUI();
-        }
-
-        function triggerModerationEvent(avgInfection) {
-            const { edginess } = gameState.traits;
-            const baseChance = 0.15 + (edginess * 0.03) + (avgInfection / 100) * 0.15; 
-
-            if (Math.random() < baseChance) {
-                const affectedColleges = [];
-                let totalReduction = 0;
-                
-                const numAffected = 1 + Math.floor(Math.random() * 3);
-                const shuffledColleges = [...gameState.colleges].sort(() => 0.5 - Math.random());
-                
-                for (let i = 0; i < numAffected && i < shuffledColleges.length; i++) {
-                    const c = shuffledColleges[i];
-                    if (c.infection > 15) { 
-                        const reduction = Math.min(c.infection, 15 + Math.random() * 5) * (1.2 - c.resistance); 
-                        c.infection = Math.max(0, c.infection - reduction);
-                        affectedColleges.push(c.name);
-                        totalReduction += reduction;
-                    }
-                }
-
-                if (affectedColleges.length > 0) {
-                    addLog(
-                        `Content moderation event in ${affectedColleges.join(', ')}. Admins clamped down. Total infection reduced by ~${Math.round(totalReduction)} points.`, 
-                        'moderation'
-                    );
-                }
-            }
-        }
-        
-        function triggerDailyTraitShift() {
-            if (gameState.day === 1 || gameState.hour !== 0) return;
-
-            const traitKeys = ['virality', 'relatability', 'edginess'];
-            const traitToShift = traitKeys[Math.floor(Math.random() * traitKeys.length)];
-            const shift = Math.random() < 0.5 ? -1 : 1;
-            
-            const oldValue = gameState.traits[traitToShift];
-            gameState.traits[traitToShift] = clampTrait(oldValue + shift);
-            
-            if (oldValue !== gameState.traits[traitToShift]) {
-                const direction = shift > 0 ? 'increased' : 'decreased';
-                const traitName = traitToShift.charAt(0).toUpperCase() + traitToShift.slice(1);
-                addLog(
-                    `Daily Mutation: Meme's ${traitName} randomly ${direction} by 1.`,
-                    'mutation'
-                );
-            }
-        }
-
-        function advanceHour() {
-            if (gameState.gameOver) return;
-            
-            triggerDailyTraitShift(); 
-
-            gameState.hour += 1;
-            if (gameState.hour >= 24) {
-                gameState.hour = 0;
-                gameState.day += 1;
-            }
-            gameState.turn += 1;
-
-            gameState.upgradePoints += 1; 
-
-            const { virality, relatability, edginess } = gameState.traits;
-
-            let newlyHigh = [];
-            
-            // --- CORE PANDEMIC INFECTION LOGIC ---
-            gameState.colleges.forEach((c) => {
-                
-                if (c.infection <= 0.01) {
-                    if (isVectorUnlocked(c.accessType)) {
-                        c.infection = 0.5 + Math.random() * 2; 
-                        addLog(`${c.name} is now exposed via ${c.accessType} Vector. Meme is established!`, 'event');
-                        return; 
-                    } else {
-                        return;
-                    }
-                }
-                
-                const spreadBoost = virality * c.spreadModifier * 0.5;
-                const stickinessBoost = (relatability * c.stickinessModifier * c.infection) / 100;
-                
-                const resistanceFactor = c.moderation * c.resistance * 5; 
-                
-                const edgyBonus = edginess * 0.35;
-                const chaos = (Math.random() - 0.5) * 4;
-
-                let delta = spreadBoost + stickinessBoost + edgyBonus - resistanceFactor + chaos;
-                
-                if (c.infection < 5) delta *= 0.6;
-                if (c.infection > 95) delta *= 0.7; 
-                
-                if (delta < -5) delta = -5;
-                if (delta > 10) delta = 10;
-
-                const oldInfection = c.infection;
-                c.infection = Math.max(0, Math.min(100, c.infection + delta));
-
-                if (oldInfection < 50 && c.infection >= 50) {
-                    newlyHigh.push(c.name);
-                }
-            });
-            // --- END CORE PANDEMIC INFECTION LOGIC ---
-
-            const avg =
-                gameState.colleges.reduce((sum, c) => sum + c.infection, 0) /
-                gameState.colleges.length;
-            
-            const isDay = gameState.hour >= 8 && gameState.hour <= 22;
-            
-            // --- EDGINESS PENALTY & TOLERANCE DECAY ---
-            let tolDecayBase = 0.2 + (avg / 100) * 1.0; 
-            const edginessPenalty = 1 + (edginess * 0.2); 
-            
-            if (avg < 40) tolDecayBase *= 0.5;
-            
-            const tolDecay = tolDecayBase * (isDay ? 1.2 : 0.9) * edginessPenalty;
-            gameState.adminTolerance -= tolDecay;
-            // --- END TOLERANCE DECAY ---
-
-            triggerModerationEvent(avg);
-
-            if (newlyHigh.length > 0) {
-                addLog(
-                    `${newlyHigh.join(", ")} crossed 50% infection. Offline discussions are accelerating.`,
-                    'event'
-                );
-            }
-            
-            if (gameState.hour % 4 === 0 && newlyHigh.length === 0) {
-                 addLog(`The meme continues to circulate. Overall infection now ~${Math.round(avg)}%.`);
-            }
-            
-            checkGameOver(avg);
-            renderUI();
-        }
-        
-        function checkGameOver(avg) {
-            if (gameState.gameOver) return;
-            
-            let message = "";
-            let title = "GAME OVER";
-            let type = "loss";
-
-            if (avg >= 80) {
-                title = "VICTORY! 🏆";
-                message = `Campus is saturated (avg ${Math.round(avg)}%). You successfully won the culture war!`;
-                type = "win";
-                gameState.gameOver = true;
-                gameState.speed = 0;
-            } else if (gameState.adminTolerance <= 0) {
-                title = "DEFEAT";
-                message = "Admin Tolerance hit 0%. The university forced a content clampdown. The meme is dead.";
-                gameState.gameOver = true;
-                gameState.speed = 0;
-            } else if (gameState.day > gameState.maxDays) {
-                title = "DEFEAT";
-                message = `It's Day ${gameState.day}. Campus attention has moved on. Meme topped out at ${Math.round(avg)}%.`;
-                gameState.gameOver = true;
-                gameState.speed = 0;
-            }
-
-            if (gameState.gameOver) {
-                addLog(message, type === 'win' ? 'event' : 'moderation');
-                showGameOverOverlay(title, message, type);
-                renderUI(); 
-            }
-        }
-        
-        function showGameOverOverlay(title, message, type) {
-            document.getElementById('gameOverTitle').textContent = title;
-            document.getElementById('gameOverMessage').textContent = message;
-            const overlay = document.getElementById('gameOverOverlay');
-            overlay.classList.add('visible');
-            overlay.querySelector('h2').style.color = type === 'win' ? 'var(--green-active)' : 'var(--danger)';
-        }
-        
-        function hideGameOverOverlay() {
-             document.getElementById('gameOverOverlay').classList.remove('visible');
-        }
-
-        function attachMapClickHandlers() {
-            for (let i = 0; i < COLLEGE_NAMES.length; i++) {
-                const el = document.getElementById(`college-${i}`);
-                if (!el) continue;
-                el.onclick = () => showCollegeDetails(i);
-            }
-        }
-
-        function setSpeed(s) {
-            if (gameState.gameOver) {
-                gameState.speed = 0;
+    setSpeed(s) {
+        Game.speed = s;
+        document.querySelectorAll('.btn-time').forEach((b, i) => {
+            if ((i===0 && s===0) || (i===1 && s===1) || (i===2 && s===2) || (i===3 && s===4)) {
+                b.classList.add('active');
             } else {
-                gameState.speed = s;
+                b.classList.remove('active');
             }
-            updateSpeedButtons();
-        }
+        });
+    },
 
-        function updateSpeedButtons() {
-            [1, 2, 4].forEach((s) => {
-                const btn = document.getElementById(`speed${s}`);
-                if (!btn) return;
-                btn.classList.toggle("active", gameState.speed === s);
-            });
-        }
-
-        // student animation
+    loop() {
+        if (Game.ended) return;
         
-        function initStudents() {
-            const canvas = document.getElementById("studentsCanvas");
-            if (!canvas) return;
-            resizeCanvas();
-            window.addEventListener("resize", resizeCanvas);
-            studentsState.dots = [];
-            studentsState.lastSpawn = performance.now();
-        }
-
-        function resizeCanvas() {
-            const canvas = document.getElementById("studentsCanvas");
-            if (!canvas) return;
-            const rect = canvas.parentNode.getBoundingClientRect(); 
-            canvas.width = rect.width - 8; /* Reduced padding area */
-            canvas.height = rect.height - 8; /* Reduced padding area */
-        }
-
-        function getCollegeCenters() {
-            const svg = document.getElementById("mapSvg");
-            const canvas = document.getElementById("studentsCanvas");
-            if (!svg || !canvas) return [];
-            
-            const sx = canvas.width / svg.viewBox.baseVal.width;
-            const sy = canvas.height / svg.viewBox.baseVal.height;
-
-            const centers = [];
-            for (let i = 0; i < COLLEGE_NAMES.length; i++) {
-                const el = document.getElementById(`college-${i}`);
-                if (!el) {
-                    centers.push({ x: 0, y: 0, collegeIndex: i });
-                    continue;
+        if (Game.speed > 0) {
+            // Game tick runs based on speed
+            for(let i=0; i<Game.speed; i++) {
+                Game.tick++;
+                if (Game.tick % 60 === 0) { // Roughly every "hour"
+                    Game.updateLogic();
                 }
-                const x = parseFloat(el.getAttribute("x"));
-                const y = parseFloat(el.getAttribute("y"));
-                const w = parseFloat(el.getAttribute("width"));
-                const h = parseFloat(el.getAttribute("height"));
-                
-                centers.push({
-                    x: (x + w / 2) * sx,
-                    y: (y + h / 2) * sy,
-                    collegeIndex: i
-                });
             }
-            return centers;
+            // Particle animation runs every frame regardless of logic tick
+            ParticleSystem.update();
         }
 
-        function spawnStudents(now) {
-            const centers = getCollegeCenters();
-            if (!centers.length) return;
-            
-            const isDay = gameState.hour >= 8 && gameState.hour <= 22;
-            const baseRate = isDay ? 0.0035 : 0.001; 
-            const elapsed = now - studentsState.lastSpawn;
-            const expected = baseRate * elapsed * COLLEGE_NAMES.length;
-            const numNew = Math.floor(expected);
-            if (numNew <= 0) return;
+        requestAnimationFrame(Game.loop);
+    },
 
-            for (let n = 0; n < numNew; n++) {
-                const fromIndex = Math.floor(Math.random() * centers.length);
-                let toIndex = Math.floor(Math.random() * centers.length);
-                if (toIndex === fromIndex) toIndex = (toIndex + 1) % centers.length;
-                
-                const start = centers[fromIndex];
-                
-                const startCollege = gameState.colleges[fromIndex];
-                const isInfected = startCollege.infection >= 5 && Math.random() * 100 < startCollege.infection;
+    updateLogic() {
+        // 1. Spread Infection
+        let newInfections = 0;
+        let globalInf = 0;
 
-                studentsState.dots.push({
-                    x0: start.x,
-                    y0: start.y,
-                    x1: centers[toIndex].x,
-                    y1: centers[toIndex].y,
-                    t: 0,
-                    speed: 0.0005 + Math.random() * 0.0008,
-                    size: 2 + Math.random() * 1.5,
-                    infected: isInfected,
-                });
-            }
-
-            studentsState.lastSpawn = now;
-        }
-
-        function stepStudents(now, dt) {
-            const canvas = document.getElementById("studentsCanvas");
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-
-            spawnStudents(now);
-
-            const remaining = [];
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            studentsState.dots.forEach((dot) => {
-                dot.t += dot.speed * dt;
-                
-                if (dot.t < 1) { 
-                    const x = dot.x0 + (dot.x1 - dot.x0) * dot.t;
-                    const y = dot.y0 + (dot.y1 - dot.y0) * dot.t;
-                    const alpha = 0.3 + 0.7 * (1 - Math.abs(dot.t - 0.5) * 2);
-
-                    ctx.beginPath();
-                    ctx.arc(x, y, dot.size, 0, Math.PI * 2);
+        Game.colleges.forEach(c => {
+            if (c.infected > 0) {
+                // Internal Spread
+                if (c.infected < c.pop) {
+                    let rate = (Game.infectivity * 0.05) + (c.infected * 0.002);
+                    // Cap rate based on population density
+                    let growth = Math.ceil(rate);
+                    let actual = Math.min(c.pop - c.infected, growth);
+                    c.infected += actual;
+                    newInfections += actual;
                     
-                    ctx.fillStyle = dot.infected 
-                        ? studentsState.infectedDotColor.replace('0.8', alpha)
-                        : studentsState.safeDotColor.replace('0.8', alpha);
-                        
-                    ctx.fill();
-
-                    remaining.push(dot);
+                    // Generate Particles
+                    if (Math.random() < 0.2) ParticleSystem.spawn(c);
                 }
-            });
 
-            studentsState.dots = remaining;
-        }
+                // External Spread (Neighbor/Global)
+                if (Math.random() < 0.02 * Game.infectivity) {
+                    let target = Game.colleges[Math.floor(Math.random() * Game.colleges.length)];
+                    // Can we infect this target? (Must own the transmission vector or already be infected)
+                    let canInfect = target.infected > 0;
+                    if (!canInfect) {
+                        // Check upgrade type
+                        let typeUpgrade = Game.ownedUpgrades.find(u => u.type === target.type);
+                        if (typeUpgrade) canInfect = true;
+                    }
 
-        // main loop
-        function gameLoop(timestamp) {
-            if (gameState.lastFrameTime == null) {
-                gameState.lastFrameTime = timestamp;
-            }
-            const dt = timestamp - gameState.lastFrameTime;
-            gameState.lastFrameTime = timestamp;
-
-            if (!gameState.gameOver && gameState.speed > 0) {
-                const hoursToAdd = (dt / 2000) * gameState.speed;
-                gameState.timeAccHours += hoursToAdd;
-                while (gameState.timeAccHours >= 1) {
-                    gameState.timeAccHours -= 1;
-                    advanceHour();
+                    if (canInfect && target.infected < target.pop) {
+                        if (target.infected === 0) {
+                            // First infection event
+                            target.infected = 1;
+                            UI.spawnBubble(target.x, target.y, 'dna');
+                            UI.ticker(`Outbreak confirmed in ${target.name}!`);
+                        }
+                        // Send particle
+                        ParticleSystem.travel(c, target);
+                    }
                 }
             }
+            globalInf += c.infected;
+            
+            // Visual update for college
+            let intensity = c.infected / c.pop;
+            document.getElementById(`col_${c.id}`).style.fill = `rgba(185, 28, 28, ${0.2 + (intensity * 0.8)})`;
+        });
 
-            stepStudents(timestamp, dt);
-            requestAnimationFrame(gameLoop);
+        Game.infectedPop = globalInf;
+
+        // 2. Ban Progress
+        // Ban speed depends on Visibility and how many people are infected (Panic)
+        if (Game.infectedPop > 50) {
+            let panicFactor = Game.infectedPop / Game.totalPop; // 0 to 1
+            let baseRate = (Game.visibility * 0.001) + (panicFactor * 0.05);
+            
+            // Ability reducers
+            if (Game.hasUpgrade('a_obs')) baseRate *= 0.8;
+            if (Game.hasUpgrade('a_vpn')) baseRate *= 0.85;
+            if (Game.hasUpgrade('a_alumni')) baseRate *= 0.5;
+
+            Game.banProgress += baseRate;
+            
+            // Chance to spawn Cure Bubble (Reduces ban progress slightly)
+            if (Math.random() < 0.005 && Game.banProgress > 10) {
+                let c = Game.colleges[Math.floor(Math.random()*Game.colleges.length)];
+                UI.spawnBubble(c.x, c.y, 'cure');
+            }
         }
 
-        initGame();
-        requestAnimationFrame(gameLoop);
-    </script>
+        // 3. Time / Win / Lose
+        if (Game.tick % 1440 === 0) {
+            Game.day++;
+            UI.ticker("Another day passes...");
+        }
+
+        UI.updateHUD();
+        Game.checkEnd();
+    },
+
+    hasUpgrade(id) {
+        return Game.ownedUpgrades.some(u => u.id === id);
+    },
+
+    buyUpgrade(upgrade) {
+        if (Game.dna >= upgrade.cost) {
+            Game.dna -= upgrade.cost;
+            Game.ownedUpgrades.push(upgrade);
+            
+            // Apply stats
+            if (upgrade.inf) Game.infectivity += upgrade.inf;
+            if (upgrade.vis) Game.visibility += upgrade.vis;
+            
+            UI.renderEvo();
+            UI.updateHUD();
+        }
+    },
+
+    checkEnd() {
+        if (Game.banProgress >= 100) {
+            Game.endGame(false);
+        } else if (Game.infectedPop >= Game.totalPop * 0.99) { // 99% infection
+            Game.endGame(true);
+        }
+    },
+
+    endGame(win) {
+        Game.ended = true;
+        const screen = document.getElementById('screenGameOver');
+        const title = document.getElementById('goTitle');
+        const desc = document.getElementById('goDesc');
+
+        screen.style.display = 'flex';
+        if (win) {
+            title.innerText = "MEME SUPREMACY";
+            title.className = "go-title go-win";
+            desc.innerText = "There is no escaping your meme. Even the Dean has printed it out and put it on their door. You are a legend.";
+        } else {
+            title.innerText = "BANNED";
+            title.className = "go-title go-lose";
+            desc.innerText = "The Administration has completely scrubbed the meme from the internet. Expulsions have been handed out. It's over.";
+        }
+    }
+};
+
+/* --- PARTICLE SYSTEM --- */
+const ParticleSystem = {
+    particles: [],
+    ctx: null,
+
+    init() {
+        const canvas = document.getElementById('particleCanvas');
+        canvas.width = 800; // Matches viewbox
+        canvas.height = 500;
+        this.ctx = canvas.getContext('2d');
+    },
+
+    spawn(college) {
+        this.particles.push({
+            x: college.x * 800 + (Math.random()*20-10),
+            y: college.y * 500 + (Math.random()*20-10),
+            vx: (Math.random()-0.5)*2,
+            vy: (Math.random()-0.5)*2,
+            life: 60,
+            color: '#b91c1c'
+        });
+    },
+
+    travel(source, target) {
+        this.particles.push({
+            x: source.x * 800,
+            y: source.y * 500,
+            tx: target.x * 800,
+            ty: target.y * 500,
+            life: 100, // Travel time
+            travel: true,
+            color: '#eab308' // Gold particle for transmission
+        });
+    },
+
+    update() {
+        if (!this.ctx) this.init();
+        this.ctx.clearRect(0, 0, 800, 500);
+
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            let p = this.particles[i];
+            
+            if (p.travel) {
+                // Move towards target
+                let dx = p.tx - p.x;
+                let dy = p.ty - p.y;
+                p.x += dx * 0.05;
+                p.y += dy * 0.05;
+                if (Math.abs(dx) < 2 && Math.abs(dy) < 2) p.life = 0;
+            } else {
+                // Float around
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+            }
+
+            this.ctx.fillStyle = p.color;
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+            this.ctx.fill();
+
+            if (p.life <= 0) this.particles.splice(i, 1);
+        }
+    }
+};
+
+/* --- UI MANAGER --- */
+const UI = {
+    activeTab: 'transmission',
+
+    initListeners() {
+        // Bubbles
+        document.getElementById('bubbleLayer').addEventListener('click', (e) => {
+            if (e.target.classList.contains('bubble')) {
+                let type = e.target.dataset.type;
+                if (type === 'dna') {
+                    Game.dna += (Math.floor(Math.random()*2)+1);
+                    UI.updateHUD();
+                } else if (type === 'cure') {
+                    Game.banProgress = Math.max(0, Game.banProgress - 5);
+                    UI.updateHUD();
+                }
+                e.target.remove();
+            }
+        });
+    },
+
+    renderMap() {
+        const svg = document.getElementById('svgMap');
+        Game.colleges.forEach(c => {
+            // Draw rect
+            let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            rect.setAttribute("x", (c.x * 800) - 20);
+            rect.setAttribute("y", (c.y * 500) - 20);
+            rect.setAttribute("width", 40);
+            rect.setAttribute("height", 40);
+            rect.setAttribute("id", `col_${c.id}`);
+            rect.classList.add("college-rect");
+            
+            // Draw Label
+            let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("x", (c.x * 800) - 20);
+            text.setAttribute("y", (c.y * 500) - 25);
+            text.textContent = c.name;
+            text.classList.add("map-label");
+
+            svg.appendChild(rect);
+            svg.appendChild(text);
+        });
+    },
+
+    spawnBubble(xPct, yPct, type) {
+        const layer = document.getElementById('bubbleLayer');
+        const el = document.createElement('div');
+        el.classList.add('bubble');
+        el.classList.add(type === 'dna' ? 'bubble-dna' : 'bubble-cure');
+        el.style.left = (xPct * 800 - 20) + 'px';
+        el.style.top = (yPct * 500 - 20) + 'px';
+        el.dataset.type = type;
+        
+        if (type === 'dna') el.innerHTML = "DNA";
+        
+        layer.appendChild(el);
+        
+        // Auto fade
+        setTimeout(() => {
+            if (el.parentNode) el.remove();
+        }, 4000);
+    },
+
+    updateHUD() {
+        document.getElementById('valDNA').innerText = Game.dna;
+        document.getElementById('valInf').innerText = Game.infectedPop;
+        document.getElementById('valSafe').innerText = Game.totalPop - Game.infectedPop;
+        document.getElementById('valDay').innerText = Game.day;
+
+        document.getElementById('barBan').style.width = Game.banProgress + '%';
+        document.getElementById('lblBan').innerText = Math.floor(Game.banProgress) + '%';
+        
+        let infPct = (Game.infectedPop / Game.totalPop) * 100;
+        document.getElementById('barInf').style.width = infPct + '%';
+        document.getElementById('lblInf').innerText = Math.floor(infPct) + '%';
+        
+        // Sync Modal DNA
+        document.getElementById('modalDNA').innerText = Game.dna;
+    },
+
+    ticker(msg) {
+        const t = document.getElementById('newsTicker');
+        t.innerText = msg;
+        // Reset animation to show new text immediately
+        t.style.animation = 'none';
+        t.offsetHeight; 
+        t.style.animation = 'ticker 20s linear infinite';
+    },
+
+    toggleModal(show) {
+        const m = document.getElementById('evoModal');
+        m.style.display = show ? 'flex' : 'none';
+        if (show) this.renderEvo();
+    },
+
+    setTab(tab) {
+        this.activeTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        this.renderEvo();
+    },
+
+    renderEvo() {
+        const body = document.getElementById('evoBody');
+        body.innerHTML = '';
+        const list = document.createElement('div');
+        list.className = 'upgrade-grid';
+
+        DATA.upgrades[this.activeTab].forEach(u => {
+            let owned = Game.hasUpgrade(u.id);
+            let locked = false;
+            if (u.req && !Game.hasUpgrade(u.req)) locked = true;
+
+            let card = document.createElement('div');
+            card.className = `upgrade-card ${owned ? 'owned' : ''} ${locked ? 'locked' : ''}`;
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="card-name">${u.name}</span>
+                    <span class="card-cost">${owned ? 'OWNED' : u.cost}</span>
+                </div>
+                <div class="card-desc">${u.desc}</div>
+            `;
+            
+            if (!owned && !locked) {
+                card.onclick = () => Game.buyUpgrade(u);
+            }
+            
+            list.appendChild(card);
+        });
+        
+        body.appendChild(list);
+    }
+};
+
+// --- BOOT ---
+Game.init();
+
+</script>
 </body>
 </html>
