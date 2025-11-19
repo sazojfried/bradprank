@@ -2,32 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>MEME OUTBREAK: PANDEMIC LEGACY [ULTIMATE]</title>
+<title>MEME OUTBREAK: PANDEMIC LEGACY [FULL VERSION]</title>
 <style>
-    /* --- CRT & FLASH AESTHETIC --- */
+    /* --- CRT & VISUAL CORE --- */
     :root {
-        --bg-dark: #050505;
-        --panel-bg: #0f0f0f;
-        --border-color: #3a3a3a;
-        --accent-red: #cc0000;
-        --accent-blue: #0066cc;
-        --accent-yellow: #ffcc00;
-        --text-main: #e0e0e0;
-        --text-dim: #666;
-        --scanline-color: rgba(0, 0, 0, 0.5);
-        --glass-highlight: rgba(255, 255, 255, 0.05);
-    }
+        --bg-deep: #020202;
+        --bg-panel: #0a0a0a;
+        --border: #333;
+        --glass: rgba(255,255,255,0.05);
+        
+        --col-red: #b91c1c;    /* Infection */
+        --col-blue: #3b82f6;   /* Cure/Ban */
+        --col-gold: #eab308;   /* DNA */
+        --col-digital: #06b6d4; /* Cyan for Digital/Wifi */
+        --col-social: #f43f5e;  /* Pink for Party */
+        --col-acad: #8b5cf6;    /* Purple for Academic */
+        --col-phys: #84cc16;    /* Lime for Physical */
 
-    @font-face {
-        font-family: 'Pixel';
-        src: local('Courier New'); /* Fallback to mono */
+        --font-term: "Courier New", Courier, monospace;
+        --font-ui: "Segoe UI", Tahoma, sans-serif;
     }
 
     body {
         margin: 0;
         background: #000;
-        color: var(--text-main);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #eee;
+        font-family: var(--font-ui);
         height: 100vh;
         overflow: hidden;
         display: flex;
@@ -36,323 +36,340 @@
         user-select: none;
     }
 
-    /* CRT OVERLAY EFFECT */
-    .scanlines {
+    /* CRT SCANLINE OVERLAY */
+    .crt-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
         background-size: 100% 2px, 3px 100%;
         pointer-events: none;
-        z-index: 999;
+        z-index: 9999;
+        opacity: 0.6;
     }
 
-    /* MAIN CONTAINER */
     #game-shell {
-        width: 1024px;
-        height: 768px;
-        background: var(--panel-bg);
-        border: 2px solid #222;
-        box-shadow: 0 0 100px rgba(204, 0, 0, 0.1);
+        width: 1100px;
+        height: 800px;
+        background: var(--bg-panel);
+        border: 2px solid #444;
+        box-shadow: 0 0 80px rgba(0,0,0,0.8);
         display: grid;
-        grid-template-rows: 50px 1fr 200px;
+        grid-template-rows: 50px 1fr 220px;
         position: relative;
     }
 
     /* --- HEADER --- */
     header {
         background: #111;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 1px solid #333;
         display: flex;
         align-items: center;
         padding: 0 15px;
-        box-shadow: inset 0 -10px 20px -10px #000;
     }
-    .date-display {
-        font-family: 'Courier New', monospace;
+    .date-box {
+        font-family: var(--font-term);
         font-weight: bold;
-        color: #ccc;
-        margin-right: 20px;
+        color: #aaa;
+        width: 120px;
         border-right: 1px solid #333;
-        padding-right: 20px;
+        margin-right: 15px;
     }
-    .news-bar {
+    .news-strip {
         flex: 1;
         background: #000;
         height: 30px;
         border: 1px solid #333;
+        position: relative;
+        overflow: hidden;
         display: flex;
         align-items: center;
-        overflow: hidden;
-        position: relative;
     }
-    .news-icon {
-        background: var(--accent-red);
-        color: white;
+    .news-tag {
+        background: var(--col-red);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: bold;
+        padding: 0 8px;
         height: 100%;
         display: flex;
         align-items: center;
-        padding: 0 10px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        z-index: 2;
+        z-index: 5;
     }
-    #news-ticker {
+    #ticker {
         white-space: nowrap;
-        color: var(--text-main);
-        font-family: 'Courier New', monospace;
+        font-family: var(--font-term);
         font-size: 0.9rem;
         position: absolute;
         left: 100%;
-        animation: ticker 15s linear infinite;
+        animation: scrollText 20s linear infinite;
     }
-    @keyframes ticker { 100% { left: -100%; } }
+    @keyframes scrollText { 100% { left: -100%; } }
 
     /* --- MAP STAGE --- */
     #map-stage {
         position: relative;
-        background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
         overflow: hidden;
     }
     
-    /* Regions (Colleges) */
-    .college-group { cursor: pointer; transition: opacity 0.2s; }
-    .college-group:hover { filter: brightness(1.3); }
-    .college-shape {
-        fill: #2a2a2a;
-        stroke: #444;
-        stroke-width: 1;
-        transition: fill 0.5s;
-    }
-    .college-label {
-        fill: #666;
-        font-size: 10px;
-        font-family: monospace;
-        text-transform: uppercase;
-        pointer-events: none;
-        text-shadow: 0 1px 2px black;
+    svg { width: 100%; height: 100%; display: block; }
+
+    /* Map Entities */
+    .conn-line { stroke: #333; stroke-width: 1; stroke-dasharray: 4; opacity: 0.5; }
+    
+    .region-group { cursor: pointer; }
+    .region-group:hover .region-bg { stroke: #fff; stroke-width: 2; }
+    
+    .region-bg { 
+        fill: #222; 
+        stroke: #444; 
+        stroke-width: 1; 
+        transition: fill 0.5s ease;
     }
 
-    /* Particles & Bubbles */
-    #fx-canvas {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none;
-    }
+    /* Icons on Map */
+    .icon-circle { fill: #111; stroke: #444; stroke-width: 1; }
+    .icon-path { fill: #666; }
+    
+    /* Icon Colors (Active) */
+    .active-digital .icon-path { fill: var(--col-digital); }
+    .active-social .icon-path { fill: var(--col-social); }
+    .active-acad .icon-path { fill: var(--col-acad); }
+    .active-phys .icon-path { fill: var(--col-phys); }
+
+    /* Layers */
+    #particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    #bubble-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+    /* Bubbles */
     .bubble {
         position: absolute;
-        width: 40px; height: 40px;
+        width: 45px; height: 45px;
         border-radius: 50%;
-        background: radial-gradient(circle at 30% 30%, #fff, var(--accent-yellow));
+        background: radial-gradient(circle at 30% 30%, #fff, var(--col-gold));
         border: 2px solid #fff;
-        box-shadow: 0 0 15px var(--accent-yellow);
-        display: flex;
-        justify-content: center; align-items: center;
-        font-weight: bold; color: #422006;
-        cursor: pointer;
+        box-shadow: 0 0 20px var(--col-gold);
+        display: flex; justify-content: center; align-items: center;
+        color: #330; font-weight: 900; font-size: 1.2rem;
+        pointer-events: auto; cursor: pointer;
+        animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         z-index: 100;
-        animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .bubble.cure {
-        background: radial-gradient(circle at 30% 30%, #dbeafe, var(--accent-blue));
-        box-shadow: 0 0 15px var(--accent-blue);
+        background: radial-gradient(circle at 30% 30%, #dbeafe, var(--col-blue));
+        box-shadow: 0 0 20px var(--col-blue);
         color: #fff;
     }
-    @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+    @keyframes popUp { from { transform: scale(0); } to { transform: scale(1); } }
 
     /* --- HUD AREA --- */
     #hud {
-        background: linear-gradient(to bottom, #181818, #050505);
-        border-top: 1px solid var(--border-color);
+        background: linear-gradient(to bottom, #151515, #000);
+        border-top: 1px solid #333;
         display: grid;
-        grid-template-columns: 300px 1fr 250px;
+        grid-template-columns: 280px 1fr 240px;
         padding: 15px;
-        gap: 20px;
+        gap: 15px;
     }
 
-    /* Left Panel: Region Data & Global Stats */
-    .panel-box {
-        background: #080808;
+    /* HUD Panels */
+    .panel {
+        background: #0b0b0b;
         border: 1px solid #333;
         padding: 10px;
         border-radius: 4px;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         display: flex;
         flex-direction: column;
     }
-    .hud-title {
-        font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px;
-        border-bottom: 1px solid #333; margin-bottom: 8px; padding-bottom: 4px;
-    }
-    .data-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9rem; }
-    .val-gold { color: var(--accent-yellow); font-weight: bold; font-size: 1.2rem; }
-    .val-red { color: var(--accent-red); }
-    .val-blue { color: var(--accent-blue); }
-
-    /* Center Panel: Progress & Evolution */
-    .center-controls { display: flex; flex-direction: column; gap: 10px; }
     
-    .bar-container { width: 100%; background: #000; border: 1px solid #444; height: 18px; border-radius: 9px; position: relative; overflow: hidden; }
-    .bar-fill { height: 100%; width: 0%; transition: width 0.5s linear; }
-    .bar-red { background: linear-gradient(90deg, #450a0a, #dc2626); }
-    .bar-blue { background: linear-gradient(90deg, #172554, #2563eb); }
-    .bar-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; color: #fff; text-shadow: 0 1px 2px #000; font-weight: bold; z-index: 2;}
-
-    .btn-disease {
-        background: #222; border: 1px solid #444; color: #ccc;
-        padding: 10px; text-align: center; font-weight: bold; cursor: pointer;
-        transition: all 0.1s; text-transform: uppercase;
-        box-shadow: 0 4px 0 #000;
-        margin-top: auto;
+    .panel-title {
+        font-size: 0.7rem; color: #666;
+        border-bottom: 1px solid #222;
+        margin-bottom: 8px; padding-bottom: 4px;
+        text-transform: uppercase; letter-spacing: 1px;
     }
-    .btn-disease:hover { background: #333; color: #fff; transform: translateY(-2px); box-shadow: 0 6px 0 #000; }
-    .btn-disease:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
+    
+    .stat-row {
+        display: flex; justify-content: space-between;
+        margin-bottom: 5px; font-size: 0.85rem;
+        font-family: var(--font-term);
+    }
 
-    /* Right Panel: Time & Global Actions */
-    .time-panel { display: flex; gap: 5px; justify-content: center; margin-bottom: 15px; }
+    /* Bars */
+    .bar-wrap {
+        background: #000; border: 1px solid #333;
+        height: 16px; border-radius: 8px;
+        position: relative; overflow: hidden;
+        margin-bottom: 10px;
+    }
+    .bar-fill { height: 100%; width: 0%; transition: width 0.3s linear; }
+    .fill-red { background: linear-gradient(90deg, #7f1d1d, var(--col-red)); }
+    .fill-blue { background: linear-gradient(90deg, #1e3a8a, var(--col-blue)); }
+    .bar-label {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 0.65rem; color: #fff; font-weight: bold;
+        text-shadow: 0 1px 2px #000;
+    }
+
+    /* Buttons */
+    .btn-disease {
+        background: #1a1a1a; border: 1px solid #333;
+        color: #ddd; padding: 10px; text-align: center;
+        font-weight: bold; cursor: pointer; text-transform: uppercase;
+        margin-top: auto;
+        transition: all 0.1s;
+    }
+    .btn-disease:hover { background: #222; border-color: #666; color: #fff; }
+
+    .time-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 10px; }
     .btn-time {
-        width: 40px; height: 30px; background: #111; border: 1px solid #444;
+        width: 30px; height: 25px; background: #111; border: 1px solid #333;
         color: #666; cursor: pointer; font-weight: bold;
     }
     .btn-time.active { background: #333; color: #fff; border-color: #888; }
-    
-    .big-circle-btn {
-        width: 100px; height: 100px; border-radius: 50%;
+
+    .btn-world {
+        width: 80px; height: 80px; border-radius: 50%;
         background: radial-gradient(circle at 30% 30%, #333, #000);
         border: 2px solid #555; color: #aaa;
+        margin: 0 auto; cursor: pointer;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        font-size: 0.8rem; font-weight: bold; margin: 0 auto;
-        cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        font-weight: bold; font-size: 0.7rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-    .big-circle-btn:hover { border-color: #fff; color: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
+    .btn-world:hover { color: #fff; border-color: #fff; }
 
-    /* --- EVOLUTION MODAL --- */
-    #evo-modal {
-        position: absolute; top: 50px; left: 0; width: 100%; height: 518px; /* Cover Map */
-        background: rgba(10, 10, 10, 0.95);
-        backdrop-filter: blur(5px);
+    /* --- MODAL --- */
+    #modal {
+        position: absolute; top: 51px; left: 0; width: 100%; height: 527px;
+        background: rgba(10,10,10,0.95);
+        backdrop-filter: blur(8px);
         z-index: 500; display: none; flex-direction: column;
     }
-    .evo-header {
-        height: 60px; background: #151515; border-bottom: 1px solid #333;
-        display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
+    .modal-head {
+        height: 50px; background: #151515; border-bottom: 1px solid #333;
+        display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
     }
-    .evo-tabs button {
-        background: none; border: none; color: #666; font-size: 1rem; font-weight: bold;
-        margin-right: 20px; cursor: pointer; text-transform: uppercase;
+    .tab-btn {
+        background: none; border: none; color: #666; 
+        font-size: 0.9rem; font-weight: bold; text-transform: uppercase;
+        margin-right: 15px; cursor: pointer;
     }
-    .evo-tabs button.active { color: #fff; text-decoration: underline; text-decoration-color: var(--accent-red); text-underline-offset: 5px;}
+    .tab-btn.active { color: #fff; text-decoration: underline; text-decoration-color: var(--col-red); text-underline-offset: 6px; }
     
-    .evo-body { flex: 1; padding: 30px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-    
-    .hex-upgrade {
-        background: #1a1a1a; border: 1px solid #333; padding: 15px;
-        display: flex; flex-direction: column; gap: 5px; cursor: pointer; transition: all 0.2s;
-        position: relative;
+    .modal-grid {
+        flex: 1; padding: 30px; overflow-y: auto;
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px;
     }
-    .hex-upgrade:hover { background: #222; border-color: #666; }
-    .hex-upgrade.owned { background: #2a0e0e; border-color: var(--accent-red); }
-    .hex-upgrade.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
-    .hex-title { color: #fff; font-weight: bold; font-size: 0.9rem; }
-    .hex-cost { color: var(--accent-yellow); font-size: 0.8rem; font-family: monospace; }
-    .hex-desc { color: #888; font-size: 0.75rem; line-height: 1.2; }
+    
+    .hex {
+        background: #111; border: 1px solid #333; padding: 10px;
+        display: flex; flex-direction: column; gap: 5px;
+        cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .hex:hover { border-color: #666; background: #1a1a1a; }
+    .hex.owned { background: #220a0a; border-color: var(--col-red); }
+    .hex.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+    .hex-icon { position: absolute; top: 10px; right: 10px; font-size: 1.2rem; opacity: 0.2; }
 
     /* --- GAME OVER --- */
     #game-over {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: #000; z-index: 1000; display: none;
+        background: #000; z-index: 2000; display: none;
         flex-direction: column; justify-content: center; align-items: center;
     }
-    .go-text { font-size: 4rem; font-weight: 900; margin-bottom: 20px; }
-    .win { color: var(--accent-red); text-shadow: 0 0 30px var(--accent-red); }
-    .lose { color: var(--accent-blue); text-shadow: 0 0 30px var(--accent-blue); }
-    
+    .end-title { font-size: 4rem; font-weight: 900; letter-spacing: 5px; margin-bottom: 20px; }
+    .win { color: var(--col-red); text-shadow: 0 0 30px var(--col-red); }
+    .lose { color: var(--col-blue); text-shadow: 0 0 30px var(--col-blue); }
+
 </style>
 </head>
 <body>
 
-<div class="scanlines"></div>
+<div class="crt-overlay"></div>
 
 <div id="game-shell">
     <header>
-        <div class="date-display" id="date-display">DAY 1</div>
-        <div class="news-bar">
-            <div class="news-icon">NEWS</div>
-            <div id="news-ticker">Outbreak detected in Ben Franklin College... Students report "cringe" content...</div>
+        <div class="date-box" id="disp-date">DAY 1</div>
+        <div class="news-strip">
+            <div class="news-tag">LIVE</div>
+            <div id="ticker">Meme outbreak reported in Benjamin Franklin... Students claim it's "based"...</div>
         </div>
     </header>
 
     <div id="map-stage">
-        <svg id="svg-map" viewBox="0 0 800 500" style="width:100%; height:100%;">
+        <svg id="svg-layer" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice">
             <defs>
-                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="2" result="blur" />
-                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
+                <g id="icon-wifi"><path d="M12,2C7.9,2,4.2,3.1,1,5l2,2.5c2.6-1.5,5.6-2.4,8.9-2.4s6.4,0.9,8.9,2.4l2-2.5C19.8,3.1,16.1,2,12,2z M12,7 c-3,0-5.7,0.8-8.1,2.2l2,2.5C7.5,10.9,9.6,10.4,12,10.4s4.5,0.5,6.1,1.3l2-2.5C17.7,7.8,15,7,12,7z M12,12c-1.3,0-2.6,0.3-3.7,0.9 l2.4,3L12,17.5l1.3-1.6l2.4-3C14.6,12.3,13.3,12,12,12z" /></g>
+                <g id="icon-book"><path d="M18,2H6C4.9,2,4,2.9,4,4v16c0,1.1,0.9,2,2,2h12c1.1,0,2-0.9,2-2V4C20,2.9,19.1,2,18,2z M18,20H6V4h2v9l2.5-1.5 L13,13V4h5V20z" /></g>
+                <g id="icon-party"><path d="M12,2L2,12h3v8h6v-6h2v6h6v-8h3L12,2z M9,8h6V6H9V8z" /></g> <g id="icon-gate"><path d="M20,4h-4V2h-2v2h-4V2H8v2H4C2.9,4,2,4.9,2,6v14c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V6C22,4.9,21.1,4,20,4z M10,18H6v-4h4V18z M10,12H6V8h4V12z M18,18h-4v-4h4V18z M18,12h-4V8h4V12z" /></g>
             </defs>
+            <g id="connections-layer"></g>
             <g id="regions-layer"></g>
         </svg>
-        <canvas id="fx-canvas"></canvas>
-        <div id="bubble-layer"></div>
-
-        <div id="evo-modal">
-            <div class="evo-header">
-                <div class="evo-tabs">
-                    <button class="active" onclick="GameUI.setTab('transmission')">Transmission</button>
-                    <button onclick="GameUI.setTab('symptoms')">Content</button>
-                    <button onclick="GameUI.setTab('abilities')">Abilities</button>
-                </div>
-                <div style="color: var(--accent-yellow); font-weight: bold; font-size: 1.2rem;">
-                    <span id="modal-dna">0</span> DNA
-                </div>
-                <button style="background:var(--accent-red); border:none; color:white; padding:5px 15px; cursor:pointer;" onclick="GameUI.toggleEvo(false)">CLOSE</button>
-            </div>
-            <div class="evo-body" id="evo-list"></div>
-        </div>
         
+        <canvas id="particles-canvas"></canvas>
+        <div id="bubble-layer"></div>
+        
+        <div id="modal">
+            <div class="modal-head">
+                <div>
+                    <button class="tab-btn active" onclick="UI.setTab('trans')">Vector</button>
+                    <button class="tab-btn" onclick="UI.setTab('symp')">Content</button>
+                    <button class="tab-btn" onclick="UI.setTab('abil')">Resilience</button>
+                </div>
+                <div style="color:var(--col-gold); font-weight:bold;">DNA: <span id="dna-modal">0</span></div>
+                <button style="background:#333; color:#fff; border:none; padding:5px 10px; cursor:pointer;" onclick="UI.toggleModal(false)">X</button>
+            </div>
+            <div class="modal-grid" id="modal-list"></div>
+        </div>
+
         <div id="game-over">
-            <div class="go-text" id="go-title">VICTORY</div>
-            <div style="color:#aaa; margin-bottom:30px;" id="go-desc">Description</div>
-            <button class="btn-disease" onclick="location.reload()">PLAY AGAIN</button>
+            <div class="end-title" id="go-title">VICTORY</div>
+            <p style="color:#888; max-width:400px; text-align:center; font-family:monospace; margin-bottom:30px;" id="go-desc"></p>
+            <button class="btn-disease" onclick="location.reload()">RESTART SIMULATION</button>
         </div>
     </div>
 
     <div id="hud">
-        <div class="panel-box">
-            <div class="hud-title">REGION DATA: <span id="reg-name" style="color:#fff">WORLD</span></div>
-            <div class="data-row"><span>POPULATION</span><span id="reg-pop">6000</span></div>
-            <div class="data-row"><span>INFECTED</span><span id="reg-inf" class="val-red">0</span></div>
-            <div class="data-row"><span>EXPELLED</span><span id="reg-dead" class="val-blue">0</span></div>
+        <div class="panel">
+            <div class="panel-title">REGION: <span id="ui-reg-name" style="color:#fff">WORLD</span></div>
+            <div class="stat-row"><span>POPULATION</span><span id="ui-reg-pop">6000</span></div>
+            <div class="stat-row"><span>INFECTED</span><span id="ui-reg-inf" style="color:var(--col-red)">0</span></div>
+            <div class="stat-row"><span>EXPELLED</span><span id="ui-reg-dead" style="color:var(--col-blue)">0</span></div>
             
             <div style="flex:1"></div>
-            
-            <div class="hud-title">GLOBAL STATS</div>
-            <div class="data-row"><span>DNA POINTS</span><span id="val-dna" class="val-gold">0</span></div>
-            <div class="data-row"><span>TOTAL INFECTED</span><span id="val-total-inf" class="val-red">0</span></div>
+            <div class="panel-title">GLOBAL</div>
+            <div class="stat-row"><span>DNA POINTS</span><span id="ui-dna" style="color:var(--col-gold); font-size:1.1rem;">0</span></div>
+            <div class="stat-row"><span>TOTAL CASES</span><span id="ui-total">0</span></div>
         </div>
 
-        <div class="center-controls">
-            <div class="bar-container">
-                <div class="bar-text">CAMPUS SATURATION</div>
-                <div class="bar-fill bar-red" id="bar-inf"></div>
-            </div>
-            <div class="bar-container">
-                <div class="bar-text">ADMIN BAN PROGRESS</div>
-                <div class="bar-fill bar-blue" id="bar-ban"></div>
+        <div class="panel" style="justify-content: center; gap: 10px;">
+            <div class="bar-wrap">
+                <div class="bar-label">CAMPUS SATURATION</div>
+                <div class="bar-fill fill-red" id="bar-inf"></div>
             </div>
             
-            <div style="flex:1"></div>
-            <button class="btn-disease" onclick="GameUI.toggleEvo(true)">DISEASE MENU</button>
+            <div class="bar-wrap">
+                <div class="bar-label">ADMIN BAN PROGRESS</div>
+                <div class="bar-fill fill-blue" id="bar-ban"></div>
+            </div>
+            
+            <button class="btn-disease" onclick="UI.toggleModal(true)">DISEASE MENU</button>
         </div>
 
-        <div class="panel-box" style="align-items:center; justify-content: space-between;">
-            <div class="time-panel">
+        <div class="panel" style="align-items:center;">
+            <div class="time-row">
                 <button class="btn-time" onclick="Game.setSpeed(0)">||</button>
                 <button class="btn-time active" id="btn-s1" onclick="Game.setSpeed(1)">1</button>
                 <button class="btn-time" id="btn-s2" onclick="Game.setSpeed(3)">2</button>
                 <button class="btn-time" id="btn-s3" onclick="Game.setSpeed(6)">3</button>
             </div>
             
-            <div class="big-circle-btn" onclick="AudioSys.playAlert()">
+            <div class="btn-world" onclick="Audio.alert()">
                 <span>YALE</span>
-                <span style="font-size:0.6rem; color:#666">CONNECT</span>
+                <span>CONNECT</span>
             </div>
         </div>
     </div>
@@ -360,443 +377,396 @@
 
 <script>
 /**
- * MEME OUTBREAK: ULTIMATE
- * Includes Audio Synth, Particle System, Logic, and UI.
+ * PANDEMIC LEGACY: YALE EDITION (FINAL)
+ * Features: Graph Topology, Icon Rendering, Particle Vectors, Sound Synth.
  */
 
-/* --- AUDIO ENGINE (Web Audio API) --- */
-const AudioSys = {
+/* --- AUDIO SYNTH --- */
+const Audio = {
     ctx: null,
-    init() {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AudioContext();
-    },
-    playTone(freq, type, duration) {
-        if (!this.ctx) this.init();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + duration);
-    },
-    playPop() { this.playTone(400 + Math.random()*200, 'sine', 0.15); },
-    playClick() { this.playTone(800, 'square', 0.05); },
-    playAlert() { 
+    init() { window.AudioContext = window.AudioContext || window.webkitAudioContext; this.ctx = new AudioContext(); },
+    tone(freq, type, len, vol=0.1) {
         if(!this.ctx) this.init();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(100, this.ctx.currentTime + 0.5);
-        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.5);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.5);
-    }
+        const o = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(vol, this.ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + len);
+        o.connect(g); g.connect(this.ctx.destination);
+        o.start(); o.stop(this.ctx.currentTime + len);
+    },
+    pop() { this.tone(600 + Math.random()*200, 'sine', 0.15); },
+    click() { this.tone(800, 'square', 0.05, 0.05); },
+    alert() { this.tone(150, 'sawtooth', 0.6, 0.2); }
 };
 
-/* --- GAME DATA --- */
-const CONFIG = {
-    colleges: [
-        { id: "BF", name: "Ben Franklin", x: 100, y: 380, w: 50, h: 50, pop: 450, type: "Physical" },
-        { id: "BK", name: "Berkeley", x: 250, y: 380, w: 50, h: 50, pop: 400, type: "Social" },
-        { id: "BR", name: "Branford", x: 400, y: 380, w: 50, h: 50, pop: 410, type: "Physical" },
-        { id: "DC", name: "Davenport", x: 550, y: 380, w: 50, h: 50, pop: 430, type: "Academic" },
-        { id: "ES", name: "Ezra Stiles", x: 100, y: 280, w: 50, h: 45, pop: 400, type: "Social" },
-        { id: "GH", name: "Hopper", x: 250, y: 280, w: 40, h: 60, pop: 380, type: "Digital" },
-        { id: "JE", name: "J. Edwards", x: 400, y: 280, w: 60, h: 40, pop: 380, type: "Academic" },
-        { id: "MC", name: "Morse", x: 560, y: 280, w: 35, h: 60, pop: 400, type: "Physical" },
-        { id: "PM", name: "Pauli Murray", x: 100, y: 180, w: 60, h: 40, pop: 450, type: "Digital" },
-        { id: "PC", name: "Pierson", x: 300, y: 180, w: 50, h: 40, pop: 420, type: "Digital" },
-        { id: "SY", name: "Saybrook", x: 450, y: 180, w: 50, h: 40, pop: 400, type: "Academic" },
-        { id: "SM", name: "Silliman", x: 600, y: 180, w: 30, h: 45, pop: 440, type: "Social" },
-        { id: "TD", name: "Tim Dwight", x: 180, y: 80, w: 70, h: 45, pop: 390, type: "Social" },
-        { id: "TC", name: "Trumbull", x: 420, y: 80, w: 70, h: 45, pop: 390, type: "Academic" }
+/* --- DATA --- */
+// Note: neighbors array defines walking paths. Franklin/Murray have NO neighbors (Madagascar).
+const COLLEGES = [
+    { id: "BF", name: "Ben Franklin", x: 100, y: 400, type: "Physical", neighbors: [] },
+    { id: "PM", name: "Pauli Murray", x: 100, y: 150, type: "Digital", neighbors: [] },
+    
+    { id: "BK", name: "Berkeley", x: 250, y: 400, type: "Social", neighbors: ["BR", "GH"] },
+    { id: "BR", name: "Branford", x: 400, y: 400, type: "Physical", neighbors: ["BK", "JE", "SY"] },
+    { id: "JE", name: "J. Edwards", x: 400, y: 300, type: "Academic", neighbors: ["BR", "SY", "BK"] },
+    { id: "SY", name: "Saybrook", x: 550, y: 300, type: "Academic", neighbors: ["BR", "JE", "DC"] },
+    { id: "DC", name: "Davenport", x: 650, y: 400, type: "Academic", neighbors: ["SY", "MC", "SM"] },
+    
+    { id: "GH", name: "Hopper", x: 250, y: 250, type: "Digital", neighbors: ["BK", "ES"] },
+    { id: "ES", name: "Ezra Stiles", x: 100, y: 280, type: "Social", neighbors: ["GH", "MC"] },
+    { id: "MC", name: "Morse", x: 650, y: 250, type: "Physical", neighbors: ["ES", "DC"] },
+    
+    { id: "PC", name: "Pierson", x: 400, y: 150, type: "Digital", neighbors: ["DC", "TD"] },
+    { id: "TD", name: "Tim Dwight", x: 550, y: 100, type: "Social", neighbors: ["PC", "SM"] },
+    { id: "SM", name: "Silliman", x: 700, y: 150, type: "Social", neighbors: ["TD", "DC"] },
+    { id: "TC", name: "Trumbull", x: 400, y: 80, type: "Academic", neighbors: ["PC", "BK"] }
+];
+
+const UPGRADES = {
+    trans: [
+        { id: "d_insta", name: "Instagram", cost: 3, type: "Digital", desc: "Unlocks Digital Transmission. Required for Franklin/Murray." },
+        { id: "s_woads", name: "Woads", cost: 4, type: "Social", desc: "Unlocks Social Transmission." },
+        { id: "a_pset", name: "Pset Group", cost: 3, type: "Academic", desc: "Unlocks Academic Transmission." },
+        { id: "p_chalk", name: "Chalking", cost: 2, type: "Physical", desc: "Unlocks Physical Transmission." },
+        { id: "d_tiktok", name: "TikTok", cost: 10, req: "d_insta", desc: "Massive Digital boost." }
     ],
-    upgrades: {
-        transmission: [
-            { id: "t1", name: "Insta Page", cost: 3, type: "Digital", desc: "Allows Digital Infection." },
-            { id: "t2", name: "Woads", cost: 4, type: "Social", desc: "Allows Social Infection." },
-            { id: "t3", name: "Chalking", cost: 3, type: "Physical", desc: "Allows Physical Infection." },
-            { id: "t4", name: "Piazza", cost: 3, type: "Academic", desc: "Allows Academic Infection." },
-            { id: "t5", name: "TikTok", cost: 10, req: "t1", desc: "Massive spread boost." }
-        ],
-        symptoms: [
-            { id: "s1", name: "Caption", cost: 2, inf: 3, vis: 1, desc: "Mildly funny." },
-            { id: "s2", name: "Cursed", cost: 5, inf: 6, vis: 4, desc: "High engagement." },
-            { id: "s3", name: "Political", cost: 12, inf: 15, vis: 25, desc: "Huge spread, HUGE ban risk." },
-            { id: "s4", name: "Deep Fried", cost: 8, inf: 8, vis: 2, desc: "Confuses admins." }
-        ],
-        abilities: [
-            { id: "a1", name: "Obscurity", cost: 8, desc: "Slows Ban by 20%." },
-            { id: "a2", name: "Alumni", cost: 15, desc: "Significant Ban reduction." },
-            { id: "a3", name: "Mutation", cost: 12, desc: "Random free upgrade." }
-        ]
-    }
+    symp: [
+        { id: "c_meme", name: "Basic Meme", cost: 2, inf: 3, vis: 1, desc: "It begins." },
+        { id: "c_cursed", name: "Cursed Image", cost: 5, inf: 6, vis: 3, desc: "High spread." },
+        { id: "c_pol", name: "Political", cost: 12, inf: 15, vis: 25, desc: "Huge spread, huge risk." }
+    ],
+    abil: [
+        { id: "r_anon", name: "Anonymity", cost: 8, desc: "Slows ban by 20%." },
+        { id: "r_vpn", name: "VPN", cost: 15, desc: "Slows ban by 30%." },
+        { id: "r_dna", name: "Mutation", cost: 12, desc: "Gain random DNA bursts." }
+    ]
 };
 
-/* --- GAME LOGIC --- */
+/* --- GAME ENGINE --- */
 const Game = {
     state: {
-        dna: 10, day: 1, tick: 0, speed: 1,
-        ban: 0, visibility: 0, infectivity: 1,
-        owned: [], paused: false, ended: false,
-        selectedRegion: null
+        dna: 5, day: 1, tick: 0, speed: 1,
+        ban: 0, vis: 0, inf: 1,
+        owned: [], ended: false,
+        sel: null
     },
-    colleges: [],
+    nodes: [],
     totalPop: 0,
 
     init() {
-        // Init Colleges
-        CONFIG.colleges.forEach(c => {
-            Game.state.selectedRegion = null;
-            Game.totalPop += c.pop;
-            Game.colleges.push({
+        // Setup Nodes
+        COLLEGES.forEach(c => {
+            Game.nodes.push({
                 ...c,
+                pop: 400 + Math.floor(Math.random()*100),
                 inf: 0, dead: 0,
                 color: 0
             });
         });
         
-        // Infect Patient Zero
-        Game.colleges[0].inf = 5; 
+        Game.totalPop = Game.nodes.reduce((a,b) => a+b.pop, 0);
         
-        // Initial Render
-        GameUI.initMap();
-        GameUI.updateHUD();
+        // Start in Berkeley (Central)
+        Game.nodes[2].inf = 5; 
         
-        // Loop
+        UI.initMap();
+        UI.update();
+        
         requestAnimationFrame(Game.loop);
-        
-        // Ambience
-        setTimeout(() => AudioSys.playAlert(), 1000);
     },
 
     setSpeed(s) {
         Game.state.speed = s;
         document.querySelectorAll('.btn-time').forEach((b,i) => {
-            b.classList.remove('active');
-            if ([0,1,3,6].indexOf(s) === i) b.classList.add('active');
+            b.classList.toggle('active', [0,1,3,6].indexOf(s) === i);
         });
     },
 
     loop() {
-        if (Game.state.ended) return;
-        
-        if (Game.state.speed > 0) {
-            for(let i=0; i<Game.state.speed; i++) {
-                Game.tick();
-            }
-            GameParticles.update();
+        if(Game.state.ended) return;
+        if(Game.state.speed > 0) {
+            for(let i=0; i<Game.state.speed; i++) Game.tick();
+            Particles.update();
         }
         requestAnimationFrame(Game.loop);
     },
 
     tick() {
         Game.state.tick++;
-        
-        // Hourly Logic (Every 60 ticks)
-        if (Game.state.tick % 60 === 0) {
-            Game.updateInfection();
-            Game.updateBan();
-        }
-        
-        // Daily Logic
-        if (Game.state.tick % 1440 === 0) {
+        if(Game.state.tick % 60 === 0) Game.logic();
+        if(Game.state.tick % 1440 === 0) {
             Game.state.day++;
-            GameUI.ticker("Another day on campus...");
+            UI.ticker("Another day passes...");
         }
-
-        GameUI.updateHUD();
+        UI.update();
     },
 
-    updateInfection() {
+    logic() {
         let totalInf = 0;
         
-        Game.colleges.forEach(c => {
-            if (c.inf > 0 && c.inf < c.pop) {
-                // Logistic-ish growth
-                let rate = (Game.state.infectivity * 0.05) + (c.inf * 0.002);
-                let growth = Math.ceil(rate);
-                let actual = Math.min(c.pop - c.inf - c.dead, growth);
-                c.inf += actual;
+        Game.nodes.forEach(node => {
+            // Internal spread
+            if(node.inf > 0 && node.inf < node.pop) {
+                let growth = Math.ceil((node.inf * 0.05 * Game.state.inf) + 0.1);
+                let actual = Math.min(node.pop - node.inf - node.dead, growth);
+                node.inf += actual;
                 
-                // Particles
-                if (Math.random() < 0.3) GameParticles.spawn(c);
+                if(Math.random() < 0.2) Particles.emit(node, 'internal');
             }
             
-            // Spread to neighbors
-            if (c.inf > 0 && Math.random() < 0.01 * Game.state.infectivity) {
-                let target = Game.colleges[Math.floor(Math.random() * Game.colleges.length)];
-                if (target.inf === 0) {
-                    // Access Check
-                    let hasAccess = Game.state.owned.some(u => u.type === target.type);
-                    if (hasAccess || Game.state.owned.length === 0 && target === Game.colleges[0]) {
-                        target.inf = 1;
-                        GameUI.spawnBubble(target.x, target.y, 'dna');
-                        GameUI.ticker(`Outbreak in ${target.name}!`);
-                        AudioSys.playAlert();
-                    }
-                } else {
-                    // Show travel particle
-                    GameParticles.travel(c, target);
-                }
-            }
-            
-            totalInf += c.inf;
-            GameUI.colorCollege(c);
-        });
-        
-        // Win Condition
-        if (totalInf >= Game.totalPop * 0.99) Game.end(true);
-    },
-
-    updateBan() {
-        let totalInf = Game.colleges.reduce((a,b) => a + b.inf, 0);
-        if (totalInf > 50) {
-            // Ban Logic
-            let rate = (Game.state.visibility * 0.002) + 0.01;
-            
-            // Reducers
-            if (Game.has('a1')) rate *= 0.8;
-            if (Game.has('a2')) rate *= 0.5;
-
-            Game.state.ban += rate;
-            
-            // Expulsion logic (People getting banned/expelled)
-            if (Game.state.ban > 20) {
-                Game.colleges.forEach(c => {
-                    if (c.inf > 0) {
-                        let killed = Math.ceil(c.inf * (Game.state.ban / 2000));
-                        if (killed > 0) {
-                            c.inf -= killed;
-                            c.dead += killed;
-                        }
+            // Outbound spread
+            if(node.inf > 0) {
+                // 1. Neighbors (Walking)
+                node.neighbors.forEach(nid => {
+                    let target = Game.nodes.find(n => n.id === nid);
+                    // Can spread if target has >0 infection OR user has unlocked Physical/Social vectors
+                    // Simplified: Walking always works slowly, vectors speed it up.
+                    if(Math.random() < 0.01 * Game.state.inf) {
+                        Game.infect(target, 'phys');
                     }
                 });
+
+                // 2. Vectors (Digital/Social jumps)
+                if(Math.random() < 0.02 * Game.state.inf) {
+                    let target = Game.nodes[Math.floor(Math.random()*Game.nodes.length)];
+                    // Check if we have the vector for target's type
+                    let hasVector = Game.state.owned.some(u => u.type === target.type);
+                    
+                    // Digital (Insta) allows infecting Franklin/Murray
+                    if(hasVector) {
+                        Game.infect(target, target.type === 'Digital' ? 'digital' : 'social');
+                    }
+                }
             }
-            
-            // Cure Bubble
-            if (Math.random() < 0.005) {
-                let r = Game.colleges[Math.floor(Math.random()*Game.colleges.length)];
-                GameUI.spawnBubble(r.x, r.y, 'cure');
+            totalInf += node.inf;
+            UI.paint(node);
+        });
+
+        // Ban Logic
+        if(totalInf > 50) {
+            let rate = (Game.state.vis * 0.005) + 0.02;
+            if(Game.has('r_anon')) rate *= 0.8;
+            if(Game.has('r_vpn')) rate *= 0.7;
+            Game.state.ban += rate;
+
+            // Random Bubble
+            if(Math.random() < 0.01) {
+                let n = Game.nodes[Math.floor(Math.random()*Game.nodes.length)];
+                UI.spawnBubble(n.x, n.y, Math.random()>0.8 ? 'cure':'dna');
             }
         }
         
-        if (Game.state.ban >= 100) Game.end(false);
+        if(Game.state.ban >= 100) Game.end(false);
+        if(totalInf >= Game.totalPop * 0.99) Game.end(true);
+    },
+
+    infect(target, type) {
+        if(target.inf === 0) {
+            target.inf = 1;
+            UI.spawnBubble(target.x, target.y, 'dna');
+            UI.ticker(`${target.name} infected via ${type}!`);
+            Audio.alert();
+        }
     },
 
     has(id) { return Game.state.owned.some(u => u.id === id); },
-
+    
     buy(u) {
-        if (Game.state.dna >= u.cost) {
+        if(Game.state.dna >= u.cost) {
             Game.state.dna -= u.cost;
             Game.state.owned.push(u);
-            if (u.inf) Game.state.infectivity += u.inf;
-            if (u.vis) Game.state.visibility += u.vis;
-            GameUI.renderEvo();
-            AudioSys.playClick();
+            if(u.inf) Game.state.inf += u.inf;
+            if(u.vis) Game.state.vis += u.vis;
+            UI.renderEvo();
+            Audio.click();
         }
     },
 
     end(win) {
         Game.state.ended = true;
         document.getElementById('game-over').style.display = 'flex';
-        document.getElementById('go-title').className = win ? 'go-text win' : 'go-text lose';
+        document.getElementById('go-title').className = win ? 'end-title win' : 'end-title lose';
         document.getElementById('go-title').innerText = win ? "VICTORY" : "BANNED";
-        document.getElementById('go-desc').innerText = win ? "Your meme is legendary." : "The Administration erased it.";
-        if(win) AudioSys.playAlert();
+        document.getElementById('go-desc').innerText = win ? "Total Campus Saturation Achieved." : "The Administration shut you down.";
+        if(win) Audio.alert();
     }
 };
 
-/* --- UI SYSTEM --- */
-const GameUI = {
-    currentTab: 'transmission',
+/* --- VISUALS --- */
+const UI = {
+    tab: 'trans',
     
     initMap() {
-        const svg = document.getElementById('regions-layer');
-        Game.colleges.forEach((c, i) => {
+        const sl = document.getElementById('regions-layer');
+        const cl = document.getElementById('connections-layer');
+        
+        // Draw Connections
+        Game.nodes.forEach(n => {
+            n.neighbors.forEach(nid => {
+                let t = Game.nodes.find(x => x.id === nid);
+                let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", n.x + 25); line.setAttribute("y1", n.y + 25);
+                line.setAttribute("x2", t.x + 25); line.setAttribute("y2", t.y + 25);
+                line.setAttribute("class", "conn-line");
+                cl.appendChild(line);
+            });
+        });
+
+        // Draw Nodes
+        Game.nodes.forEach((n, i) => {
             let g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            g.setAttribute("class", "college-group");
-            g.onclick = () => GameUI.selectRegion(i);
+            g.setAttribute("class", "region-group");
+            g.onclick = () => UI.select(i);
+
+            // Rect BG
+            let r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            r.setAttribute("x", n.x); r.setAttribute("y", n.y);
+            r.setAttribute("width", 50); r.setAttribute("height", 50);
+            r.setAttribute("rx", 5);
+            r.setAttribute("class", "region-bg");
+            r.setAttribute("id", `node-${n.id}`);
             
-            let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rect.setAttribute("x", c.x * 1);
-            rect.setAttribute("y", c.y * 1);
-            rect.setAttribute("width", c.w);
-            rect.setAttribute("height", c.h);
-            rect.setAttribute("class", "college-shape");
-            rect.setAttribute("id", `shp-${c.id}`);
+            // Icon
+            let iconUse = "";
+            if(n.type === 'Digital') iconUse = "icon-wifi";
+            if(n.type === 'Academic') iconUse = "icon-book";
+            if(n.type === 'Social') iconUse = "icon-party";
+            if(n.type === 'Physical') iconUse = "icon-gate";
             
-            let txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            txt.setAttribute("x", c.x);
-            txt.setAttribute("y", c.y - 5);
-            txt.setAttribute("class", "college-label");
-            txt.textContent = c.id;
-            
-            g.appendChild(rect);
-            g.appendChild(txt);
-            svg.appendChild(g);
+            let ico = document.createElementNS("http://www.w3.org/2000/svg", "use");
+            ico.setAttribute("href", `#${iconUse}`);
+            ico.setAttribute("x", n.x + 13); ico.setAttribute("y", n.y + 13);
+            ico.setAttribute("width", 24); ico.setAttribute("height", 24);
+            ico.setAttribute("class", "icon-path");
+            ico.setAttribute("id", `ico-${n.id}`);
+
+            g.appendChild(r);
+            g.appendChild(ico);
+            sl.appendChild(g);
         });
         
-        // Canvas setup
-        const cvs = document.getElementById('fx-canvas');
-        cvs.width = 800; cvs.height = 500;
-        GameParticles.ctx = cvs.getContext('2d');
+        Particles.init();
     },
 
-    selectRegion(idx) {
-        Game.state.selectedRegion = idx;
-        let c = Game.colleges[idx];
-        document.getElementById('reg-name').innerText = c.name;
-        AudioSys.playClick();
-        GameUI.updateHUD();
+    paint(n) {
+        let pct = n.inf / n.pop;
+        let el = document.getElementById(`node-${n.id}`);
+        let ic = document.getElementById(`ico-${n.id}`);
+        
+        // Dark grey to bright red
+        let r = 34 + (pct * 200);
+        el.style.fill = `rgb(${r}, 34, 34)`;
+        
+        // Icon glow
+        if(pct > 0) ic.style.fill = "#fff";
     },
 
-    colorCollege(c) {
-        let intensity = c.inf / c.pop;
-        let el = document.getElementById(`shp-${c.id}`);
-        // Red intensity
-        el.style.fill = `rgb(${42 + (intensity * 200)}, 42, 42)`;
-        if (c.inf > 0 && c.inf < c.pop) el.style.stroke = "#fff";
-        else el.style.stroke = "#444";
+    select(i) {
+        Game.state.sel = i;
+        let n = Game.nodes[i];
+        document.getElementById('ui-reg-name').innerText = n.name;
+        Audio.click();
+        UI.update();
     },
 
     spawnBubble(x, y, type) {
         let b = document.createElement('div');
         b.className = `bubble ${type}`;
-        b.style.left = (x + Math.random()*20) + 'px';
-        b.style.top = (y + Math.random()*20) + 'px';
-        
-        if (type === 'dna') {
-            b.innerHTML = "+";
-            b.onclick = () => { 
-                Game.state.dna += (1 + Math.floor(Math.random()*2)); 
-                AudioSys.playPop(); 
-                b.remove(); 
-                GameUI.updateHUD(); 
-            };
-        } else {
-            b.innerHTML = "!";
-            b.onclick = () => {
-                Game.state.ban = Math.max(0, Game.state.ban - 5);
-                AudioSys.playPop();
-                b.remove();
-                GameUI.updateHUD();
-            };
-        }
-        
+        b.style.left = (x + 5 + Math.random()*20) + 'px';
+        b.style.top = (y + 5 + Math.random()*20) + 'px';
+        b.innerHTML = type === 'dna' ? "+" : "!";
+        b.onclick = (e) => {
+            if(type === 'dna') Game.state.dna += (1 + Math.floor(Math.random()*3));
+            else Game.state.ban = Math.max(0, Game.state.ban - 5);
+            Audio.pop();
+            e.target.remove();
+            UI.update();
+        };
         document.getElementById('bubble-layer').appendChild(b);
         setTimeout(() => b.remove(), 4000);
     },
 
-    updateHUD() {
-        // Global
-        let totalInf = Game.colleges.reduce((a,b)=>a+b.inf,0);
-        document.getElementById('val-dna').innerText = Game.state.dna;
+    update() {
+        // HUD
+        document.getElementById('ui-dna').innerText = Game.state.dna;
         document.getElementById('modal-dna').innerText = Game.state.dna;
-        document.getElementById('val-total-inf').innerText = totalInf;
-        document.getElementById('date-display').innerText = `DAY ${Game.state.day}`;
+        document.getElementById('disp-date').innerText = `DAY ${Game.state.day}`;
         
-        // Bars
-        document.getElementById('bar-inf').style.width = (totalInf / Game.totalPop * 100) + '%';
-        document.getElementById('bar-ban').style.width = Game.state.ban + '%';
+        let total = Game.nodes.reduce((a,b)=>a+b.inf,0);
+        document.getElementById('ui-total').innerText = total;
+        document.getElementById('bar-inf').style.width = (total/Game.totalPop*100) + "%";
+        document.getElementById('bar-ban').style.width = Game.state.ban + "%";
         
-        // Region
-        if (Game.state.selectedRegion !== null) {
-            let c = Game.colleges[Game.state.selectedRegion];
-            document.getElementById('reg-pop').innerText = c.pop;
-            document.getElementById('reg-inf').innerText = c.inf;
-            document.getElementById('reg-dead').innerText = c.dead;
+        if(Game.state.sel !== null) {
+            let n = Game.nodes[Game.state.sel];
+            document.getElementById('ui-reg-pop').innerText = n.pop;
+            document.getElementById('ui-reg-inf').innerText = n.inf;
+            document.getElementById('ui-reg-dead').innerText = n.dead;
         }
     },
 
     ticker(msg) {
-        let el = document.getElementById('news-ticker');
-        el.innerText = msg;
-        el.style.animation = 'none';
-        el.offsetHeight; 
-        el.style.animation = 'ticker 15s linear infinite';
+        let t = document.getElementById('ticker');
+        t.innerText = msg;
+        t.style.animation = 'none'; t.offsetHeight; t.style.animation = 'scrollText 20s linear infinite';
     },
 
-    toggleEvo(show) {
-        document.getElementById('evo-modal').style.display = show ? 'flex' : 'none';
-        if(show) GameUI.renderEvo();
-        AudioSys.playClick();
-    },
-
-    setTab(t) {
-        GameUI.currentTab = t;
-        document.querySelectorAll('.evo-tabs button').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        GameUI.renderEvo();
-        AudioSys.playClick();
-    },
-
+    toggleModal(s) { document.getElementById('modal').style.display = s ? 'flex':'none'; if(s) UI.renderEvo(); Audio.click(); },
+    setTab(t) { UI.tab = t; document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); UI.renderEvo(); Audio.click(); },
+    
     renderEvo() {
-        const list = document.getElementById('evo-list');
-        list.innerHTML = '';
-        CONFIG.upgrades[GameUI.currentTab].forEach(u => {
-            let owned = Game.has(u.id);
-            let locked = false;
-            if (u.req && !Game.has(u.req)) locked = true;
-            
-            let el = document.createElement('div');
-            el.className = `hex-upgrade ${owned?'owned':''} ${locked?'locked':''}`;
-            el.innerHTML = `<div class="hex-title">${u.name}</div><div class="hex-cost">${owned?'OWNED':u.cost}</div><div class="hex-desc">${u.desc}</div>`;
-            if (!owned && !locked) el.onclick = () => Game.buy(u);
-            list.appendChild(el);
+        const lst = document.getElementById('modal-list');
+        lst.innerHTML = '';
+        UPGRADES[UI.tab].forEach(u => {
+            let own = Game.has(u.id);
+            let lck = u.req && !Game.has(u.req);
+            let d = document.createElement('div');
+            d.className = `hex ${own?'owned':''} ${lck?'locked':''}`;
+            d.innerHTML = `<div style="font-weight:bold; color:#fff">${u.name}</div><div style="color:var(--col-gold)">${own?'OWNED':u.cost}</div><div style="font-size:0.75rem; color:#888">${u.desc}</div>`;
+            if(!own && !lck) d.onclick = () => Game.buy(u);
+            lst.appendChild(d);
         });
     }
 };
 
-/* --- PARTICLE SYSTEM --- */
-const GameParticles = {
-    particles: [],
-    ctx: null,
-    
-    spawn(c) {
-        this.particles.push({
-            x: c.x + 25, y: c.y + 25,
-            vx: (Math.random()-0.5)*1, vy: (Math.random()-0.5)*1,
-            life: 50, color: '#cc0000'
-        });
+/* --- PARTICLES --- */
+const Particles = {
+    ctx: null, list: [],
+    init() {
+        const c = document.getElementById('particles-canvas');
+        c.width = 800; c.height = 500;
+        this.ctx = c.getContext('2d');
     },
-    travel(s, t) {
-        this.particles.push({
-            x: s.x + 25, y: s.y + 25,
-            tx: t.x + 25, ty: t.y + 25,
-            travel: true, life: 100, color: '#ffcc00'
-        });
+    spawn(n) {
+        this.list.push({ x: n.x+25, y: n.y+25, vx: (Math.random()-.5), vy: (Math.random()-.5), life: 40, col: '#b91c1c' });
+    },
+    travel(a, b) {
+        // Vector particle
+        let col = '#fff';
+        if(b.type === 'Digital') col = '#06b6d4';
+        if(b.type === 'Social') col = '#f43f5e';
+        this.list.push({ x: a.x+25, y: a.y+25, tx: b.x+25, ty: b.y+25, travel: true, life: 100, col: col });
     },
     update() {
         if(!this.ctx) return;
         this.ctx.clearRect(0,0,800,500);
-        for(let i=this.particles.length-1; i>=0; i--) {
-            let p = this.particles[i];
+        for(let i=this.list.length-1; i>=0; i--) {
+            let p = this.list[i];
             if(p.travel) {
-                p.x += (p.tx - p.x)*0.05;
-                p.y += (p.ty - p.y)*0.05;
-                if(Math.abs(p.x-p.tx)<1) p.life=0;
+                p.x += (p.tx - p.x)*0.05; p.y += (p.ty - p.y)*0.05;
+                if(Math.abs(p.x-p.tx)<2) p.life=0;
             } else {
-                p.x+=p.vx; p.y+=p.vy; p.life--;
+                p.x += p.vx; p.y += p.vy; p.life--;
             }
-            this.ctx.fillStyle = p.color;
+            this.ctx.fillStyle = p.col;
             this.ctx.fillRect(p.x, p.y, 2, 2);
-            if(p.life<=0) this.particles.splice(i,1);
+            if(p.life<=0) this.list.splice(i,1);
         }
     }
 };
 
-// START
-window.onload = Game.init;
+Game.init();
+
 </script>
 </body>
 </html>
