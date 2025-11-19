@@ -70,6 +70,40 @@
       color: var(--text-muted);
     }
 
+    .map-wrapper {
+      margin: 8px 0 14px 0;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top, #111827 0, #020617 60%);
+      padding: 6px;
+    }
+
+    #mapSvg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .map-college {
+      stroke: #0f172a;
+      stroke-width: 1.5;
+      fill: #1f2937;
+      transition: fill 0.15s ease-out, transform 0.1s ease-out;
+      cursor: pointer;
+    }
+
+    .map-college:hover {
+      transform: translateY(-1px);
+      stroke-width: 2;
+    }
+
+    .map-label {
+      font-size: 8px;
+      fill: var(--text-muted);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
     .colleges-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -137,24 +171,6 @@
     .stat-label {
       font-size: 0.8rem;
       color: var(--text-muted);
-    }
-
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 7px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.14);
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-
-    .tag-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent-soft);
     }
 
     .btn-row {
@@ -282,24 +298,6 @@
       color: var(--text-muted);
     }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: rgba(56, 189, 248, 0.12);
-      font-size: 0.72rem;
-      color: var(--accent-soft);
-    }
-
-    .pill-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-    }
-
     .footer-note {
       margin-top: 8px;
       font-size: 0.7rem;
@@ -317,6 +315,7 @@
         <strong>upgrade</strong> to tweak your meme's traits, then watch it
         propagate.
       </p>
+
       <div class="meta-row">
         <div>Turn <span class="meta-highlight" id="turnNumber">1</span></div>
         <div>
@@ -328,6 +327,63 @@
           <span class="meta-highlight" id="upgradePoints">1</span>
         </div>
       </div>
+
+      <!-- SVG MAP -->
+      <div class="map-wrapper">
+        <svg id="mapSvg" viewBox="0 0 260 320">
+          <!-- stylized campus grid -->
+          <rect x="0" y="0" width="260" height="320" fill="#020617" />
+
+          <!-- 14 building shapes – positions loosely mimic downtown layout -->
+          <!-- 0 Benjamin Franklin -->
+          <rect class="map-college" id="college-0" x="20" y="230" width="40" height="40" rx="4" />
+
+          <!-- 1 Berkeley -->
+          <rect class="map-college" id="college-1" x="80" y="230" width="40" height="40" rx="4" />
+
+          <!-- 2 Branford -->
+          <rect class="map-college" id="college-2" x="140" y="230" width="40" height="40" rx="4" />
+
+          <!-- 3 Davenport -->
+          <rect class="map-college" id="college-3" x="200" y="230" width="40" height="40" rx="4" />
+
+          <!-- 4 Ezra Stiles -->
+          <rect class="map-college" id="college-4" x="20" y="170" width="40" height="36" rx="4" />
+
+          <!-- 5 Grace Hopper -->
+          <rect class="map-college" id="college-5" x="80" y="170" width="32" height="50" rx="4" />
+
+          <!-- 6 Jonathan Edwards -->
+          <rect class="map-college" id="college-6" x="140" y="170" width="48" height="34" rx="4" />
+
+          <!-- 7 Morse -->
+          <rect class="map-college" id="college-7" x="208" y="170" width="28" height="50" rx="4" />
+
+          <!-- 8 Pauli Murray -->
+          <rect class="map-college" id="college-8" x="20" y="110" width="50" height="32" rx="4" />
+
+          <!-- 9 Pierson -->
+          <rect class="map-college" id="college-9" x="100" y="110" width="40" height="32" rx="4" />
+
+          <!-- 10 Saybrook -->
+          <rect class="map-college" id="college-10" x="160" y="110" width="40" height="32" rx="4" />
+
+          <!-- 11 Silliman -->
+          <rect class="map-college" id="college-11" x="220" y="110" width="26" height="36" rx="4" />
+
+          <!-- 12 Timothy Dwight -->
+          <rect class="map-college" id="college-12" x="60" y="40" width="60" height="38" rx="4" />
+
+          <!-- 13 Trumbull -->
+          <rect class="map-college" id="college-13" x="150" y="40" width="60" height="38" rx="4" />
+
+          <!-- simple labels -->
+          <text x="10" y="20" class="map-label">Grove-ish</text>
+          <text x="10" y="305" class="map-label">Near Green-ish</text>
+        </svg>
+      </div>
+
+      <!-- old cards list still useful as a legend -->
       <div class="colleges-grid" id="collegesGrid"></div>
     </div>
 
@@ -370,7 +426,7 @@
   </div>
 
   <script>
-    const COLLEGES = [
+    const COLLEGE_NAMES = [
       "Benjamin Franklin",
       "Berkeley",
       "Branford",
@@ -407,10 +463,9 @@
       gameState.upgradePoints = 1;
       gameState.traits = { virality: 2, relatability: 2, edginess: 2 };
       gameState.gameOver = false;
-      gameState.colleges = COLLEGES.map((name, index) => {
-        // Seed one random college as origin with small infection
+      gameState.colleges = COLLEGE_NAMES.map((name, index) => {
         const baseInfection = index === 0 ? 20 : 0;
-        const moderation = 0.2 + Math.random() * 0.4; // resistance
+        const moderation = 0.2 + Math.random() * 0.4;
         return {
           name,
           infection: baseInfection,
@@ -421,6 +476,7 @@
       addLog(
         "New meme detected in Benjamin Franklin. It seems harmless. For now."
       );
+      attachMapClickHandlers();
       renderUI();
     }
 
@@ -489,6 +545,20 @@
         gameState.upgradePoints;
     }
 
+    function renderMap() {
+      for (let i = 0; i < gameState.colleges.length; i++) {
+        const c = gameState.colleges[i];
+        const el = document.getElementById(`college-${i}`);
+        if (!el) continue;
+
+        const t = c.infection / 100;
+        // color from dark slate (low) to bright cyan/pink (high)
+        const hue = 200 - 60 * t;
+        const light = 20 + 40 * (1 - t);
+        el.style.fill = `hsl(${hue}, 80%, ${light}%)`;
+      }
+    }
+
     function renderColleges() {
       const grid = document.getElementById("collegesGrid");
       grid.innerHTML = "";
@@ -524,15 +594,8 @@
         const mod = document.createElement("div");
         mod.textContent = "Resistance: " + c.moderation.toFixed(2);
         const tag = document.createElement("div");
-        tag.className = "tag";
-        const dot = document.createElement("div");
-        dot.className = "tag-dot";
-        tag.appendChild(dot);
-        tag.append(
-          document.createTextNode(
-            p >= 80 ? "Fully memed" : p >= 20 ? "Contaminated" : "Mostly safe"
-          )
-        );
+        tag.textContent =
+          p >= 80 ? "Fully memed" : p >= 20 ? "Contaminated" : "Mostly safe";
         meta.appendChild(mod);
         meta.appendChild(tag);
 
@@ -542,6 +605,8 @@
 
         grid.appendChild(card);
       });
+
+      renderMap();
     }
 
     function renderMeta() {
@@ -553,7 +618,6 @@
       document.getElementById("overallInfection").textContent =
         Math.round(avg) + "%";
 
-      // Disable buttons if game over
       const disabled = gameState.gameOver;
       ["btnVirality", "btnRelatability", "btnEdginess", "btnNextTurn"].forEach(
         (id) => {
@@ -600,7 +664,6 @@
     function nextTurn() {
       if (gameState.gameOver) return;
 
-      // Each turn, re-gain 1 upgrade point (max 3 to keep things sane)
       if (gameState.upgradePoints < 3) {
         gameState.upgradePoints += 1;
       }
@@ -615,18 +678,15 @@
         const existingBoost = (relatability * c.infection) / 100;
         const resistance = c.moderation * 5;
 
-        // Edginess helps bypass resistance but also invites clampdowns
         const edgyBonus = edginess * 0.4;
-        const chaos = (Math.random() - 0.5) * 4; // small randomness
+        const chaos = (Math.random() - 0.5) * 4;
 
         let delta = baseSpread + existingBoost + edgyBonus - resistance + chaos;
 
-        // If infection is zero, it's harder to start
         if (c.infection < 5) {
           delta *= 0.6;
         }
 
-        // Clamp delta
         if (delta < -5) delta = -5;
         if (delta > 15) delta = 15;
 
@@ -637,7 +697,6 @@
           newlyHigh.push(c.name);
         }
 
-        // Moderation event chance increases with edginess & infection level
         const moderationChance =
           (edginess * 0.04 + c.infection / 400) * c.moderation;
         if (Math.random() < moderationChance) {
@@ -694,11 +753,25 @@
       renderUI();
     }
 
+    function attachMapClickHandlers() {
+      for (let i = 0; i < COLLEGE_NAMES.length; i++) {
+        const el = document.getElementById(`college-${i}`);
+        if (!el) continue;
+        el.onclick = () => {
+          const c = gameState.colleges[i];
+          addLog(
+            `${c.name} currently at ~${Math.round(
+              c.infection
+            )}% infection (resistance ${c.moderation.toFixed(2)}).`
+          );
+        };
+      }
+    }
+
     function resetGame() {
       initGame();
     }
 
-    // Boot
     initGame();
   </script>
 </body>
