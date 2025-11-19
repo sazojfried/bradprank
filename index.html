@@ -87,8 +87,7 @@
     }
 
     .map-college {
-      stroke: #0f172a;
-      stroke-width: 1.5;
+      stroke-width: 2;
       fill: #1f2937;
       transition: fill 0.15s ease-out, transform 0.1s ease-out;
       cursor: pointer;
@@ -96,17 +95,17 @@
 
     .map-college:hover {
       transform: translateY(-1px);
-      stroke-width: 2;
+      stroke-width: 2.5;
     }
 
-    .map-label {
+    .map-label,
+    .college-label {
       font-size: 8px;
-      fill: var(--text-muted);
+      fill: #e5e7eb;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
     }
 
-    /* student dots overlay */
     #studentsCanvas {
       position: absolute;
       left: 6px;
@@ -220,17 +219,19 @@
       transform: none;
     }
 
-    .btn-secondary {
+    .speed-btn {
       background: transparent;
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
       box-shadow: none;
+      padding-inline: 10px;
     }
 
-    .btn-danger {
-      background: var(--danger);
-      color: #f8fafc;
-      box-shadow: 0 6px 16px rgba(248, 113, 113, 0.5);
+    .speed-btn.active {
+      background: var(--accent);
+      color: #020617;
+      border-color: var(--accent-soft);
+      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
     }
 
     .traits-list {
@@ -291,7 +292,7 @@
       border-radius: 10px;
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid var(--border-subtle);
-      height: 170px;
+      height: 160px;
       overflow-y: auto;
       font-size: 0.78rem;
       line-height: 1.3;
@@ -347,26 +348,14 @@
       color: var(--text-muted);
     }
 
-    .speed-btn {
-      background: transparent;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      box-shadow: none;
-      padding-inline: 10px;
-    }
-
-    .speed-btn.active {
-      background: var(--accent);
-      color: #020617;
-      border-color: var(--accent-soft);
-      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
-    }
-
     .upgrades-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 6px;
       margin-top: 6px;
+      max-height: 260px;
+      overflow-y: auto;
+      padding-right: 4px;
     }
 
     .upgrade-card {
@@ -381,8 +370,8 @@
       font-size: 0.75rem;
       color: var(--text-main);
       box-shadow: none;
-      height: 80px;
-      justify-content: space-between;
+      height: auto;
+      justify-content: flex-start;
     }
 
     .upgrade-card:hover {
@@ -398,11 +387,13 @@
     .upgrade-desc {
       font-size: 0.72rem;
       color: var(--text-muted);
+      margin-bottom: 2px;
     }
 
     .upgrade-meta {
       font-size: 0.7rem;
       color: var(--accent-soft);
+      margin-top: auto;
     }
   </style>
 </head>
@@ -411,9 +402,8 @@
     <div class="panel">
       <h2>Meme Outbreak: Yale Edition</h2>
       <p class="subtitle">
-        A tiny, slightly cursed simulation of how a meme spreads across Yale's
-        14 residential colleges. Time flows continuously; every in-game hour
-        the meme evolves and you earn one upgrade point.
+        Continuous-time meme epidemiology across 14 residential colleges.
+        Each in-game hour the meme evolves and you earn one upgrade point.
       </p>
 
       <div class="meta-row">
@@ -434,7 +424,7 @@
       <div class="tolerance-wrap">
         <div class="tolerance-label">
           Admin Tolerance:
-          <span class="meta-highlight" id="toleranceText">100%</span>
+          <span class="meta-highlight" id="toleranceText">120%</span>
         </div>
         <div class="tolerance-bar-outer">
           <div
@@ -447,18 +437,17 @@
 
       <div class="speed-row">
         <div class="speed-label">Time speed:</div>
-        <button class="speed-btn" id="speed0" onclick="setSpeed(0)">Pause</button>
         <button class="speed-btn" id="speed1" onclick="setSpeed(1)">1x</button>
         <button class="speed-btn" id="speed2" onclick="setSpeed(2)">2x</button>
         <button class="speed-btn" id="speed4" onclick="setSpeed(4)">4x</button>
       </div>
 
-      <!-- SVG MAP -->
+      <!-- MAP -->
       <div class="map-wrapper">
         <svg id="mapSvg" viewBox="0 0 260 320">
           <rect x="0" y="0" width="260" height="320" fill="#020617" />
 
-          <!-- 14 building shapes -->
+          <!-- buildings -->
           <rect class="map-college" id="college-0" x="20" y="230" width="40" height="40" rx="4" />
           <rect class="map-college" id="college-1" x="80" y="230" width="40" height="40" rx="4" />
           <rect class="map-college" id="college-2" x="140" y="230" width="40" height="40" rx="4" />
@@ -477,8 +466,27 @@
           <rect class="map-college" id="college-12" x="60" y="40" width="60" height="38" rx="4" />
           <rect class="map-college" id="college-13" x="150" y="40" width="60" height="38" rx="4" />
 
-          <text x="10" y="20" class="map-label">Grove-ish</text>
-          <text x="10" y="305" class="map-label">Near Green-ish</text>
+          <!-- labels -->
+          <text class="map-label" x="10" y="20">Grove-ish</text>
+          <text class="map-label" x="10" y="305">Near Green-ish</text>
+
+          <text class="college-label" x="22" y="278">Ben Frank</text>
+          <text class="college-label" x="82" y="278">Berkeley</text>
+          <text class="college-label" x="142" y="278">Branford</text>
+          <text class="college-label" x="202" y="278">Davenport</text>
+
+          <text class="college-label" x="22" y="205">Ezra Stiles</text>
+          <text class="college-label" x="82" y="205">Hopper</text>
+          <text class="college-label" x="142" y="205">JE</text>
+          <text class="college-label" x="210" y="205">Morse</text>
+
+          <text class="college-label" x="22" y="140">Pauli</text>
+          <text class="college-label" x="100" y="140">Pierson</text>
+          <text class="college-label" x="160" y="140">Saybrook</text>
+          <text class="college-label" x="220" y="145">Silliman</text>
+
+          <text class="college-label" x="62" y="70">TD</text>
+          <text class="college-label" x="152" y="70">Trumbull</text>
         </svg>
         <canvas id="studentsCanvas"></canvas>
       </div>
@@ -490,8 +498,9 @@
       <h3>Meme Traits & Upgrades</h3>
       <p class="subtitle">
         Every in-game hour, you gain 1 upgrade point. Spend them on themed
-        upgrades that tweak <strong>Virality</strong>, <strong>Relatability</strong>,
-        <strong>Edginess</strong>, and how quickly Admin Tolerance melts down.
+        upgrades that tweak <strong>Virality</strong>,
+        <strong>Relatability</strong>, <strong>Edginess</strong>, and Admin
+        Tolerance.
       </p>
 
       <div class="traits-list" id="traitsList"></div>
@@ -503,8 +512,8 @@
       <div class="footer-note">
         Win by infecting at least <strong>80%</strong> of the overall
         population before Admin Tolerance hits zero or campus moves on to a new
-        drama (after Day 7). Student dots are people walking between colleges—
-        traffic peaks during the day.
+        drama (after Day 7). Student dots approximate people walking between
+        colleges—traffic peaks during the day.
       </div>
     </div>
   </div>
@@ -527,188 +536,55 @@
       "Trumbull",
     ];
 
-    // 30 upgrades, 3 columns x 10 rows
+    // rough color vibes for strokes (not perfectly canonical, but distinct)
+    const COLLEGE_COLORS = [
+      "#1d4ed8", // BF - blue
+      "#15803d", // Berkeley - green
+      "#1e40af", // Branford - dark blue
+      "#7f1d1d", // Davenport - maroon
+      "#f97316", // Stiles - orange
+      "#facc15", // Hopper - yellow
+      "#6d28d9", // JE - purple
+      "#0ea5e9", // Morse - cyan
+      "#f59e0b", // Pauli - gold
+      "#dc2626", // Pierson - red
+      "#2563eb", // Saybrook - blue
+      "#22c55e", // Silliman - green
+      "#16a34a", // TD - green
+      "#047857", // Trumbull - deep green
+    ];
+
     const UPGRADES = [
-      {
-        id: "trumpify",
-        name: "Trumpify",
-        desc: "Your meme now applies to Trump; virality and edginess spike, admins panic.",
-        v: 2, r: 0, e: 2, tol: -8,
-      },
-      {
-        id: "commons-feature",
-        name: "Commons Feature",
-        desc: "The meme hits the screens in The Schwarzman Center.",
-        v: 2, r: 1, e: 0, tol: -4,
-      },
-      {
-        id: "ydn-article",
-        name: "YDN Article",
-        desc: "Yale Daily News writes a think-piece about your meme.",
-        v: 1, r: 2, e: 0, tol: -3,
-      },
-      {
-        id: "stonks",
-        name: "Stonks",
-        desc: "You lean into the 'stonks' template. Easy shares.",
-        v: 2, r: 1, e: 1, tol: -2,
-      },
-      {
-        id: "six-seven",
-        name: "Six–Seven Chant",
-        desc: "Students adopt your meme as a chant in the Bowl.",
-        v: 3, r: 1, e: 0, tol: -5,
-      },
-      {
-        id: "bulldog-days",
-        name: "Bulldog Days Leak",
-        desc: "Prefrosh see the meme before they even enroll.",
-        v: 2, r: 2, e: 0, tol: -4,
-      },
-      {
-        id: "froco-endorsement",
-        name: "FroCo Endorsement",
-        desc: "FroCos ironically include your meme in group emails.",
-        v: 1, r: 2, e: 0, tol: -1,
-      },
-      {
-        id: "section-meme-page",
-        name: "Section Meme Page",
-        desc: "Your meme becomes the default language of a section meme page.",
-        v: 1, r: 3, e: 1, tol: -3,
-      },
-      {
-        id: "sig-blast",
-        name: "SIG Blast",
-        desc: "A big student org sends it out in a listserv blast.",
-        v: 2, r: 1, e: 0, tol: -2,
-      },
-      {
-        id: "yale-facebook",
-        name: "Yale Facebook Group",
-        desc: "The old guard picks it up on Facebook.",
-        v: 1, r: 1, e: 0, tol: -1,
-      },
-      {
-        id: "bass-whiteboard",
-        name: "Bass Whiteboard",
-        desc: "Someone draws your meme on a Bass study room whiteboard.",
-        v: 1, r: 2, e: 0, tol: -1,
-      },
-      {
-        id: "lecture-slide",
-        name: "Lecture Slide Cameo",
-        desc: "A professor uses your meme in their lecture slides.",
-        v: 1, r: 2, e: 0, tol: +2,
-      },
-      {
-        id: "groupme-stickers",
-        name: "GroupMe Stickers",
-        desc: "Your meme becomes a cursed sticker pack.",
-        v: 1, r: 3, e: 1, tol: -2,
-      },
-      {
-        id: "yalies-tiktok",
-        name: "Yalies on TikTok",
-        desc: "The meme jumps to TikTok with a trending sound.",
-        v: 3, r: 2, e: 1, tol: -5,
-      },
-      {
-        id: "cs-piazza",
-        name: "CS Piazza Thread",
-        desc: "CS majors turn a Piazza post into a meme thread.",
-        v: 1, r: 2, e: 1, tol: -2,
-      },
-      {
-        id: "econ-pset",
-        name: "Econ Pset Joke",
-        desc: "Your meme features in an Econ pset hint.",
-        v: 1, r: 1, e: 0, tol: +1,
-      },
-      {
-        id: "beinecke-projection",
-        name: "Beinecke Projection",
-        desc: "A meme variant gets projected on Beinecke in a stunt.",
-        v: 2, r: 1, e: 2, tol: -6,
-      },
-      {
-        id: "td-buttery",
-        name: "TD Buttery Graffiti",
-        desc: "It appears in TD buttery graffiti and menu names.",
-        v: 1, r: 2, e: 1, tol: -2,
-      },
-      {
-        id: "hopper-courtyard",
-        name: "Hopper Courtyard Projector",
-        desc: "Hopper plays the meme on a projector at night.",
-        v: 2, r: 1, e: 1, tol: -3,
-      },
-      {
-        id: "gheav-sighting",
-        name: "GHeav Sighting",
-        desc: "Someone captures the meme at GHeav at 2 a.m.",
-        v: 2, r: 1, e: 2, tol: -4,
-      },
-      {
-        id: "woads-night",
-        name: "Woads Theme Night",
-        desc: "The meme becomes a Woads pregame theme.",
-        v: 3, r: 1, e: 2, tol: -6,
-      },
-      {
-        id: "secret-society",
-        name: "Secret Society Cameo",
-        desc: "A secret-society tap joke references your meme.",
-        v: 1, r: 1, e: 2, tol: -3,
-      },
-      {
-        id: "ycc-referendum",
-        name: "YCC Referendum",
-        desc: "Someone proposes a serious YCC resolution framed by your meme.",
-        v: 1, r: 2, e: 1, tol: -3,
-      },
-      {
-        id: "reddit-frontpage",
-        name: "Yale Reddit Front Page",
-        desc: "It hits the front page of /r/yale.",
-        v: 2, r: 2, e: 1, tol: -4,
-      },
-      {
-        id: "dining-hall",
-        name: "Dining Hall Announcements",
-        desc: "Dining staff adopt the meme in menu announcements.",
-        v: 1, r: 2, e: 0, tol: 0,
-      },
-      {
-        id: "im-trash-talk",
-        name: "IM Trash Talk",
-        desc: "Intramural captains weaponize your meme in trash talk.",
-        v: 2, r: 1, e: 2, tol: -3,
-      },
-      {
-        id: "acappella-beef",
-        name: "A Cappella Beef",
-        desc: "Competing groups subtweet each other using your meme.",
-        v: 1, r: 2, e: 2, tol: -3,
-      },
-      {
-        id: "alumni-twitter",
-        name: "Alumni Twitter",
-        desc: "Alumni discover the meme and misinterpret it slightly.",
-        v: 1, r: 1, e: 0, tol: +1,
-      },
-      {
-        id: "ct-news",
-        name: "CT News Pickup",
-        desc: "Local news runs a lighthearted segment on the meme.",
-        v: 2, r: 1, e: 0, tol: -2,
-      },
-      {
-        id: "national-media",
-        name: "National Media Moment",
-        desc: "A national outlet uses your meme as shorthand for campus culture.",
-        v: 3, r: 1, e: 1, tol: -7,
-      },
+      { id: "trumpify", name: "Trumpify", desc: "Your meme now applies to Trump; virality and edginess spike, admins panic.", v: 2, r: 0, e: 2, tol: -8 },
+      { id: "commons-feature", name: "Commons Feature", desc: "The meme hits the screens in The Schwarzman Center.", v: 2, r: 1, e: 0, tol: -4 },
+      { id: "ydn-article", name: "YDN Article", desc: "Yale Daily News writes a think-piece about your meme.", v: 1, r: 2, e: 0, tol: -3 },
+      { id: "stonks", name: "Stonks", desc: "You lean into the 'stonks' template. Easy shares.", v: 2, r: 1, e: 1, tol: -2 },
+      { id: "six-seven", name: "Six–Seven Chant", desc: "Students adopt your meme as a chant in the Bowl.", v: 3, r: 1, e: 0, tol: -5 },
+      { id: "bulldog-days", name: "Bulldog Days Leak", desc: "Prefrosh see the meme before they even enroll.", v: 2, r: 2, e: 0, tol: -4 },
+      { id: "froco-endorsement", name: "FroCo Endorsement", desc: "FroCos ironically include your meme in group emails.", v: 1, r: 2, e: 0, tol: -1 },
+      { id: "section-meme-page", name: "Section Meme Page", desc: "Your meme becomes the default language of a section meme page.", v: 1, r: 3, e: 1, tol: -3 },
+      { id: "sig-blast", name: "SIG Blast", desc: "A big student org sends it out in a listserv blast.", v: 2, r: 1, e: 0, tol: -2 },
+      { id: "yale-facebook", name: "Yale Facebook Group", desc: "The old guard picks it up on Facebook.", v: 1, r: 1, e: 0, tol: -1 },
+      { id: "bass-whiteboard", name: "Bass Whiteboard", desc: "Someone draws your meme on a Bass study room whiteboard.", v: 1, r: 2, e: 0, tol: -1 },
+      { id: "lecture-slide", name: "Lecture Slide Cameo", desc: "A professor uses your meme in their lecture slides.", v: 1, r: 2, e: 0, tol: +3 },
+      { id: "groupme-stickers", name: "GroupMe Stickers", desc: "Your meme becomes a cursed sticker pack.", v: 1, r: 3, e: 1, tol: -2 },
+      { id: "yalies-tiktok", name: "Yalies on TikTok", desc: "The meme jumps to TikTok with a trending sound.", v: 3, r: 2, e: 1, tol: -5 },
+      { id: "cs-piazza", name: "CS Piazza Thread", desc: "CS majors turn a Piazza post into a meme thread.", v: 1, r: 2, e: 1, tol: -2 },
+      { id: "econ-pset", name: "Econ Pset Joke", desc: "Your meme features in an Econ pset hint.", v: 1, r: 1, e: 0, tol: +2 },
+      { id: "beinecke-projection", name: "Beinecke Projection", desc: "A meme variant gets projected on Beinecke in a stunt.", v: 2, r: 1, e: 2, tol: -6 },
+      { id: "td-buttery", name: "TD Buttery Graffiti", desc: "It appears in TD buttery graffiti and menu names.", v: 1, r: 2, e: 1, tol: -2 },
+      { id: "hopper-courtyard", name: "Hopper Courtyard Projector", desc: "Hopper plays the meme on a projector at night.", v: 2, r: 1, e: 1, tol: -3 },
+      { id: "gheav-sighting", name: "GHeav Sighting", desc: "Someone captures the meme at GHeav at 2 a.m.", v: 2, r: 1, e: 2, tol: -4 },
+      { id: "woads-night", name: "Woads Theme Night", desc: "The meme becomes a Woads pregame theme.", v: 3, r: 1, e: 2, tol: -6 },
+      { id: "secret-society", name: "Secret Society Cameo", desc: "A secret-society tap joke references your meme.", v: 1, r: 1, e: 2, tol: -3 },
+      { id: "ycc-referendum", name: "YCC Referendum", desc: "A serious YCC resolution is framed by your meme.", v: 1, r: 2, e: 1, tol: -3 },
+      { id: "reddit-frontpage", name: "Yale Reddit Front Page", desc: "It hits the front page of /r/yale.", v: 2, r: 2, e: 1, tol: -4 },
+      { id: "dining-hall", name: "Dining Hall Announcements", desc: "Dining staff adopt the meme in menu announcements.", v: 1, r: 2, e: 0, tol: 0 },
+      { id: "im-trash-talk", name: "IM Trash Talk", desc: "Intramural captains weaponize your meme in trash talk.", v: 2, r: 1, e: 2, tol: -3 },
+      { id: "acappella-beef", name: "A Cappella Beef", desc: "Competing groups subtweet each other using your meme.", v: 1, r: 2, e: 2, tol: -3 },
+      { id: "alumni-twitter", name: "Alumni Twitter", desc: "Alumni discover the meme and misinterpret it slightly.", v: 1, r: 1, e: 0, tol: +1 },
+      { id: "ct-news", name: "CT News Pickup", desc: "Local news runs a lighthearted segment on the meme.", v: 2, r: 1, e: 0, tol: -2 },
+      { id: "national-media", name: "National Media Moment", desc: "A national outlet uses your meme as shorthand for campus culture.", v: 3, r: 1, e: 1, tol: -7 },
     ];
 
     const gameState = {
@@ -717,15 +593,11 @@
       maxDays: 7,
       turn: 1,
       upgradePoints: 1,
-      traits: {
-        virality: 2,
-        relatability: 2,
-        edginess: 2,
-      },
+      traits: { virality: 2, relatability: 2, edginess: 2 },
       colleges: [],
       log: [],
       gameOver: false,
-      adminTolerance: 100,
+      adminTolerance: 120,
       speed: 1,
       timeAccHours: 0,
       purchased: {},
@@ -749,7 +621,7 @@
       gameState.upgradePoints = 1;
       gameState.traits = { virality: 2, relatability: 2, edginess: 2 };
       gameState.gameOver = false;
-      gameState.adminTolerance = 100;
+      gameState.adminTolerance = 120;
       gameState.speed = 1;
       gameState.timeAccHours = 0;
       gameState.purchased = {};
@@ -758,16 +630,11 @@
       gameState.colleges = COLLEGE_NAMES.map((name, index) => {
         const baseInfection = index === 0 ? 20 : 0;
         const moderation = 0.2 + Math.random() * 0.4;
-        return {
-          name,
-          infection: baseInfection,
-          moderation,
-        };
+        return { name, infection: baseInfection, moderation };
       });
+
       gameState.log = [];
-      addLog(
-        "Day 1, 09:00 — New meme detected in Benjamin Franklin. It seems harmless. For now."
-      );
+      addLog("Day 1, 09:00 — New meme detected in Benjamin Franklin.");
 
       attachMapClickHandlers();
       initStudents();
@@ -886,6 +753,7 @@
         const hue = 200 - 60 * t;
         const light = 20 + 40 * (1 - t);
         el.style.fill = `hsl(${hue}, 80%, ${light}%)`;
+        el.style.stroke = COLLEGE_COLORS[i] || "#e5e7eb";
       }
     }
 
@@ -893,7 +761,7 @@
       const grid = document.getElementById("collegesGrid");
       grid.innerHTML = "";
 
-      gameState.colleges.forEach((c) => {
+      gameState.colleges.forEach((c, idx) => {
         const card = document.createElement("div");
         card.className = "college-card";
 
@@ -952,8 +820,10 @@
         Math.round(avg) + "%";
 
       const tol = Math.max(0, Math.round(gameState.adminTolerance));
+      const tolPercent = Math.min(100, (tol / 120) * 100);
       document.getElementById("toleranceText").textContent = tol + "%";
-      document.getElementById("toleranceBar").style.width = tol + "%";
+      document.getElementById("toleranceBar").style.width =
+        tolPercent + "%";
     }
 
     function renderUI() {
@@ -996,7 +866,7 @@
       if (u.tol) {
         gameState.adminTolerance = Math.max(
           0,
-          Math.min(100, gameState.adminTolerance + u.tol)
+          Math.min(120, gameState.adminTolerance + u.tol)
         );
       }
 
@@ -1007,7 +877,6 @@
     function advanceHour() {
       if (gameState.gameOver) return;
 
-      // time bookkeeping
       gameState.hour += 1;
       if (gameState.hour >= 24) {
         gameState.hour = 0;
@@ -1015,7 +884,7 @@
       }
       gameState.turn += 1;
 
-      // 1 upgrade point per hour
+      // gain 1 upgrade point per hour
       gameState.upgradePoints += 1;
 
       const { virality, relatability, edginess } = gameState.traits;
@@ -1024,17 +893,17 @@
       let moderationEvents = [];
 
       gameState.colleges.forEach((c) => {
-        const baseSpread = virality * 0.8;
-        const existingBoost = (relatability * c.infection) / 100;
-        const resistance = c.moderation * 5;
-        const edgyBonus = edginess * 0.4;
-        const chaos = (Math.random() - 0.5) * 4;
+        const baseSpread = virality * 0.7;
+        const existingBoost = (relatability * c.infection) / 120;
+        const resistance = c.moderation * 4;
+        const edgyBonus = edginess * 0.35;
+        const chaos = (Math.random() - 0.5) * 3;
 
         let delta = baseSpread + existingBoost + edgyBonus - resistance + chaos;
 
         if (c.infection < 5) delta *= 0.6;
-        if (delta < -5) delta = -5;
-        if (delta > 15) delta = 15;
+        if (delta < -4) delta = -4;
+        if (delta > 12) delta = 12;
 
         const oldInfection = c.infection;
         c.infection = Math.max(0, Math.min(100, c.infection + delta));
@@ -1044,9 +913,9 @@
         }
 
         const moderationChance =
-          (edginess * 0.04 + c.infection / 400) * c.moderation;
+          (edginess * 0.03 + c.infection / 350) * c.moderation;
         if (Math.random() < moderationChance) {
-          const reduction = 5 + Math.random() * 10;
+          const reduction = 3 + Math.random() * 8;
           c.infection = Math.max(0, c.infection - reduction);
           moderationEvents.push(c.name);
         }
@@ -1057,7 +926,8 @@
         gameState.colleges.length;
 
       const isDay = gameState.hour >= 8 && gameState.hour <= 22;
-      const tolDecayBase = 0.3 + (avg / 100) * 1.2 + edginess * 0.2;
+      let tolDecayBase = 0.15 + (avg / 100) * 0.7 + edginess * 0.12;
+      if (avg < 40) tolDecayBase *= 0.5;
       const tolDecay = tolDecayBase * (isDay ? 1.1 : 0.8);
       gameState.adminTolerance -= tolDecay;
 
@@ -1135,21 +1005,20 @@
     }
 
     function updateSpeedButtons() {
-      [0, 1, 2, 4].forEach((s) => {
+      [1, 2, 4].forEach((s) => {
         const btn = document.getElementById(`speed${s}`);
         if (!btn) return;
         btn.classList.toggle("active", gameState.speed === s);
       });
     }
 
-    // --- student animation ---
+    // student animation
 
     function initStudents() {
       const canvas = document.getElementById("studentsCanvas");
       if (!canvas) return;
       resizeCanvas();
       window.addEventListener("resize", resizeCanvas);
-
       studentsState.dots = [];
       studentsState.lastSpawn = performance.now();
     }
@@ -1166,7 +1035,6 @@
       const svg = document.getElementById("mapSvg");
       const canvas = document.getElementById("studentsCanvas");
       if (!svg || !canvas) return [];
-
       const sx = canvas.width / svg.viewBox.baseVal.width;
       const sy = canvas.height / svg.viewBox.baseVal.height;
 
@@ -1196,7 +1064,7 @@
       if (!canvas) return;
 
       const isDay = gameState.hour >= 8 && gameState.hour <= 22;
-      const baseRate = isDay ? 0.0025 : 0.0007; // per ms per college
+      const baseRate = isDay ? 0.0025 : 0.0007;
       const elapsed = now - studentsState.lastSpawn;
       const expected = baseRate * elapsed * COLLEGE_NAMES.length;
       const numNew = Math.floor(expected);
@@ -1250,7 +1118,7 @@
       studentsState.dots = remaining;
     }
 
-    // main loop
+    // main loop: 1 hour ~ 2 real seconds at 1x
     function gameLoop(timestamp) {
       if (gameState.lastFrameTime == null) {
         gameState.lastFrameTime = timestamp;
@@ -1259,7 +1127,7 @@
       gameState.lastFrameTime = timestamp;
 
       if (!gameState.gameOver && gameState.speed > 0) {
-        const hoursToAdd = (dt / 1000) * gameState.speed; // 1 in-game hour per real second at 1x
+        const hoursToAdd = (dt / 2000) * gameState.speed;
         gameState.timeAccHours += hoursToAdd;
         while (gameState.timeAccHours >= 1) {
           gameState.timeAccHours -= 1;
@@ -1271,7 +1139,6 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // boot
     initGame();
     requestAnimationFrame(gameLoop);
   </script>
