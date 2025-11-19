@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meme Outbreak: Yale Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050816;
+      --card: #0b1020;
+      --accent: #48bfe3;
+      --accent-soft: #4cc9f0;
+      --danger: #f94144;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-subtle: #1e293b;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .game-root {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .game-root {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 18px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.65);
+    }
+
+    .panel h2 {
+      margin: 0 0 4px 0;
+      font-size: 1.15rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent-soft);
+    }
+
+    .panel h3 {
+      margin: 0 0 8px 0;
+      font-size: 1rem;
+      color: var(--accent-soft);
+    }
+
+    .subtitle {
+      margin: 0 0 12px 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .colleges-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .college-card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 12px;
+      padding: 10px 11px;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+
+    .college-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .college-name {
+      font-weight: 600;
+    }
+
+    .college-percent {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.85rem;
+    }
+
+    .bar-wrap {
+      width: 100%;
+      background: #020617;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #111827;
+      height: 8px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-soft), #a855f7);
+      transition: width 0.2s ease-out;
+    }
+
+    .college-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 10px;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.14);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: var(--accent);
+      color: #020617;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out,
+        background 0.1s ease-out;
+      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
+      white-space: nowrap;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(56, 189, 248, 0.6);
+    }
+
+    button:disabled {
+      opacity: 0.35;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      box-shadow: none;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #f8fafc;
+      box-shadow: 0 6px 16px rgba(248, 113, 113, 0.5);
+    }
+
+    .traits-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    .trait-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trait-name {
+      font-size: 0.82rem;
+    }
+
+    .trait-value {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .trait-bar-wrap {
+      flex: 1;
+      height: 7px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid #0f172a;
+      overflow: hidden;
+    }
+
+    .trait-bar {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent-soft), #22c55e);
+      transition: width 0.15s ease-out;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      margin-top: 6px;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+    }
+
+    .meta-highlight {
+      color: var(--accent-soft);
+      font-weight: 500;
+    }
+
+    .log-box {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-subtle);
+      height: 170px;
+      overflow-y: auto;
+      font-size: 0.78rem;
+      line-height: 1.3;
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+    }
+
+    .log-entry span {
+      color: var(--text-muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.12);
+      font-size: 0.72rem;
+      color: var(--accent-soft);
+    }
+
+    .pill-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+    }
+
+    .footer-note {
+      margin-top: 8px;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="game-root">
+    <div class="panel">
+      <h2>Meme Outbreak: Yale Edition</h2>
+      <p class="subtitle">
+        A tiny, slightly cursed simulation of how a meme spreads across Yale's
+        14 residential colleges. Each turn, you choose one
+        <strong>upgrade</strong> to tweak your meme's traits, then watch it
+        propagate.
+      </p>
+      <div class="meta-row">
+        <div>Turn <span class="meta-highlight" id="turnNumber">1</span></div>
+        <div>
+          Overall Infection:
+          <span class="meta-highlight" id="overallInfection">0%</span>
+        </div>
+        <div>
+          Upgrade Points:
+          <span class="meta-highlight" id="upgradePoints">1</span>
+        </div>
+      </div>
+      <div class="colleges-grid" id="collegesGrid"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Meme Traits & Upgrades</h3>
+      <p class="subtitle">
+        In Dawkins-speak, you're optimizing the meme's "fitness." In practice,
+        you're making it more cursed.
+      </p>
+
+      <div class="traits-list" id="traitsList"></div>
+
+      <div class="btn-row">
+        <button onclick="buyUpgrade('virality')" id="btnVirality">
+          Upgrade Virality
+        </button>
+        <button onclick="buyUpgrade('relatability')" id="btnRelatability">
+          Upgrade Relatability
+        </button>
+        <button onclick="buyUpgrade('edginess')" id="btnEdginess">
+          Upgrade Edginess
+        </button>
+      </div>
+
+      <div class="btn-row" style="margin-top: 10px">
+        <button class="btn-danger" onclick="nextTurn()" id="btnNextTurn">
+          Next Turn
+        </button>
+        <button class="btn-secondary" onclick="resetGame()">Reset</button>
+      </div>
+
+      <div class="log-box" id="logBox"></div>
+
+      <div class="footer-note">
+        Win by infecting at least <strong>80%</strong> of the overall
+        population before the attention span of campus moves on. Each upgrade is
+        basically you becoming a slightly worse person in the group chat.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const COLLEGES = [
+      "Benjamin Franklin",
+      "Berkeley",
+      "Branford",
+      "Davenport",
+      "Ezra Stiles",
+      "Grace Hopper",
+      "Jonathan Edwards",
+      "Morse",
+      "Pauli Murray",
+      "Pierson",
+      "Saybrook",
+      "Silliman",
+      "Timothy Dwight",
+      "Trumbull",
+    ];
+
+    const gameState = {
+      turn: 1,
+      maxTurns: 20,
+      upgradePoints: 1,
+      traits: {
+        virality: 2,
+        relatability: 2,
+        edginess: 2,
+      },
+      colleges: [],
+      log: [],
+      gameOver: false,
+    };
+
+    function initGame() {
+      gameState.turn = 1;
+      gameState.maxTurns = 20;
+      gameState.upgradePoints = 1;
+      gameState.traits = { virality: 2, relatability: 2, edginess: 2 };
+      gameState.gameOver = false;
+      gameState.colleges = COLLEGES.map((name, index) => {
+        // Seed one random college as origin with small infection
+        const baseInfection = index === 0 ? 20 : 0;
+        const moderation = 0.2 + Math.random() * 0.4; // resistance
+        return {
+          name,
+          infection: baseInfection,
+          moderation,
+        };
+      });
+      gameState.log = [];
+      addLog(
+        "New meme detected in Benjamin Franklin. It seems harmless. For now."
+      );
+      renderUI();
+    }
+
+    function addLog(message) {
+      const entry = `Turn ${gameState.turn}: ${message}`;
+      gameState.log.unshift(entry);
+      if (gameState.log.length > 80) {
+        gameState.log.pop();
+      }
+      renderLog();
+    }
+
+    function renderLog() {
+      const logBox = document.getElementById("logBox");
+      logBox.innerHTML = "";
+      gameState.log.forEach((line) => {
+        const div = document.createElement("div");
+        div.className = "log-entry";
+        const [prefix, ...rest] = line.split(": ");
+        div.innerHTML = `<span>${prefix}:</span> ${rest.join(": ")}`;
+        logBox.appendChild(div);
+      });
+    }
+
+    function renderTraits() {
+      const traitsList = document.getElementById("traitsList");
+      traitsList.innerHTML = "";
+
+      const traitMeta = {
+        virality: "How quickly the meme jumps into new colleges.",
+        relatability: "How much already-infected students keep sharing it.",
+        edginess:
+          "Helps bypass social norms & moderation, but draws more scrutiny.",
+      };
+
+      Object.entries(gameState.traits).forEach(([key, value]) => {
+        const row = document.createElement("div");
+        row.className = "trait-row";
+
+        const left = document.createElement("div");
+        const nameSpan = document.createElement("div");
+        nameSpan.className = "trait-name";
+        nameSpan.textContent =
+          key.charAt(0).toUpperCase() + key.slice(1) + ` (${value})`;
+        const label = document.createElement("div");
+        label.className = "stat-label";
+        label.textContent = traitMeta[key];
+        left.appendChild(nameSpan);
+        left.appendChild(label);
+
+        const center = document.createElement("div");
+        center.className = "trait-bar-wrap";
+        const bar = document.createElement("div");
+        bar.className = "trait-bar";
+        const width = Math.min(100, (value / 10) * 100);
+        bar.style.width = width + "%";
+        center.appendChild(bar);
+
+        row.appendChild(left);
+        row.appendChild(center);
+
+        traitsList.appendChild(row);
+      });
+
+      document.getElementById("upgradePoints").textContent =
+        gameState.upgradePoints;
+    }
+
+    function renderColleges() {
+      const grid = document.getElementById("collegesGrid");
+      grid.innerHTML = "";
+
+      gameState.colleges.forEach((c) => {
+        const card = document.createElement("div");
+        card.className = "college-card";
+
+        const header = document.createElement("div");
+        header.className = "college-header";
+
+        const name = document.createElement("div");
+        name.className = "college-name";
+        name.textContent = c.name;
+
+        const percent = document.createElement("div");
+        percent.className = "college-percent";
+        const p = Math.round(c.infection);
+        percent.textContent = p + "%";
+
+        header.appendChild(name);
+        header.appendChild(percent);
+
+        const barWrap = document.createElement("div");
+        barWrap.className = "bar-wrap";
+        const barFill = document.createElement("div");
+        barFill.className = "bar-fill";
+        barFill.style.width = p + "%";
+        barWrap.appendChild(barFill);
+
+        const meta = document.createElement("div");
+        meta.className = "college-meta";
+        const mod = document.createElement("div");
+        mod.textContent = "Resistance: " + c.moderation.toFixed(2);
+        const tag = document.createElement("div");
+        tag.className = "tag";
+        const dot = document.createElement("div");
+        dot.className = "tag-dot";
+        tag.appendChild(dot);
+        tag.append(
+          document.createTextNode(
+            p >= 80 ? "Fully memed" : p >= 20 ? "Contaminated" : "Mostly safe"
+          )
+        );
+        meta.appendChild(mod);
+        meta.appendChild(tag);
+
+        card.appendChild(header);
+        card.appendChild(barWrap);
+        card.appendChild(meta);
+
+        grid.appendChild(card);
+      });
+    }
+
+    function renderMeta() {
+      document.getElementById("turnNumber").textContent = gameState.turn;
+
+      const avg =
+        gameState.colleges.reduce((sum, c) => sum + c.infection, 0) /
+        gameState.colleges.length;
+      document.getElementById("overallInfection").textContent =
+        Math.round(avg) + "%";
+
+      // Disable buttons if game over
+      const disabled = gameState.gameOver;
+      ["btnVirality", "btnRelatability", "btnEdginess", "btnNextTurn"].forEach(
+        (id) => {
+          const btn = document.getElementById(id);
+          if (btn) btn.disabled = disabled;
+        }
+      );
+    }
+
+    function renderUI() {
+      renderTraits();
+      renderColleges();
+      renderMeta();
+      renderLog();
+    }
+
+    function buyUpgrade(traitKey) {
+      if (gameState.gameOver) return;
+      if (gameState.upgradePoints <= 0) return;
+      if (!gameState.traits.hasOwnProperty(traitKey)) return;
+      if (gameState.traits[traitKey] >= 10) {
+        addLog(`Your ${traitKey} is already maxed out.`);
+        return;
+      }
+
+      gameState.traits[traitKey] += 1;
+      gameState.upgradePoints -= 1;
+
+      let flavor;
+      if (traitKey === "virality") {
+        flavor = "You tweaked the format. It now fits perfectly in an IG story.";
+      } else if (traitKey === "relatability") {
+        flavor =
+          "You added a painfully specific caption. Everyone feels personally attacked.";
+      } else if (traitKey === "edginess") {
+        flavor =
+          "You made it just a bit more cursed. Campus admins are starting to notice.";
+      }
+
+      addLog(`Upgrade purchased: ${traitKey.toUpperCase()}. ${flavor}`);
+      renderUI();
+    }
+
+    function nextTurn() {
+      if (gameState.gameOver) return;
+
+      // Each turn, re-gain 1 upgrade point (max 3 to keep things sane)
+      if (gameState.upgradePoints < 3) {
+        gameState.upgradePoints += 1;
+      }
+
+      const { virality, relatability, edginess } = gameState.traits;
+
+      let newlyHigh = [];
+      let moderationEvents = [];
+
+      gameState.colleges.forEach((c) => {
+        const baseSpread = virality * 0.8;
+        const existingBoost = (relatability * c.infection) / 100;
+        const resistance = c.moderation * 5;
+
+        // Edginess helps bypass resistance but also invites clampdowns
+        const edgyBonus = edginess * 0.4;
+        const chaos = (Math.random() - 0.5) * 4; // small randomness
+
+        let delta = baseSpread + existingBoost + edgyBonus - resistance + chaos;
+
+        // If infection is zero, it's harder to start
+        if (c.infection < 5) {
+          delta *= 0.6;
+        }
+
+        // Clamp delta
+        if (delta < -5) delta = -5;
+        if (delta > 15) delta = 15;
+
+        const oldInfection = c.infection;
+        c.infection = Math.max(0, Math.min(100, c.infection + delta));
+
+        if (oldInfection < 50 && c.infection >= 50) {
+          newlyHigh.push(c.name);
+        }
+
+        // Moderation event chance increases with edginess & infection level
+        const moderationChance =
+          (edginess * 0.04 + c.infection / 400) * c.moderation;
+        if (Math.random() < moderationChance) {
+          const reduction = 5 + Math.random() * 10;
+          c.infection = Math.max(0, c.infection - reduction);
+          moderationEvents.push(c.name);
+        }
+      });
+
+      gameState.turn += 1;
+
+      const avg =
+        gameState.colleges.reduce((sum, c) => sum + c.infection, 0) /
+        gameState.colleges.length;
+
+      if (newlyHigh.length > 0) {
+        addLog(
+          `${newlyHigh.join(
+            ", "
+          )} crossed 50% infection. People are starting to reference the meme offline.`
+        );
+      }
+
+      if (moderationEvents.length > 0) {
+        addLog(
+          `Admins/Group chats in ${moderationEvents.join(
+            ", "
+          )} tried to clamp down. Some posts disappeared, but the meme survived.`
+        );
+      }
+
+      if (avg >= 80) {
+        addLog(
+          `Campus is saturated (avg ${Math.round(
+            avg
+          )}%). In Gladwell terms, you've achieved a very cursed weak-tie revolution.`
+        );
+        gameState.gameOver = true;
+      } else if (gameState.turn > gameState.maxTurns) {
+        addLog(
+          `Attention has moved on to a new drama. The meme topped out at ${Math.round(
+            avg
+          )}% average infection.`
+        );
+        gameState.gameOver = true;
+      } else {
+        addLog(
+          `The meme continues to circulate. Overall infection now ~${Math.round(
+            avg
+          )}%.`
+        );
+      }
+
+      renderUI();
+    }
+
+    function resetGame() {
+      initGame();
+    }
+
+    // Boot
+    initGame();
+  </script>
+</body>
+</html>
