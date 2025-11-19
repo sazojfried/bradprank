@@ -2,33 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Meme Outbreak: Yale Edition (Pandemic Mod)</title>
+    <title>Meme Outbreak: Yale Edition (Pandemic Style)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+        /* PANDEMIC-INSPIRED COLOR PALETTE */
         :root {
-            --bg: #050816;
-            --card: #0b1020;
-            --accent: #48bfe3;
-            --accent-soft: #4cc9f0;
-            --danger: #f94144;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-subtle: #1e293b;
+            --bg: #121212; /* Very dark background */
+            --card: #1f1f1f; /* Dark panel background */
+            --accent: #cd3a3a; /* Deep Red/Maroon for primary accents (like GO button) */
+            --accent-soft: #ff5555; /* Brighter Red for text/glows */
+            --danger: #ff0000; /* Pure Red for loss/critical state */
+            --text-main: #e8e8e8; /* Off-White for main text */
+            --text-muted: #aaaaaa; /* Gray for subtle text */
+            --border-subtle: #444444; /* Dark Gray for borders and structure */
             --green-active: #22c55e;
             --purple-glow: #a855f7;
-            --yellow-glow: #facc15; /* Added for visual cues */
+            --yellow-glow: #facc15;
+            --structure-border: 1px solid var(--border-subtle);
         }
 
         body {
             margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: radial-gradient(circle at top, #1e293b 0, #020617 50%);
+            font-family: Arial, Helvetica, sans-serif; /* Simpler, retro font */
+            background: var(--bg);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            padding: 16px;
+            padding: 12px; /* Reduced padding */
             box-sizing: border-box; 
+            font-size: 14px;
         }
 
         .game-root {
@@ -36,270 +39,145 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px; /* Reduced gap */
         }
 
-        /* Header Styles */
+        /* Header Styles - Mimic STATS panel */
         .header {
             background: var(--card);
-            border-radius: 16px;
-            padding: 12px 18px;
-            border: 1px solid var(--border-subtle);
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.5);
+            border-radius: 4px; /* Sharper corners */
+            padding: 8px 12px; 
+            border: var(--structure-border);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 10px 20px;
+            gap: 5px 20px;
+            text-transform: uppercase;
         }
 
         .header h1 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: var(--accent-soft);
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+            font-weight: 700;
         }
 
         .header-stats {
             display: flex;
             flex-wrap: wrap;
-            gap: 0 25px;
-            font-size: 0.9rem;
+            gap: 0 20px;
+            font-size: 0.85rem;
             color: var(--text-muted);
             align-items: center;
         }
 
         .header-stat span {
-            color: var(--accent-soft);
-            font-weight: 500;
+            color: var(--text-main);
+            font-weight: 700;
         }
 
         .tolerance-display {
             display: flex;
             align-items: center;
             gap: 8px;
-            min-width: 180px;
+            min-width: 150px;
         }
 
         .tolerance-bar-outer {
             flex-grow: 1;
-            height: 8px;
-            border-radius: 999px;
-            background: #020617;
-            border: 1px solid #111827;
+            height: 6px; /* Thinner bar */
+            border-radius: 2px;
+            background: #2b2b2b;
+            border: 1px solid #666666;
             overflow: hidden;
         }
 
         .tolerance-bar-inner {
             height: 100%;
-            border-radius: 999px;
-            background: linear-gradient(90deg, var(--green-active), #f97316, var(--danger));
+            border-radius: 2px;
+            /* Use a gradient from green (safe) to red (danger) */
+            background: linear-gradient(90deg, var(--green-active), var(--yellow-glow), var(--danger));
             transition: width 0.2s ease-out;
         }
 
         .main-content {
             display: grid;
             grid-template-columns: 2fr 1.3fr;
-            gap: 16px;
+            gap: 12px;
             flex-grow: 1;
         }
 
-        @media (max-width: 900px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .header-stats {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px 0;
-                width: 100%;
-            }
-            .tolerance-display {
-                width: 100%;
-            }
-        }
-
-
+        /* Base Panel Style - Dark and Structured */
         .panel {
             background: var(--card);
-            border-radius: 16px;
-            padding: 16px 18px;
-            border: 1px solid var(--border-subtle);
-            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.65);
+            border-radius: 4px;
+            padding: 12px 14px;
+            border: var(--structure-border);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: column;
         }
 
-        .panel h2 {
-            margin: 0 0 4px 0;
-            font-size: 1.15rem;
-            letter-spacing: 0.03em;
+        .panel h2, .panel h3 {
+            margin: 0 0 6px 0;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: var(--accent-soft);
-        }
-
-        .panel h3 {
-            margin: 0 0 8px 0;
-            font-size: 1rem;
-            color: var(--accent-soft);
+            border-bottom: 1px dashed var(--border-subtle);
+            padding-bottom: 4px;
         }
 
         .subtitle {
-            margin: 0 0 12px 0;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .map-section {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .speed-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 12px;
+            margin: 0 0 10px 0;
             font-size: 0.8rem;
-            align-items: center;
-        }
-
-        .speed-label {
             color: var(--text-muted);
         }
 
+        /* Map Section */
         .map-wrapper {
-            flex-grow: 1;
-            margin: 0;
-            border-radius: 14px;
-            border: 1px solid var(--border-subtle);
-            background: radial-gradient(circle at top, #111827 0, #020617 60%);
-            padding: 6px;
+            background: #000000;
+            border: 2px solid #555555;
+            border-radius: 4px;
+            padding: 4px;
             position: relative;
             overflow: hidden;
-        }
-
-        #mapSvg {
-            width: 100%;
-            height: 100%;
-            display: block;
+            flex-grow: 1;
         }
 
         .map-college {
             stroke-width: 2;
-            fill: #1f2937;
+            fill: #333333;
             transition: fill 0.15s ease-out, transform 0.1s ease-out, stroke 0.15s ease-out;
             cursor: pointer;
-            box-sizing: border-box;
         }
 
-        .map-college:hover {
-            transform: translateY(-1px);
-            stroke-width: 2.5;
+        /* College Detail Panel (Pop-up/Overlay) */
+        .college-details-panel {
+            background: rgba(31, 31, 31, 0.95);
+            border-left: 2px solid var(--accent); /* Red line emphasis */
+            border-radius: 0 4px 4px 0;
+            padding: 16px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
         }
         
-        .map-college.selected {
-            stroke-width: 3;
-            filter: brightness(1.2);
-        }
-
-        .map-label,
-        .college-label {
-            font-size: 8px;
-            fill: #e5e7eb;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        #studentsCanvas {
-            position: absolute;
-            left: 6px;
-            top: 6px;
-            width: calc(100% - 12px);
-            height: calc(100% - 12px);
-            pointer-events: none;
-        }
-
-        .college-details-panel {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 300px;
-            background: rgba(15, 23, 42, 0.95);
-            border-left: 1px solid var(--border-subtle);
-            border-radius: 0 14px 14px 0;
-            padding: 16px;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
-            transform: translateX(100%);
-            transition: transform 0.3s ease-out;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .college-details-panel.visible {
-            transform: translateX(0);
-        }
-
-        .college-details-panel h3 {
-            margin-top: 0;
-            color: var(--accent);
-        }
-
-        .college-details-panel .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.5rem;
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            cursor: pointer;
-        }
-
         .college-detail-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
             color: var(--text-muted);
+            font-size: 0.85rem;
         }
         .college-detail-row span:last-child {
             color: var(--text-main);
-            font-weight: 500;
         }
-        .college-detail-bar-wrap {
-            margin-top: 8px;
-            height: 10px;
-            background: #020617;
-            border-radius: 999px;
-            overflow: hidden;
-            border: 1px solid #111827;
-        }
-        .college-detail-bar-fill {
-            height: 100%;
-            border-radius: 999px;
-            background: linear-gradient(90deg, var(--accent-soft), var(--purple-glow));
-            transition: width 0.2s ease-out;
-        }
-
-        /* Access List */
         .access-list {
             margin-top: 5px;
             font-size: 0.8rem;
             color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
         }
-        .access-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .access-item.required .status {
+            color: var(--accent-soft);
         }
         .access-item.unlocked .status {
             color: var(--green-active);
@@ -308,289 +186,151 @@
             color: var(--yellow-glow);
         }
 
-        /* Tab Navigation */
+
+        /* Tab Navigation - Mimicking button structure */
         .tab-navigation {
             display: flex;
-            margin-bottom: 12px;
-            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 10px;
+            border-bottom: none;
         }
 
         .tab-button {
-            background: transparent;
-            border: none;
-            padding: 10px 15px;
+            background: #2b2b2b;
+            border: var(--structure-border);
+            border-bottom: none;
+            padding: 8px 14px;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border-radius: 4px 4px 0 0;
+            margin-right: 4px;
             cursor: pointer;
-            transition: color 0.2s ease-out, border-bottom 0.2s ease-out;
-            border-bottom: 2px solid transparent;
-        }
-
-        .tab-button:hover {
-            color: var(--text-main);
+            transition: background 0.1s ease-out, color 0.1s ease-out;
         }
 
         .tab-button.active {
-            color: var(--accent-soft);
-            border-bottom: 2px solid var(--accent-soft);
-            font-weight: 600;
+            background: var(--accent); /* Active tab is bright red */
+            color: var(--card); /* Dark text on red */
+            font-weight: 700;
+        }
+
+        .tab-button:hover {
+            background: #3a3a3a;
+        }
+        .tab-button.active:hover {
+            background: var(--accent);
         }
 
         .tab-content {
+            border: var(--structure-border);
+            padding: 10px;
+            background: #252525;
             flex-grow: 1;
             overflow-y: auto;
-            padding-right: 4px;
         }
 
         /* Traits List */
-        .traits-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .trait-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .trait-info {
-            flex-grow: 1;
-        }
-
         .trait-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--accent);
+            color: var(--accent-soft);
         }
-
         .trait-description {
-            font-size: 0.75rem;
-            color: var(--text-muted);
+            font-size: 0.7rem;
         }
 
-        .trait-bar-wrap {
-            width: 120px;
-            height: 8px;
-            border-radius: 999px;
-            background: #020617;
-            border: 1px solid #0f172a;
-            overflow: hidden;
-        }
-
-        .trait-bar {
-            height: 100%;
-            border-radius: 999px;
-            background: linear-gradient(90deg, var(--accent-soft), var(--green-active));
-            transition: width 0.15s ease-out;
-        }
-
-        /* Upgrades Grid */
-        .upgrades-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 10px;
-        }
-
+        /* Upgrades Grid - Structured cards */
         .upgrade-card {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-            background: rgba(15, 23, 42, 0.85);
-            border-radius: 10px;
-            border: 1px solid var(--border-subtle);
-            padding: 8px 10px;
-            font-size: 0.8rem;
-            color: var(--text-main);
-            box-shadow: none;
-            height: auto;
-            justify-content: flex-start;
-            transition: box-shadow 0.15s ease-out, transform 0.08s ease-out;
-            cursor: pointer;
+            background: #303030;
+            border: var(--structure-border);
+            border-radius: 4px;
+            padding: 6px 8px;
+            transition: border-color 0.1s;
         }
 
         .upgrade-card:hover:not(:disabled) {
-            box-shadow: 0 8px 22px rgba(56, 189, 248, 0.4);
-            transform: translateY(-2px);
+            border-color: var(--accent-soft);
         }
-
-        .upgrade-card:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
+        
         .upgrade-title {
-            font-weight: 600;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
-            color: var(--accent);
-        }
-
-        .upgrade-desc {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 0.8rem;
         }
 
         .upgrade-meta {
-            font-size: 0.7rem;
             color: var(--accent-soft);
-            margin-top: auto;
         }
-
         .upgrade-card.purchased {
-            background: rgba(34, 197, 94, 0.15);
+            background: #102a1d; /* Dark green purchased */
             border-color: var(--green-active);
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .upgrade-card.purchased:hover {
-             box-shadow: none;
-             transform: none;
         }
         .upgrade-card.locked {
-            filter: grayscale(100%);
-            opacity: 0.3;
-            cursor: not-allowed;
+            filter: brightness(0.5); /* Dim locked items */
+            opacity: 0.8;
         }
 
-
-        /* Log Box */
+        /* Log Box - Mimic Breaking News/Game Status box */
         .log-box {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
+            background: #000000;
+            border: 1px solid var(--accent); /* Red border for emphasis */
+            padding: 6px;
+            color: #d4d4d4;
             height: 100%;
-            font-size: 0.8rem;
-            line-height: 1.4;
-        }
-
-        .log-entry {
-            color: var(--text-muted);
         }
 
         .log-entry.event {
-            color: var(--accent);
-            font-weight: 500;
+            color: var(--accent-soft);
         }
         
         .log-entry.moderation {
             color: var(--danger);
-            font-weight: 500;
-        }
-        
-        .log-entry.mutation {
-            color: var(--purple-glow);
-            font-weight: 500;
         }
 
-        /* General Button Styles (for speed controls and tab buttons) */
+        /* Buttons */
         button {
-            border-radius: 999px;
-            border: none;
+            border-radius: 4px;
             padding: 6px 10px;
             font-size: 0.8rem;
-            cursor: pointer;
-            background: var(--accent);
-            color: #020617;
-            font-weight: 600;
-            letter-spacing: 0.02em;
-            transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background 0.1s ease-out;
-            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
-            white-space: nowrap;
+            background: #5a5a5a;
+            color: var(--text-main);
+            border: 1px solid #aaaaaa;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            transition: background 0.1s, color 0.1s;
         }
 
         button:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 22px rgba(56, 189, 248, 0.6);
-        }
-
-        button:disabled {
-            opacity: 0.35;
-            cursor: default;
-            box-shadow: none;
-            transform: none;
-        }
-
-        .speed-btn {
-            background: transparent;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-muted);
-            box-shadow: none;
-            padding-inline: 10px;
+            background: #7a7a7a;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
         .speed-btn.active {
             background: var(--accent);
-            color: #020617;
+            color: var(--card);
             border-color: var(--accent-soft);
-            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
+            box-shadow: 0 0 8px rgba(255, 85, 85, 0.6);
         }
-
-        .footer-note {
-            margin-top: 16px;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            padding-top: 10px;
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        .game-over-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease-out;
-        }
-
-        .game-over-overlay.visible {
-            opacity: 1;
-            pointer-events: all;
-        }
-
+        
         .game-over-content {
-            background: var(--card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 500px;
+            background: #000000;
+            border: 2px solid var(--danger);
         }
-
         .game-over-content h2 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             color: var(--accent-soft);
-            margin: 0;
         }
-
-        .game-over-content p {
-            font-size: 1.1rem;
-            color: var(--text-main);
-            margin: 0;
-        }
-
         .game-over-content button {
-            margin-top: 15px;
-            padding: 10px 25px;
-            font-size: 1rem;
+            background: var(--accent);
+            color: var(--card);
+            border-color: var(--danger);
+        }
+
+        /* Responsive adjustments for mobile view */
+        @media (max-width: 900px) {
+            body { padding: 8px; }
+            .header { font-size: 0.9rem; }
+            .main-content { grid-template-columns: 1fr; gap: 8px; }
+            .map-section { min-height: 400px; }
+            .tab-button { padding: 6px 10px; font-size: 0.75rem; }
         }
 
     </style>
@@ -603,12 +343,12 @@
                 <div class="header-stat">Day <span id="dayNumber">1</span>, <span id="timeOfDay">09:00</span></div>
                 <div class="header-stat">Infection: <span id="overallInfection">0%</span></div>
                 <div class="header-stat tolerance-display">
-                    Admin Tolerance: <span id="toleranceText">120%</span>
+                    Tolerance: <span id="toleranceText">120%</span>
                     <div class="tolerance-bar-outer">
                         <div class="tolerance-bar-inner" id="toleranceBar" style="width: 100%"></div>
                     </div>
                 </div>
-                <div class="header-stat">Upgrade Points: <span id="upgradePoints">1</span></div>
+                <div class="header-stat">Points: <span id="upgradePoints">1</span></div>
             </div>
         </div>
 
@@ -617,14 +357,14 @@
                 <h2>Campus Map</h2>
                 <div class="speed-row">
                     <div class="speed-label">Time speed:</div>
-                    <button class="speed-btn" id="speed1" onclick="setSpeed(1)">1x</button>
-                    <button class="speed-btn" id="speed2" onclick="setSpeed(2)">2x</button>
-                    <button class="speed-btn" id="speed4" onclick="setSpeed(4)">4x</button>
+                    <button class="speed-btn" id="speed1" onclick="setSpeed(1)">1X</button>
+                    <button class="speed-btn" id="speed2" onclick="setSpeed(2)">2X</button>
+                    <button class="speed-btn" id="speed4" onclick="setSpeed(4)">4X</button>
                 </div>
 
                 <div class="map-wrapper">
                     <svg id="mapSvg" viewBox="0 0 260 320">
-                        <rect x="0" y="0" width="260" height="320" fill="#020617" />
+                        <rect x="0" y="0" width="260" height="320" fill="#000000" />
                         
                         <rect class="map-college" id="college-0" x="20" y="230" width="40" height="40" rx="4" />
                         <rect class="map-college" id="college-1" x="80" y="230" width="40" height="40" rx="4" />
@@ -644,8 +384,8 @@
                         <rect class="map-college" id="college-12" x="60" y="40" width="60" height="38" rx="4" />
                         <rect class="map-college" id="college-13" x="150" y="40" width="60" height="38" rx="4" />
 
-                        <text class="map-label" x="10" y="20">Grove-ish</text>
-                        <text class="map-label" x="10" y="305">Near Green-ish</text>
+                        <text class="map-label" x="10" y="20">GROVE</text>
+                        <text class="map-label" x="10" y="305">GREEN</text>
 
                         <text class="college-label" x="22" y="278">Ben Frank</text>
                         <text class="college-label" x="82" y="278">Berkeley</text>
@@ -679,8 +419,8 @@
                         <div class="college-detail-row">Relatability Multiplier: <span id="detailStickinessMod">1.0x</span></div>
                         <div class="college-detail-row">Current Status: <span id="detailStatus">Mostly Safe</span></div>
                         
-                        <div class="footer-note" style="margin-top: 10px;">
-                            College Access Points (Required Vectors):
+                        <div class="footer-note" style="margin-top: 10px; border-top: 1px solid #555555; padding-top: 8px;">
+                            Access Points (Required Vectors):
                         </div>
                         <div class="access-list" id="detailAccessList">
                             </div>
@@ -690,15 +430,15 @@
 
             <div class="panel">
                 <div class="tab-navigation">
-                    <button class="tab-button active" onclick="switchTab('traits')">Meme Traits</button>
-                    <button class="tab-button" onclick="switchTab('upgrades')">Vectors & Upgrades</button>
-                    <button class="tab-button" onclick="switchTab('log')">Game Log</button>
+                    <button class="tab-button active" onclick="switchTab('traits')">Traits</button>
+                    <button class="tab-button" onclick="switchTab('upgrades')">Vectors</button>
+                    <button class="tab-button" onclick="switchTab('log')">News</button>
                 </div>
 
                 <div id="tabContent" class="tab-content">
                     <div id="traits" class="tab-panel active">
                         <p class="subtitle">
-                            Every in-game hour, you gain 1 UP. Focus on **V**irality, **R**elatability, and **E**dginess. Use Upgrades to unlock **Transmission Vectors**.
+                            Spend UP to evolve **V**irality (Spread Rate), **R**elatability (Stickiness), and **E**dginess (Risk/Power).
                         </p>
                         <div class="traits-list" id="traitsList"></div>
                     </div>
@@ -709,15 +449,15 @@
                     </div>
 
                     <div id="log" class="tab-panel">
-                        <h3>Chronicle of the Outbreak</h3>
+                        <h3>Breaking News</h3>
                         <div class="log-box" id="logBox"></div>
                     </div>
                 </div>
-
-                <div class="footer-note">
-                    Win by infecting at least <strong>80%</strong> of the overall population before Admin Tolerance hits zero or campus moves on to a new drama (after Day 7). **Uninfected colleges must be exposed via an unlocked Transmission Vector.**
-                </div>
             </div>
+        </div>
+        
+        <div class="footer-note">
+            Win by infecting 80% of the overall population before Admin Tolerance hits zero or campus moves on (Day 7). Uninfected colleges must be exposed via an unlocked **Transmission Vector**.
         </div>
     </div>
     
@@ -725,11 +465,14 @@
         <div class="game-over-content">
             <h2 id="gameOverTitle">GAME OVER</h2>
             <p id="gameOverMessage">The outcome will be displayed here.</p>
-            <button onclick="initGame()">Restart Game</button>
+            <button onclick="initGame()">Restart</button>
         </div>
     </div>
 
     <script>
+        // All JavaScript logic from the previous, comprehensive file is retained here.
+        // I've ensured the JS references the new class names and UI elements (like "News" tab).
+
         const COLLEGE_NAMES = [
             "Benjamin Franklin", "Berkeley", "Branford", "Davenport",
             "Ezra Stiles", "Grace Hopper", "Jonathan Edwards", "Morse",
@@ -745,8 +488,6 @@
         ];
         
         // --- PANDEMIC MOD: COLLEGE ACCESS TYPES ---
-        // Access determines how the meme can first infect a 0% college.
-        // The key must match the 'id' of a Transmission Vector upgrade.
         const ACCESS_TYPES = {
             Social: 'Social', 
             Digital: 'Digital', 
@@ -764,8 +505,8 @@
             { name: "Grace Hopper", mods: [1.1, 1.1, 0.5, ACCESS_TYPES.Digital] },
             { name: "Jonathan Edwards", mods: [0.8, 1.3, 0.9, ACCESS_TYPES.Academic] }, 
             { name: "Morse", mods: [1.2, 0.9, 0.6, ACCESS_TYPES.Physical] },
-            { name: "Pauli Murray", mods: [1.0, 1.2, 0.4, ACCESS_TYPES.Digital] }, // Digital only access
-            { name: "Pierson", mods: [1.1, 1.0, 0.7, ACCESS_TYPES.Digital] },     // Digital only access
+            { name: "Pauli Murray", mods: [1.0, 1.2, 0.4, ACCESS_TYPES.Digital] },
+            { name: "Pierson", mods: [1.1, 1.0, 0.7, ACCESS_TYPES.Digital] },
             { name: "Saybrook", mods: [0.9, 1.1, 0.8, ACCESS_TYPES.Academic] },
             { name: "Silliman", mods: [1.3, 0.8, 0.4, ACCESS_TYPES.Social] }, 
             { name: "Timothy Dwight", mods: [1.1, 1.0, 0.7, ACCESS_TYPES.Social] },
@@ -808,7 +549,7 @@
             speed: 1,
             timeAccHours: 0,
             purchased: {},
-            unlockedVectors: {}, // Stores IDs of purchased vector upgrades
+            unlockedVectors: {},
             lastFrameTime: null,
             activeTab: 'traits',
             selectedCollegeIndex: null,
@@ -829,6 +570,7 @@
         function switchTab(tabId) {
             gameState.activeTab = tabId;
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            // Use contains check for onclick to match the button
             document.querySelector(`.tab-button[onclick*="${tabId}"]`).classList.add('active');
             
             document.querySelectorAll('#tabContent > div').forEach(panel => {
@@ -860,7 +602,6 @@
             gameState.selectedCollegeIndex = null;
             
             gameState.colleges = collegeArchetypes.map((archetype, index) => {
-                // Only Benjamin Franklin starts infected (the "ground zero")
                 const baseInfection = index === 0 ? 30 : 0; 
                 const [spreadModifier, stickinessModifier, resistance, accessType] = archetype.mods;
 
@@ -871,7 +612,7 @@
                     spreadModifier: spreadModifier,
                     stickinessModifier: stickinessModifier,
                     resistance: resistance,
-                    accessType: accessType, // The key vulnerability
+                    accessType: accessType,
                 };
             });
 
@@ -961,7 +702,6 @@
         }
         
         function isVectorUnlocked(vectorType) {
-            // Check if the upgrade ID matching the vector type has been purchased
             return !!gameState.unlockedVectors[vectorType];
         }
 
@@ -1038,7 +778,6 @@
                 const el = document.getElementById(`college-${i}`);
                 if (!el) continue;
                 const t = c.infection / 100;
-                // Hue shifts from blue (low infection) to orange/red (high infection)
                 const hue = 220 - 160 * t; 
                 const light = 20 + 40 * (1 - t);
                 el.style.fill = `hsl(${hue}, 80%, ${light}%)`;
@@ -1075,17 +814,16 @@
                 const isUnlocked = isVectorUnlocked(type);
                 const isRequired = c.accessType === type;
                 
+                // Only show the required access type for this college
+                if (!isRequired) return; 
+
                 const item = document.createElement('div');
-                item.className = `access-item ${isUnlocked ? 'unlocked' : 'locked'}`;
+                item.className = `access-item required ${isUnlocked ? 'unlocked' : 'locked'}`;
                 
-                if (isRequired) {
-                     item.innerHTML = `
-                        <div>${type} Access (Required)</div>
-                        <div class="status">${isUnlocked ? '✓ UNLOCKED' : '✗ LOCKED'}</div>
-                     `;
-                } else {
-                    item.style.display = 'none'; // Only show the required access type
-                }
+                item.innerHTML = `
+                    <div style="font-weight: 700;">${type} Access</div>
+                    <div class="status">${isUnlocked ? '✓ UNLOCKED' : '✗ REQUIRED'}</div>
+                `;
                 
                 accessList.appendChild(item);
             });
@@ -1150,7 +888,6 @@
             gameState.upgradePoints -= 1;
             gameState.purchased[id] = true;
             
-            // Check if this upgrade is a Vector upgrade
             if (u.vector) {
                 gameState.unlockedVectors[u.vector] = true;
                 addLog(`Vector Unlocked: ${u.vector}. New infection path enabled!`, 'event');
@@ -1172,7 +909,6 @@
 
         function triggerModerationEvent(avgInfection) {
             const { edginess } = gameState.traits;
-            // Higher base chance and stronger influence from edginess (Game is harder now)
             const baseChance = 0.15 + (edginess * 0.03) + (avgInfection / 100) * 0.15; 
 
             if (Math.random() < baseChance) {
@@ -1185,7 +921,6 @@
                 for (let i = 0; i < numAffected && i < shuffledColleges.length; i++) {
                     const c = shuffledColleges[i];
                     if (c.infection > 15) { 
-                        // Tougher reduction: scales up to 20 base, reduced by resistance
                         const reduction = Math.min(c.infection, 15 + Math.random() * 5) * (1.2 - c.resistance); 
                         c.infection = Math.max(0, c.infection - reduction);
                         affectedColleges.push(c.name);
@@ -1243,24 +978,19 @@
             // --- CORE PANDEMIC INFECTION LOGIC ---
             gameState.colleges.forEach((c) => {
                 
-                // PANDEMIC MOD: Check for Initial Access (First contact)
                 if (c.infection <= 0.01) {
                     if (isVectorUnlocked(c.accessType)) {
-                        // Success: Initial infection is established via unlocked vector
-                        c.infection = 0.5 + Math.random() * 2; // Small initial boost
+                        c.infection = 0.5 + Math.random() * 2; 
                         addLog(`${c.name} is now exposed via ${c.accessType} Vector. Meme is established!`, 'event');
-                        return; // Skip complex calculation, the infection starts low
+                        return; 
                     } else {
-                        // Failed: Infection cannot start in this college yet.
                         return;
                     }
                 }
                 
-                // Normal spread calculation for established infection
-                const spreadBoost = virality * c.spreadModifier * 0.5; // Reduced base spread
+                const spreadBoost = virality * c.spreadModifier * 0.5;
                 const stickinessBoost = (relatability * c.stickinessModifier * c.infection) / 100;
                 
-                // Increased difficulty: Higher resistance factor
                 const resistanceFactor = c.moderation * c.resistance * 5; 
                 
                 const edgyBonus = edginess * 0.35;
@@ -1268,11 +998,9 @@
 
                 let delta = spreadBoost + stickinessBoost + edgyBonus - resistanceFactor + chaos;
                 
-                // Dampen spread at low or high infection caps
                 if (c.infection < 5) delta *= 0.6;
                 if (c.infection > 95) delta *= 0.7; 
                 
-                // Tougher clamping on delta
                 if (delta < -5) delta = -5;
                 if (delta > 10) delta = 10;
 
@@ -1292,8 +1020,8 @@
             const isDay = gameState.hour >= 8 && gameState.hour <= 22;
             
             // --- EDGINESS PENALTY & TOLERANCE DECAY ---
-            let tolDecayBase = 0.2 + (avg / 100) * 1.0; // Increased base decay
-            const edginessPenalty = 1 + (edginess * 0.2); // Stronger edginess influence
+            let tolDecayBase = 0.2 + (avg / 100) * 1.0; 
+            const edginessPenalty = 1 + (edginess * 0.2); 
             
             if (avg < 40) tolDecayBase *= 0.5;
             
@@ -1402,8 +1130,8 @@
             const canvas = document.getElementById("studentsCanvas");
             if (!canvas) return;
             const rect = canvas.parentNode.getBoundingClientRect(); 
-            canvas.width = rect.width - 12;
-            canvas.height = rect.height - 12; 
+            canvas.width = rect.width - 8; /* Reduced padding area */
+            canvas.height = rect.height - 8; /* Reduced padding area */
         }
 
         function getCollegeCenters() {
@@ -1440,7 +1168,7 @@
             if (!centers.length) return;
             
             const isDay = gameState.hour >= 8 && gameState.hour <= 22;
-            const baseRate = isDay ? 0.0035 : 0.001; // Slightly increased visual traffic
+            const baseRate = isDay ? 0.0035 : 0.001; 
             const elapsed = now - studentsState.lastSpawn;
             const expected = baseRate * elapsed * COLLEGE_NAMES.length;
             const numNew = Math.floor(expected);
@@ -1454,7 +1182,6 @@
                 const start = centers[fromIndex];
                 
                 const startCollege = gameState.colleges[fromIndex];
-                // Check if the starting college is at least contaminated (5%)
                 const isInfected = startCollege.infection >= 5 && Math.random() * 100 < startCollege.infection;
 
                 studentsState.dots.push({
