@@ -1,891 +1,802 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Meme Outbreak: Pandemic Legacy</title>
-    <style>
-        /* --- THEME & RESET --- */
-        :root {
-            --bg-body: #050505;
-            --bg-panel: #111;
-            --border: #333;
-            --accent-red: #b91c1c;   /* Disease/Infection */
-            --accent-blue: #3b82f6;  /* Cure/Ban */
-            --accent-gold: #eab308;  /* DNA/Points */
-            --text-main: #eee;
-            --text-dim: #888;
-            --font-ui: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            --font-mono: "Courier New", Courier, monospace;
-        }
+<meta charset="UTF-8">
+<title>MEME OUTBREAK: PANDEMIC LEGACY [ULTIMATE]</title>
+<style>
+    /* --- CRT & FLASH AESTHETIC --- */
+    :root {
+        --bg-dark: #050505;
+        --panel-bg: #0f0f0f;
+        --border-color: #3a3a3a;
+        --accent-red: #cc0000;
+        --accent-blue: #0066cc;
+        --accent-yellow: #ffcc00;
+        --text-main: #e0e0e0;
+        --text-dim: #666;
+        --scanline-color: rgba(0, 0, 0, 0.5);
+        --glass-highlight: rgba(255, 255, 255, 0.05);
+    }
 
-        * { box-sizing: border-box; user-select: none; }
+    @font-face {
+        font-family: 'Pixel';
+        src: local('Courier New'); /* Fallback to mono */
+    }
 
-        body {
-            margin: 0;
-            background: var(--bg-body);
-            color: var(--text-main);
-            font-family: var(--font-ui);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
+    body {
+        margin: 0;
+        background: #000;
+        color: var(--text-main);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        user-select: none;
+    }
 
-        /* --- MAIN LAYOUT --- */
-        #gameContainer {
-            width: 1024px;
-            height: 768px;
-            background: var(--bg-panel);
-            border: 2px solid #444;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-            display: grid;
-            grid-template-rows: 40px 1fr 160px; /* Header, Map, HUD */
-            position: relative;
-        }
+    /* CRT OVERLAY EFFECT */
+    .scanlines {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
+        z-index: 999;
+    }
 
-        /* --- HEADER / TICKER --- */
-        header {
-            background: #1a1a1a;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-            padding: 0 10px;
-        }
-        .news-badge {
-            background: var(--accent-red);
-            color: #fff;
-            padding: 2px 8px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            margin-right: 10px;
-            border-radius: 2px;
-        }
-        #newsTicker {
-            white-space: nowrap;
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            color: #ccc;
-            animation: ticker 25s linear infinite;
-        }
-        @keyframes ticker { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+    /* MAIN CONTAINER */
+    #game-shell {
+        width: 1024px;
+        height: 768px;
+        background: var(--panel-bg);
+        border: 2px solid #222;
+        box-shadow: 0 0 100px rgba(204, 0, 0, 0.1);
+        display: grid;
+        grid-template-rows: 50px 1fr 200px;
+        position: relative;
+    }
 
-        /* --- MAP AREA --- */
-        #mapStage {
-            position: relative;
-            background: radial-gradient(circle at 50% 50%, #1a202c 0%, #000 100%);
-            overflow: hidden;
-            cursor: crosshair;
-        }
-        
-        svg { width: 100%; height: 100%; display: block; }
-        
-        .college-rect {
-            fill: #333;
-            stroke: #555;
-            stroke-width: 1;
-            transition: fill 0.3s;
-        }
-        .college-rect:hover { stroke: #fff; }
-        
-        /* College Labels */
-        .map-label {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            fill: #888;
-            pointer-events: none;
-            text-transform: uppercase;
-        }
+    /* --- HEADER --- */
+    header {
+        background: #111;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        box-shadow: inset 0 -10px 20px -10px #000;
+    }
+    .date-display {
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        color: #ccc;
+        margin-right: 20px;
+        border-right: 1px solid #333;
+        padding-right: 20px;
+    }
+    .news-bar {
+        flex: 1;
+        background: #000;
+        height: 30px;
+        border: 1px solid #333;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+    }
+    .news-icon {
+        background: var(--accent-red);
+        color: white;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        z-index: 2;
+    }
+    #news-ticker {
+        white-space: nowrap;
+        color: var(--text-main);
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        position: absolute;
+        left: 100%;
+        animation: ticker 15s linear infinite;
+    }
+    @keyframes ticker { 100% { left: -100%; } }
 
-        /* Visual Effects Layers */
-        #particleCanvas {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-        }
-        
-        /* DNA Bubbles */
-        .bubble {
-            position: absolute;
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            cursor: pointer;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 10;
-            box-shadow: 0 0 15px currentColor;
-        }
-        .bubble-dna {
-            background: radial-gradient(circle at 30% 30%, #fef08a, #ca8a04);
-            color: #422006;
-            color: var(--accent-gold);
-        }
-        .bubble-cure {
-            background: radial-gradient(circle at 30% 30%, #bfdbfe, #2563eb);
-            color: white;
-            box-shadow: 0 0 15px var(--accent-blue);
-        }
+    /* --- MAP STAGE --- */
+    #map-stage {
+        position: relative;
+        background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        overflow: hidden;
+    }
+    
+    /* Regions (Colleges) */
+    .college-group { cursor: pointer; transition: opacity 0.2s; }
+    .college-group:hover { filter: brightness(1.3); }
+    .college-shape {
+        fill: #2a2a2a;
+        stroke: #444;
+        stroke-width: 1;
+        transition: fill 0.5s;
+    }
+    .college-label {
+        fill: #666;
+        font-size: 10px;
+        font-family: monospace;
+        text-transform: uppercase;
+        pointer-events: none;
+        text-shadow: 0 1px 2px black;
+    }
 
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-        @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0); } }
+    /* Particles & Bubbles */
+    #fx-canvas {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+    }
+    .bubble {
+        position: absolute;
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #fff, var(--accent-yellow));
+        border: 2px solid #fff;
+        box-shadow: 0 0 15px var(--accent-yellow);
+        display: flex;
+        justify-content: center; align-items: center;
+        font-weight: bold; color: #422006;
+        cursor: pointer;
+        z-index: 100;
+        animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .bubble.cure {
+        background: radial-gradient(circle at 30% 30%, #dbeafe, var(--accent-blue));
+        box-shadow: 0 0 15px var(--accent-blue);
+        color: #fff;
+    }
+    @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
 
-        /* --- HUD --- */
-        #hud {
-            background: linear-gradient(to bottom, #222, #0d0d0d);
-            border-top: 1px solid #444;
-            display: grid;
-            grid-template-columns: 220px 1fr 220px;
-            padding: 15px;
-            gap: 20px;
-        }
+    /* --- HUD AREA --- */
+    #hud {
+        background: linear-gradient(to bottom, #181818, #050505);
+        border-top: 1px solid var(--border-color);
+        display: grid;
+        grid-template-columns: 300px 1fr 250px;
+        padding: 15px;
+        gap: 20px;
+    }
 
-        /* Stats Column */
-        .stat-box {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: var(--text-dim);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 5px;
-        }
-        .stat-row { display: flex; justify-content: space-between; }
-        .val-dna { color: var(--accent-gold); font-weight: bold; font-size: 1.1rem; }
-        .val-inf { color: var(--accent-red); font-weight: bold; }
-        .val-dead { color: #555; }
+    /* Left Panel: Region Data & Global Stats */
+    .panel-box {
+        background: #080808;
+        border: 1px solid #333;
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+    }
+    .hud-title {
+        font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 1px;
+        border-bottom: 1px solid #333; margin-bottom: 8px; padding-bottom: 4px;
+    }
+    .data-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9rem; }
+    .val-gold { color: var(--accent-yellow); font-weight: bold; font-size: 1.2rem; }
+    .val-red { color: var(--accent-red); }
+    .val-blue { color: var(--accent-blue); }
 
-        /* Middle Controls */
-        .controls-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-        }
+    /* Center Panel: Progress & Evolution */
+    .center-controls { display: flex; flex-direction: column; gap: 10px; }
+    
+    .bar-container { width: 100%; background: #000; border: 1px solid #444; height: 18px; border-radius: 9px; position: relative; overflow: hidden; }
+    .bar-fill { height: 100%; width: 0%; transition: width 0.5s linear; }
+    .bar-red { background: linear-gradient(90deg, #450a0a, #dc2626); }
+    .bar-blue { background: linear-gradient(90deg, #172554, #2563eb); }
+    .bar-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 0.7rem; color: #fff; text-shadow: 0 1px 2px #000; font-weight: bold; z-index: 2;}
 
-        .progress-container { width: 100%; }
-        .bar-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; display: flex; justify-content: space-between; }
-        
-        .progress-track {
-            background: #000;
-            border: 1px solid #333;
-            height: 14px;
-            border-radius: 7px;
-            overflow: hidden;
-            position: relative;
-        }
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            transition: width 0.2s linear;
-        }
-        #barBan { background: linear-gradient(90deg, #1e40af, #60a5fa); }
-        #barInf { background: linear-gradient(90deg, #7f1d1d, #ef4444); }
+    .btn-disease {
+        background: #222; border: 1px solid #444; color: #ccc;
+        padding: 10px; text-align: center; font-weight: bold; cursor: pointer;
+        transition: all 0.1s; text-transform: uppercase;
+        box-shadow: 0 4px 0 #000;
+        margin-top: auto;
+    }
+    .btn-disease:hover { background: #333; color: #fff; transform: translateY(-2px); box-shadow: 0 6px 0 #000; }
+    .btn-disease:active { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
 
-        .time-controls {
-            display: flex;
-            gap: 5px;
-            background: #111;
-            padding: 4px;
-            border-radius: 4px;
-            border: 1px solid #333;
-        }
-        .btn-time {
-            background: transparent;
-            border: none;
-            color: #666;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 2px;
-        }
-        .btn-time.active { background: #333; color: #fff; }
-        .btn-time:hover { color: #fff; }
+    /* Right Panel: Time & Global Actions */
+    .time-panel { display: flex; gap: 5px; justify-content: center; margin-bottom: 15px; }
+    .btn-time {
+        width: 40px; height: 30px; background: #111; border: 1px solid #444;
+        color: #666; cursor: pointer; font-weight: bold;
+    }
+    .btn-time.active { background: #333; color: #fff; border-color: #888; }
+    
+    .big-circle-btn {
+        width: 100px; height: 100px; border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #333, #000);
+        border: 2px solid #555; color: #aaa;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        font-size: 0.8rem; font-weight: bold; margin: 0 auto;
+        cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    .big-circle-btn:hover { border-color: #fff; color: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.1); }
 
-        /* Actions Column */
-        .actions-box {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 15px;
-        }
-        .big-btn {
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #333, #000);
-            border: 2px solid #555;
-            color: #ddd;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            transition: transform 0.1s, border-color 0.2s;
-        }
-        .big-btn:hover { transform: scale(1.05); border-color: #999; }
-        .btn-disease { color: var(--accent-red); border-color: #7f1d1d; }
-        .btn-disease:hover { border-color: var(--accent-red); box-shadow: 0 0 15px rgba(185, 28, 28, 0.3); }
+    /* --- EVOLUTION MODAL --- */
+    #evo-modal {
+        position: absolute; top: 50px; left: 0; width: 100%; height: 518px; /* Cover Map */
+        background: rgba(10, 10, 10, 0.95);
+        backdrop-filter: blur(5px);
+        z-index: 500; display: none; flex-direction: column;
+    }
+    .evo-header {
+        height: 60px; background: #151515; border-bottom: 1px solid #333;
+        display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
+    }
+    .evo-tabs button {
+        background: none; border: none; color: #666; font-size: 1rem; font-weight: bold;
+        margin-right: 20px; cursor: pointer; text-transform: uppercase;
+    }
+    .evo-tabs button.active { color: #fff; text-decoration: underline; text-decoration-color: var(--accent-red); text-underline-offset: 5px;}
+    
+    .evo-body { flex: 1; padding: 30px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+    
+    .hex-upgrade {
+        background: #1a1a1a; border: 1px solid #333; padding: 15px;
+        display: flex; flex-direction: column; gap: 5px; cursor: pointer; transition: all 0.2s;
+        position: relative;
+    }
+    .hex-upgrade:hover { background: #222; border-color: #666; }
+    .hex-upgrade.owned { background: #2a0e0e; border-color: var(--accent-red); }
+    .hex-upgrade.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
+    .hex-title { color: #fff; font-weight: bold; font-size: 0.9rem; }
+    .hex-cost { color: var(--accent-yellow); font-size: 0.8rem; font-family: monospace; }
+    .hex-desc { color: #888; font-size: 0.75rem; line-height: 1.2; }
 
-        /* --- MODAL (EVOLUTION) --- */
-        .modal-backdrop {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 100;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-window {
-            width: 800px; height: 600px;
-            background: #0a0a0a;
-            border: 1px solid #444;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 40px rgba(0,0,0,1);
-        }
-        .modal-header {
-            background: #151515;
-            border-bottom: 1px solid #333;
-            height: 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
-        .tab-group { display: flex; height: 100%; }
-        .tab-btn {
-            background: transparent; border: none;
-            color: #666; font-weight: bold;
-            padding: 0 20px; height: 100%;
-            cursor: pointer;
-            border-right: 1px solid #222;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-        }
-        .tab-btn.active { background: #222; color: #fff; border-bottom: 3px solid var(--accent-red); }
-        
-        .modal-body { flex: 1; padding: 20px; overflow-y: auto; }
-        
-        .upgrade-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 15px;
-        }
-        .upgrade-card {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            padding: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .upgrade-card:hover { background: #222; border-color: #555; }
-        .upgrade-card.owned { background: #2a1212; border-color: var(--accent-red); opacity: 0.8; }
-        .upgrade-card.locked { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
-        
-        .card-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .card-name { font-weight: bold; color: #fff; font-size: 0.9rem; }
-        .card-cost { color: var(--accent-gold); font-family: var(--font-mono); font-size: 0.85rem; }
-        .card-desc { font-size: 0.75rem; color: #888; line-height: 1.3; }
-
-        .close-btn {
-            background: #333; border: none; color: #fff;
-            width: 30px; height: 30px; cursor: pointer; font-weight: bold;
-        }
-        .close-btn:hover { background: var(--accent-red); }
-
-        /* --- GAME OVER --- */
-        #screenGameOver {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 200;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        .go-title { font-size: 4rem; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 5px; }
-        .go-win { color: var(--accent-red); text-shadow: 0 0 20px var(--accent-red); }
-        .go-lose { color: var(--accent-blue); text-shadow: 0 0 20px var(--accent-blue); }
-        .go-desc { max-width: 500px; color: #aaa; font-size: 1.2rem; margin-bottom: 40px; line-height: 1.5; }
-        .btn-restart {
-            background: transparent; border: 2px solid #fff; color: #fff;
-            padding: 10px 40px; font-size: 1.2rem; cursor: pointer;
-            text-transform: uppercase; font-weight: bold;
-            transition: all 0.2s;
-        }
-        .btn-restart:hover { background: #fff; color: #000; }
-
-    </style>
+    /* --- GAME OVER --- */
+    #game-over {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: #000; z-index: 1000; display: none;
+        flex-direction: column; justify-content: center; align-items: center;
+    }
+    .go-text { font-size: 4rem; font-weight: 900; margin-bottom: 20px; }
+    .win { color: var(--accent-red); text-shadow: 0 0 30px var(--accent-red); }
+    .lose { color: var(--accent-blue); text-shadow: 0 0 30px var(--accent-blue); }
+    
+</style>
 </head>
 <body>
 
-<div id="gameContainer">
-    
+<div class="scanlines"></div>
+
+<div id="game-shell">
     <header>
-        <div class="news-badge">NEWS</div>
-        <div id="newsTicker">Local meme seen on Reddit... Administrators concerned about productivity...</div>
+        <div class="date-display" id="date-display">DAY 1</div>
+        <div class="news-bar">
+            <div class="news-icon">NEWS</div>
+            <div id="news-ticker">Outbreak detected in Ben Franklin College... Students report "cringe" content...</div>
+        </div>
     </header>
 
-    <div id="mapStage">
-        <svg id="svgMap" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice"></svg>
-        <canvas id="particleCanvas"></canvas>
-        <div id="bubbleLayer"></div>
+    <div id="map-stage">
+        <svg id="svg-map" viewBox="0 0 800 500" style="width:100%; height:100%;">
+            <defs>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+            </defs>
+            <g id="regions-layer"></g>
+        </svg>
+        <canvas id="fx-canvas"></canvas>
+        <div id="bubble-layer"></div>
+
+        <div id="evo-modal">
+            <div class="evo-header">
+                <div class="evo-tabs">
+                    <button class="active" onclick="GameUI.setTab('transmission')">Transmission</button>
+                    <button onclick="GameUI.setTab('symptoms')">Content</button>
+                    <button onclick="GameUI.setTab('abilities')">Abilities</button>
+                </div>
+                <div style="color: var(--accent-yellow); font-weight: bold; font-size: 1.2rem;">
+                    <span id="modal-dna">0</span> DNA
+                </div>
+                <button style="background:var(--accent-red); border:none; color:white; padding:5px 15px; cursor:pointer;" onclick="GameUI.toggleEvo(false)">CLOSE</button>
+            </div>
+            <div class="evo-body" id="evo-list"></div>
+        </div>
+        
+        <div id="game-over">
+            <div class="go-text" id="go-title">VICTORY</div>
+            <div style="color:#aaa; margin-bottom:30px;" id="go-desc">Description</div>
+            <button class="btn-disease" onclick="location.reload()">PLAY AGAIN</button>
+        </div>
     </div>
 
     <div id="hud">
-        <div class="stat-box">
-            <div class="stat-row">
-                <span>DNA POINTS</span>
-                <span class="val-dna" id="valDNA">0</span>
-            </div>
-            <div style="height: 10px;"></div>
-            <div class="stat-row">
-                <span>INFECTED</span>
-                <span class="val-inf" id="valInf">0</span>
-            </div>
-            <div class="stat-row">
-                <span>HEALTHY</span>
-                <span class="val-dead" id="valSafe">100%</span>
-            </div>
-            <div class="stat-row" style="margin-top:10px;">
-                <span>DAY</span>
-                <span id="valDay">1</span>
-            </div>
+        <div class="panel-box">
+            <div class="hud-title">REGION DATA: <span id="reg-name" style="color:#fff">WORLD</span></div>
+            <div class="data-row"><span>POPULATION</span><span id="reg-pop">6000</span></div>
+            <div class="data-row"><span>INFECTED</span><span id="reg-inf" class="val-red">0</span></div>
+            <div class="data-row"><span>EXPELLED</span><span id="reg-dead" class="val-blue">0</span></div>
+            
+            <div style="flex:1"></div>
+            
+            <div class="hud-title">GLOBAL STATS</div>
+            <div class="data-row"><span>DNA POINTS</span><span id="val-dna" class="val-gold">0</span></div>
+            <div class="data-row"><span>TOTAL INFECTED</span><span id="val-total-inf" class="val-red">0</span></div>
         </div>
 
-        <div class="controls-box">
-            <div class="progress-container">
-                <div class="bar-label">
-                    <span style="color:var(--accent-blue)">Admin Ban Progress</span>
-                    <span id="lblBan">0%</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="barBan"></div>
-                </div>
+        <div class="center-controls">
+            <div class="bar-container">
+                <div class="bar-text">CAMPUS SATURATION</div>
+                <div class="bar-fill bar-red" id="bar-inf"></div>
             </div>
-
-            <div class="progress-container">
-                <div class="bar-label">
-                    <span style="color:var(--accent-red)">Campus Saturation</span>
-                    <span id="lblInf">0%</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="barInf"></div>
-                </div>
+            <div class="bar-container">
+                <div class="bar-text">ADMIN BAN PROGRESS</div>
+                <div class="bar-fill bar-blue" id="bar-ban"></div>
             </div>
+            
+            <div style="flex:1"></div>
+            <button class="btn-disease" onclick="GameUI.toggleEvo(true)">DISEASE MENU</button>
+        </div>
 
-            <div class="time-controls">
+        <div class="panel-box" style="align-items:center; justify-content: space-between;">
+            <div class="time-panel">
                 <button class="btn-time" onclick="Game.setSpeed(0)">||</button>
-                <button class="btn-time active" id="btnS1" onclick="Game.setSpeed(1)">1</button>
-                <button class="btn-time" id="btnS2" onclick="Game.setSpeed(2)">2</button>
-                <button class="btn-time" id="btnS3" onclick="Game.setSpeed(4)">3</button>
+                <button class="btn-time active" id="btn-s1" onclick="Game.setSpeed(1)">1</button>
+                <button class="btn-time" id="btn-s2" onclick="Game.setSpeed(3)">2</button>
+                <button class="btn-time" id="btn-s3" onclick="Game.setSpeed(6)">3</button>
             </div>
-        </div>
-
-        <div class="actions-box">
-            <div class="big-btn btn-disease" onclick="UI.toggleModal(true)">
-                <div>DISEASE</div>
-                <div style="font-size:0.6rem; font-weight:normal;">EVOLVE</div>
-            </div>
-            <div class="big-btn" style="border-color:#444; color:#666; cursor:default;">
-                <div>WORLD</div>
-                <div style="font-size:0.6rem; font-weight:normal;">DATA</div>
+            
+            <div class="big-circle-btn" onclick="AudioSys.playAlert()">
+                <span>YALE</span>
+                <span style="font-size:0.6rem; color:#666">CONNECT</span>
             </div>
         </div>
     </div>
-
-    <div class="modal-backdrop" id="evoModal">
-        <div class="modal-window">
-            <div class="modal-header">
-                <div class="tab-group">
-                    <button class="tab-btn active" onclick="UI.setTab('transmission')">Transmission</button>
-                    <button class="tab-btn" onclick="UI.setTab('symptoms')">Content</button>
-                    <button class="tab-btn" onclick="UI.setTab('abilities')">Abilities</button>
-                </div>
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <span style="color:var(--accent-gold); font-weight:bold;">DNA: <span id="modalDNA">0</span></span>
-                    <button class="close-btn" onclick="UI.toggleModal(false)">X</button>
-                </div>
-            </div>
-            <div class="modal-body" id="evoBody">
-                </div>
-        </div>
-    </div>
-
-    <div id="screenGameOver">
-        <h1 class="go-title" id="goTitle">VICTORY</h1>
-        <p class="go-desc" id="goDesc">Text goes here.</p>
-        <button class="btn-restart" onclick="location.reload()">Play Again</button>
-    </div>
-
 </div>
 
 <script>
 /**
- * MEME OUTBREAK: PANDEMIC LEGACY
- * A vanilla JS clone of the flash classic.
+ * MEME OUTBREAK: ULTIMATE
+ * Includes Audio Synth, Particle System, Logic, and UI.
  */
 
-/* --- CONFIGURATION --- */
-const DATA = {
+/* --- AUDIO ENGINE (Web Audio API) --- */
+const AudioSys = {
+    ctx: null,
+    init() {
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContext();
+    },
+    playTone(freq, type, duration) {
+        if (!this.ctx) this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    },
+    playPop() { this.playTone(400 + Math.random()*200, 'sine', 0.15); },
+    playClick() { this.playTone(800, 'square', 0.05); },
+    playAlert() { 
+        if(!this.ctx) this.init();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(100, this.ctx.currentTime + 0.5);
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.5);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.5);
+    }
+};
+
+/* --- GAME DATA --- */
+const CONFIG = {
     colleges: [
-        // X, Y percent coordinates on an 800x500 map
-        { id: "BF", name: "Ben Franklin", x: 0.10, y: 0.75, pop: 450, type: "Social" },
-        { id: "PM", name: "Pauli Murray", x: 0.10, y: 0.25, pop: 450, type: "Digital" },
-        { id: "BK", name: "Berkeley", x: 0.30, y: 0.75, pop: 400, type: "Social" },
-        { id: "GH", name: "Grace Hopper", x: 0.30, y: 0.55, pop: 380, type: "Digital" },
-        { id: "TC", name: "Trumbull", x: 0.50, y: 0.15, pop: 390, type: "Academic" },
-        { id: "BR", name: "Branford", x: 0.50, y: 0.75, pop: 410, type: "Physical" },
-        { id: "SY", name: "Saybrook", x: 0.55, y: 0.55, pop: 400, type: "Academic" },
-        { id: "JE", name: "Jonathan Edwards", x: 0.50, y: 0.55, pop: 380, type: "Academic" },
-        { id: "PC", name: "Pierson", x: 0.35, y: 0.25, pop: 420, type: "Digital" },
-        { id: "DC", name: "Davenport", x: 0.70, y: 0.75, pop: 430, type: "Academic" },
-        { id: "MC", name: "Morse", x: 0.70, y: 0.55, pop: 400, type: "Physical" },
-        { id: "ES", name: "Ezra Stiles", x: 0.10, y: 0.55, pop: 400, type: "Social" },
-        { id: "SM", name: "Silliman", x: 0.75, y: 0.25, pop: 440, type: "Social" },
-        { id: "TD", name: "Timothy Dwight", x: 0.25, y: 0.15, pop: 390, type: "Social" }
+        { id: "BF", name: "Ben Franklin", x: 100, y: 380, w: 50, h: 50, pop: 450, type: "Physical" },
+        { id: "BK", name: "Berkeley", x: 250, y: 380, w: 50, h: 50, pop: 400, type: "Social" },
+        { id: "BR", name: "Branford", x: 400, y: 380, w: 50, h: 50, pop: 410, type: "Physical" },
+        { id: "DC", name: "Davenport", x: 550, y: 380, w: 50, h: 50, pop: 430, type: "Academic" },
+        { id: "ES", name: "Ezra Stiles", x: 100, y: 280, w: 50, h: 45, pop: 400, type: "Social" },
+        { id: "GH", name: "Hopper", x: 250, y: 280, w: 40, h: 60, pop: 380, type: "Digital" },
+        { id: "JE", name: "J. Edwards", x: 400, y: 280, w: 60, h: 40, pop: 380, type: "Academic" },
+        { id: "MC", name: "Morse", x: 560, y: 280, w: 35, h: 60, pop: 400, type: "Physical" },
+        { id: "PM", name: "Pauli Murray", x: 100, y: 180, w: 60, h: 40, pop: 450, type: "Digital" },
+        { id: "PC", name: "Pierson", x: 300, y: 180, w: 50, h: 40, pop: 420, type: "Digital" },
+        { id: "SY", name: "Saybrook", x: 450, y: 180, w: 50, h: 40, pop: 400, type: "Academic" },
+        { id: "SM", name: "Silliman", x: 600, y: 180, w: 30, h: 45, pop: 440, type: "Social" },
+        { id: "TD", name: "Tim Dwight", x: 180, y: 80, w: 70, h: 45, pop: 390, type: "Social" },
+        { id: "TC", name: "Trumbull", x: 420, y: 80, w: 70, h: 45, pop: 390, type: "Academic" }
     ],
     upgrades: {
         transmission: [
-            { id: "t_insta", name: "Instagram Page", cost: 3, type: "Digital", desc: "Allows infection in Digital colleges." },
-            { id: "t_woads", name: "Woads Night", cost: 5, type: "Social", desc: "Allows infection in Social colleges." },
-            { id: "t_chalk", name: "Sidealk Chalk", cost: 4, type: "Physical", desc: "Allows infection in Physical colleges." },
-            { id: "t_section", name: "Section Chatter", cost: 4, type: "Academic", desc: "Allows infection in Academic colleges." },
-            { id: "t_tiktok", name: "TikTok Trend", cost: 10, req: "t_insta", desc: "Massively boosts spread speed." },
-            { id: "t_party", name: "Frat Party Theme", cost: 12, req: "t_woads", desc: "Spread increases when people gather." },
-            { id: "t_sticker", name: "Laptop Stickers", cost: 8, req: "t_chalk", desc: "Passive spread increase." },
-            { id: "t_groupme", name: "GroupMe Spam", cost: 9, req: "t_section", desc: "High annoyance, high spread." }
+            { id: "t1", name: "Insta Page", cost: 3, type: "Digital", desc: "Allows Digital Infection." },
+            { id: "t2", name: "Woads", cost: 4, type: "Social", desc: "Allows Social Infection." },
+            { id: "t3", name: "Chalking", cost: 3, type: "Physical", desc: "Allows Physical Infection." },
+            { id: "t4", name: "Piazza", cost: 3, type: "Academic", desc: "Allows Academic Infection." },
+            { id: "t5", name: "TikTok", cost: 10, req: "t1", desc: "Massive spread boost." }
         ],
         symptoms: [
-            { id: "s_cap", name: "Funny Caption", cost: 2, inf: 2, vis: 1, desc: "Slightly increases infectivity." },
-            { id: "s_img", name: "Cursed Image", cost: 4, inf: 5, vis: 3, desc: "People share it because it's weird." },
-            { id: "s_vid", name: "Video Format", cost: 8, inf: 8, vis: 5, desc: "Higher engagement." },
-            { id: "s_pol", name: "Political Take", cost: 10, inf: 15, vis: 20, desc: "Huge spread, but Admins act fast." },
-            { id: "s_prof", name: "Mocking Profs", cost: 12, inf: 10, vis: 15, desc: "Academic circles love it." },
-            { id: "s_deep", name: "Deep Fried", cost: 6, inf: 6, vis: 2, desc: "Harder for older admins to understand." }
+            { id: "s1", name: "Caption", cost: 2, inf: 3, vis: 1, desc: "Mildly funny." },
+            { id: "s2", name: "Cursed", cost: 5, inf: 6, vis: 4, desc: "High engagement." },
+            { id: "s3", name: "Political", cost: 12, inf: 15, vis: 25, desc: "Huge spread, HUGE ban risk." },
+            { id: "s4", name: "Deep Fried", cost: 8, inf: 8, vis: 2, desc: "Confuses admins." }
         ],
         abilities: [
-            { id: "a_obs", name: "Obscurity", cost: 6, desc: "Reduces Visibility (Ban Speed) by 20%." },
-            { id: "a_vpn", name: "VPN Usage", cost: 10, desc: "Ban progress slows down by 15%." },
-            { id: "a_alumni", name: "Alumni Support", cost: 20, desc: "Massive reduction in Ban speed." },
-            { id: "a_mutate", name: "Rapid Mutation", cost: 15, desc: "Randomly gain free Content upgrades." }
+            { id: "a1", name: "Obscurity", cost: 8, desc: "Slows Ban by 20%." },
+            { id: "a2", name: "Alumni", cost: 15, desc: "Significant Ban reduction." },
+            { id: "a3", name: "Mutation", cost: 12, desc: "Random free upgrade." }
         ]
     }
 };
 
-/* --- GAME ENGINE --- */
+/* --- GAME LOGIC --- */
 const Game = {
-    dna: 10,
-    totalPop: 0,
-    infectedPop: 0,
-    day: 1,
-    tick: 0,
-    speed: 1,
-    banProgress: 0,
-    banRate: 0,
-    visibility: 0,
-    infectivity: 1,
-    paused: false,
-    ended: false,
-    
+    state: {
+        dna: 10, day: 1, tick: 0, speed: 1,
+        ban: 0, visibility: 0, infectivity: 1,
+        owned: [], paused: false, ended: false,
+        selectedRegion: null
+    },
     colleges: [],
-    ownedUpgrades: [],
-    
-    particles: [],
+    totalPop: 0,
 
     init() {
-        // Calculate total pop
-        DATA.colleges.forEach(c => {
+        // Init Colleges
+        CONFIG.colleges.forEach(c => {
+            Game.state.selectedRegion = null;
             Game.totalPop += c.pop;
             Game.colleges.push({
                 ...c,
-                infected: 0,
-                color: 0 // 0 to 1 intensity
+                inf: 0, dead: 0,
+                color: 0
             });
         });
-
-        // Start Infection in Ben Franklin
-        Game.colleges[0].infected = 5; 
-
-        // Render Map
-        UI.renderMap();
         
-        // Start Loop
+        // Infect Patient Zero
+        Game.colleges[0].inf = 5; 
+        
+        // Initial Render
+        GameUI.initMap();
+        GameUI.updateHUD();
+        
+        // Loop
         requestAnimationFrame(Game.loop);
         
-        // Input Listeners
-        UI.initListeners();
+        // Ambience
+        setTimeout(() => AudioSys.playAlert(), 1000);
     },
 
     setSpeed(s) {
-        Game.speed = s;
-        document.querySelectorAll('.btn-time').forEach((b, i) => {
-            if ((i===0 && s===0) || (i===1 && s===1) || (i===2 && s===2) || (i===3 && s===4)) {
-                b.classList.add('active');
-            } else {
-                b.classList.remove('active');
-            }
+        Game.state.speed = s;
+        document.querySelectorAll('.btn-time').forEach((b,i) => {
+            b.classList.remove('active');
+            if ([0,1,3,6].indexOf(s) === i) b.classList.add('active');
         });
     },
 
     loop() {
-        if (Game.ended) return;
+        if (Game.state.ended) return;
         
-        if (Game.speed > 0) {
-            // Game tick runs based on speed
-            for(let i=0; i<Game.speed; i++) {
-                Game.tick++;
-                if (Game.tick % 60 === 0) { // Roughly every "hour"
-                    Game.updateLogic();
-                }
+        if (Game.state.speed > 0) {
+            for(let i=0; i<Game.state.speed; i++) {
+                Game.tick();
             }
-            // Particle animation runs every frame regardless of logic tick
-            ParticleSystem.update();
+            GameParticles.update();
         }
-
         requestAnimationFrame(Game.loop);
     },
 
-    updateLogic() {
-        // 1. Spread Infection
-        let newInfections = 0;
-        let globalInf = 0;
+    tick() {
+        Game.state.tick++;
+        
+        // Hourly Logic (Every 60 ticks)
+        if (Game.state.tick % 60 === 0) {
+            Game.updateInfection();
+            Game.updateBan();
+        }
+        
+        // Daily Logic
+        if (Game.state.tick % 1440 === 0) {
+            Game.state.day++;
+            GameUI.ticker("Another day on campus...");
+        }
 
+        GameUI.updateHUD();
+    },
+
+    updateInfection() {
+        let totalInf = 0;
+        
         Game.colleges.forEach(c => {
-            if (c.infected > 0) {
-                // Internal Spread
-                if (c.infected < c.pop) {
-                    let rate = (Game.infectivity * 0.05) + (c.infected * 0.002);
-                    // Cap rate based on population density
-                    let growth = Math.ceil(rate);
-                    let actual = Math.min(c.pop - c.infected, growth);
-                    c.infected += actual;
-                    newInfections += actual;
-                    
-                    // Generate Particles
-                    if (Math.random() < 0.2) ParticleSystem.spawn(c);
-                }
-
-                // External Spread (Neighbor/Global)
-                if (Math.random() < 0.02 * Game.infectivity) {
-                    let target = Game.colleges[Math.floor(Math.random() * Game.colleges.length)];
-                    // Can we infect this target? (Must own the transmission vector or already be infected)
-                    let canInfect = target.infected > 0;
-                    if (!canInfect) {
-                        // Check upgrade type
-                        let typeUpgrade = Game.ownedUpgrades.find(u => u.type === target.type);
-                        if (typeUpgrade) canInfect = true;
+            if (c.inf > 0 && c.inf < c.pop) {
+                // Logistic-ish growth
+                let rate = (Game.state.infectivity * 0.05) + (c.inf * 0.002);
+                let growth = Math.ceil(rate);
+                let actual = Math.min(c.pop - c.inf - c.dead, growth);
+                c.inf += actual;
+                
+                // Particles
+                if (Math.random() < 0.3) GameParticles.spawn(c);
+            }
+            
+            // Spread to neighbors
+            if (c.inf > 0 && Math.random() < 0.01 * Game.state.infectivity) {
+                let target = Game.colleges[Math.floor(Math.random() * Game.colleges.length)];
+                if (target.inf === 0) {
+                    // Access Check
+                    let hasAccess = Game.state.owned.some(u => u.type === target.type);
+                    if (hasAccess || Game.state.owned.length === 0 && target === Game.colleges[0]) {
+                        target.inf = 1;
+                        GameUI.spawnBubble(target.x, target.y, 'dna');
+                        GameUI.ticker(`Outbreak in ${target.name}!`);
+                        AudioSys.playAlert();
                     }
-
-                    if (canInfect && target.infected < target.pop) {
-                        if (target.infected === 0) {
-                            // First infection event
-                            target.infected = 1;
-                            UI.spawnBubble(target.x, target.y, 'dna');
-                            UI.ticker(`Outbreak confirmed in ${target.name}!`);
-                        }
-                        // Send particle
-                        ParticleSystem.travel(c, target);
-                    }
+                } else {
+                    // Show travel particle
+                    GameParticles.travel(c, target);
                 }
             }
-            globalInf += c.infected;
             
-            // Visual update for college
-            let intensity = c.infected / c.pop;
-            document.getElementById(`col_${c.id}`).style.fill = `rgba(185, 28, 28, ${0.2 + (intensity * 0.8)})`;
+            totalInf += c.inf;
+            GameUI.colorCollege(c);
         });
+        
+        // Win Condition
+        if (totalInf >= Game.totalPop * 0.99) Game.end(true);
+    },
 
-        Game.infectedPop = globalInf;
-
-        // 2. Ban Progress
-        // Ban speed depends on Visibility and how many people are infected (Panic)
-        if (Game.infectedPop > 50) {
-            let panicFactor = Game.infectedPop / Game.totalPop; // 0 to 1
-            let baseRate = (Game.visibility * 0.001) + (panicFactor * 0.05);
+    updateBan() {
+        let totalInf = Game.colleges.reduce((a,b) => a + b.inf, 0);
+        if (totalInf > 50) {
+            // Ban Logic
+            let rate = (Game.state.visibility * 0.002) + 0.01;
             
-            // Ability reducers
-            if (Game.hasUpgrade('a_obs')) baseRate *= 0.8;
-            if (Game.hasUpgrade('a_vpn')) baseRate *= 0.85;
-            if (Game.hasUpgrade('a_alumni')) baseRate *= 0.5;
+            // Reducers
+            if (Game.has('a1')) rate *= 0.8;
+            if (Game.has('a2')) rate *= 0.5;
 
-            Game.banProgress += baseRate;
+            Game.state.ban += rate;
             
-            // Chance to spawn Cure Bubble (Reduces ban progress slightly)
-            if (Math.random() < 0.005 && Game.banProgress > 10) {
-                let c = Game.colleges[Math.floor(Math.random()*Game.colleges.length)];
-                UI.spawnBubble(c.x, c.y, 'cure');
+            // Expulsion logic (People getting banned/expelled)
+            if (Game.state.ban > 20) {
+                Game.colleges.forEach(c => {
+                    if (c.inf > 0) {
+                        let killed = Math.ceil(c.inf * (Game.state.ban / 2000));
+                        if (killed > 0) {
+                            c.inf -= killed;
+                            c.dead += killed;
+                        }
+                    }
+                });
+            }
+            
+            // Cure Bubble
+            if (Math.random() < 0.005) {
+                let r = Game.colleges[Math.floor(Math.random()*Game.colleges.length)];
+                GameUI.spawnBubble(r.x, r.y, 'cure');
             }
         }
+        
+        if (Game.state.ban >= 100) Game.end(false);
+    },
 
-        // 3. Time / Win / Lose
-        if (Game.tick % 1440 === 0) {
-            Game.day++;
-            UI.ticker("Another day passes...");
+    has(id) { return Game.state.owned.some(u => u.id === id); },
+
+    buy(u) {
+        if (Game.state.dna >= u.cost) {
+            Game.state.dna -= u.cost;
+            Game.state.owned.push(u);
+            if (u.inf) Game.state.infectivity += u.inf;
+            if (u.vis) Game.state.visibility += u.vis;
+            GameUI.renderEvo();
+            AudioSys.playClick();
         }
-
-        UI.updateHUD();
-        Game.checkEnd();
     },
 
-    hasUpgrade(id) {
-        return Game.ownedUpgrades.some(u => u.id === id);
-    },
+    end(win) {
+        Game.state.ended = true;
+        document.getElementById('game-over').style.display = 'flex';
+        document.getElementById('go-title').className = win ? 'go-text win' : 'go-text lose';
+        document.getElementById('go-title').innerText = win ? "VICTORY" : "BANNED";
+        document.getElementById('go-desc').innerText = win ? "Your meme is legendary." : "The Administration erased it.";
+        if(win) AudioSys.playAlert();
+    }
+};
 
-    buyUpgrade(upgrade) {
-        if (Game.dna >= upgrade.cost) {
-            Game.dna -= upgrade.cost;
-            Game.ownedUpgrades.push(upgrade);
+/* --- UI SYSTEM --- */
+const GameUI = {
+    currentTab: 'transmission',
+    
+    initMap() {
+        const svg = document.getElementById('regions-layer');
+        Game.colleges.forEach((c, i) => {
+            let g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            g.setAttribute("class", "college-group");
+            g.onclick = () => GameUI.selectRegion(i);
             
-            // Apply stats
-            if (upgrade.inf) Game.infectivity += upgrade.inf;
-            if (upgrade.vis) Game.visibility += upgrade.vis;
+            let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            rect.setAttribute("x", c.x * 1);
+            rect.setAttribute("y", c.y * 1);
+            rect.setAttribute("width", c.w);
+            rect.setAttribute("height", c.h);
+            rect.setAttribute("class", "college-shape");
+            rect.setAttribute("id", `shp-${c.id}`);
             
-            UI.renderEvo();
-            UI.updateHUD();
-        }
+            let txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            txt.setAttribute("x", c.x);
+            txt.setAttribute("y", c.y - 5);
+            txt.setAttribute("class", "college-label");
+            txt.textContent = c.id;
+            
+            g.appendChild(rect);
+            g.appendChild(txt);
+            svg.appendChild(g);
+        });
+        
+        // Canvas setup
+        const cvs = document.getElementById('fx-canvas');
+        cvs.width = 800; cvs.height = 500;
+        GameParticles.ctx = cvs.getContext('2d');
     },
 
-    checkEnd() {
-        if (Game.banProgress >= 100) {
-            Game.endGame(false);
-        } else if (Game.infectedPop >= Game.totalPop * 0.99) { // 99% infection
-            Game.endGame(true);
-        }
+    selectRegion(idx) {
+        Game.state.selectedRegion = idx;
+        let c = Game.colleges[idx];
+        document.getElementById('reg-name').innerText = c.name;
+        AudioSys.playClick();
+        GameUI.updateHUD();
     },
 
-    endGame(win) {
-        Game.ended = true;
-        const screen = document.getElementById('screenGameOver');
-        const title = document.getElementById('goTitle');
-        const desc = document.getElementById('goDesc');
+    colorCollege(c) {
+        let intensity = c.inf / c.pop;
+        let el = document.getElementById(`shp-${c.id}`);
+        // Red intensity
+        el.style.fill = `rgb(${42 + (intensity * 200)}, 42, 42)`;
+        if (c.inf > 0 && c.inf < c.pop) el.style.stroke = "#fff";
+        else el.style.stroke = "#444";
+    },
 
-        screen.style.display = 'flex';
-        if (win) {
-            title.innerText = "MEME SUPREMACY";
-            title.className = "go-title go-win";
-            desc.innerText = "There is no escaping your meme. Even the Dean has printed it out and put it on their door. You are a legend.";
+    spawnBubble(x, y, type) {
+        let b = document.createElement('div');
+        b.className = `bubble ${type}`;
+        b.style.left = (x + Math.random()*20) + 'px';
+        b.style.top = (y + Math.random()*20) + 'px';
+        
+        if (type === 'dna') {
+            b.innerHTML = "+";
+            b.onclick = () => { 
+                Game.state.dna += (1 + Math.floor(Math.random()*2)); 
+                AudioSys.playPop(); 
+                b.remove(); 
+                GameUI.updateHUD(); 
+            };
         } else {
-            title.innerText = "BANNED";
-            title.className = "go-title go-lose";
-            desc.innerText = "The Administration has completely scrubbed the meme from the internet. Expulsions have been handed out. It's over.";
+            b.innerHTML = "!";
+            b.onclick = () => {
+                Game.state.ban = Math.max(0, Game.state.ban - 5);
+                AudioSys.playPop();
+                b.remove();
+                GameUI.updateHUD();
+            };
         }
+        
+        document.getElementById('bubble-layer').appendChild(b);
+        setTimeout(() => b.remove(), 4000);
+    },
+
+    updateHUD() {
+        // Global
+        let totalInf = Game.colleges.reduce((a,b)=>a+b.inf,0);
+        document.getElementById('val-dna').innerText = Game.state.dna;
+        document.getElementById('modal-dna').innerText = Game.state.dna;
+        document.getElementById('val-total-inf').innerText = totalInf;
+        document.getElementById('date-display').innerText = `DAY ${Game.state.day}`;
+        
+        // Bars
+        document.getElementById('bar-inf').style.width = (totalInf / Game.totalPop * 100) + '%';
+        document.getElementById('bar-ban').style.width = Game.state.ban + '%';
+        
+        // Region
+        if (Game.state.selectedRegion !== null) {
+            let c = Game.colleges[Game.state.selectedRegion];
+            document.getElementById('reg-pop').innerText = c.pop;
+            document.getElementById('reg-inf').innerText = c.inf;
+            document.getElementById('reg-dead').innerText = c.dead;
+        }
+    },
+
+    ticker(msg) {
+        let el = document.getElementById('news-ticker');
+        el.innerText = msg;
+        el.style.animation = 'none';
+        el.offsetHeight; 
+        el.style.animation = 'ticker 15s linear infinite';
+    },
+
+    toggleEvo(show) {
+        document.getElementById('evo-modal').style.display = show ? 'flex' : 'none';
+        if(show) GameUI.renderEvo();
+        AudioSys.playClick();
+    },
+
+    setTab(t) {
+        GameUI.currentTab = t;
+        document.querySelectorAll('.evo-tabs button').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        GameUI.renderEvo();
+        AudioSys.playClick();
+    },
+
+    renderEvo() {
+        const list = document.getElementById('evo-list');
+        list.innerHTML = '';
+        CONFIG.upgrades[GameUI.currentTab].forEach(u => {
+            let owned = Game.has(u.id);
+            let locked = false;
+            if (u.req && !Game.has(u.req)) locked = true;
+            
+            let el = document.createElement('div');
+            el.className = `hex-upgrade ${owned?'owned':''} ${locked?'locked':''}`;
+            el.innerHTML = `<div class="hex-title">${u.name}</div><div class="hex-cost">${owned?'OWNED':u.cost}</div><div class="hex-desc">${u.desc}</div>`;
+            if (!owned && !locked) el.onclick = () => Game.buy(u);
+            list.appendChild(el);
+        });
     }
 };
 
 /* --- PARTICLE SYSTEM --- */
-const ParticleSystem = {
+const GameParticles = {
     particles: [],
     ctx: null,
-
-    init() {
-        const canvas = document.getElementById('particleCanvas');
-        canvas.width = 800; // Matches viewbox
-        canvas.height = 500;
-        this.ctx = canvas.getContext('2d');
-    },
-
-    spawn(college) {
+    
+    spawn(c) {
         this.particles.push({
-            x: college.x * 800 + (Math.random()*20-10),
-            y: college.y * 500 + (Math.random()*20-10),
-            vx: (Math.random()-0.5)*2,
-            vy: (Math.random()-0.5)*2,
-            life: 60,
-            color: '#b91c1c'
+            x: c.x + 25, y: c.y + 25,
+            vx: (Math.random()-0.5)*1, vy: (Math.random()-0.5)*1,
+            life: 50, color: '#cc0000'
         });
     },
-
-    travel(source, target) {
+    travel(s, t) {
         this.particles.push({
-            x: source.x * 800,
-            y: source.y * 500,
-            tx: target.x * 800,
-            ty: target.y * 500,
-            life: 100, // Travel time
-            travel: true,
-            color: '#eab308' // Gold particle for transmission
+            x: s.x + 25, y: s.y + 25,
+            tx: t.x + 25, ty: t.y + 25,
+            travel: true, life: 100, color: '#ffcc00'
         });
     },
-
     update() {
-        if (!this.ctx) this.init();
-        this.ctx.clearRect(0, 0, 800, 500);
-
-        for (let i = this.particles.length - 1; i >= 0; i--) {
+        if(!this.ctx) return;
+        this.ctx.clearRect(0,0,800,500);
+        for(let i=this.particles.length-1; i>=0; i--) {
             let p = this.particles[i];
-            
-            if (p.travel) {
-                // Move towards target
-                let dx = p.tx - p.x;
-                let dy = p.ty - p.y;
-                p.x += dx * 0.05;
-                p.y += dy * 0.05;
-                if (Math.abs(dx) < 2 && Math.abs(dy) < 2) p.life = 0;
+            if(p.travel) {
+                p.x += (p.tx - p.x)*0.05;
+                p.y += (p.ty - p.y)*0.05;
+                if(Math.abs(p.x-p.tx)<1) p.life=0;
             } else {
-                // Float around
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life--;
+                p.x+=p.vx; p.y+=p.vy; p.life--;
             }
-
             this.ctx.fillStyle = p.color;
-            this.ctx.beginPath();
-            this.ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-            this.ctx.fill();
-
-            if (p.life <= 0) this.particles.splice(i, 1);
+            this.ctx.fillRect(p.x, p.y, 2, 2);
+            if(p.life<=0) this.particles.splice(i,1);
         }
     }
 };
 
-/* --- UI MANAGER --- */
-const UI = {
-    activeTab: 'transmission',
-
-    initListeners() {
-        // Bubbles
-        document.getElementById('bubbleLayer').addEventListener('click', (e) => {
-            if (e.target.classList.contains('bubble')) {
-                let type = e.target.dataset.type;
-                if (type === 'dna') {
-                    Game.dna += (Math.floor(Math.random()*2)+1);
-                    UI.updateHUD();
-                } else if (type === 'cure') {
-                    Game.banProgress = Math.max(0, Game.banProgress - 5);
-                    UI.updateHUD();
-                }
-                e.target.remove();
-            }
-        });
-    },
-
-    renderMap() {
-        const svg = document.getElementById('svgMap');
-        Game.colleges.forEach(c => {
-            // Draw rect
-            let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            rect.setAttribute("x", (c.x * 800) - 20);
-            rect.setAttribute("y", (c.y * 500) - 20);
-            rect.setAttribute("width", 40);
-            rect.setAttribute("height", 40);
-            rect.setAttribute("id", `col_${c.id}`);
-            rect.classList.add("college-rect");
-            
-            // Draw Label
-            let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.setAttribute("x", (c.x * 800) - 20);
-            text.setAttribute("y", (c.y * 500) - 25);
-            text.textContent = c.name;
-            text.classList.add("map-label");
-
-            svg.appendChild(rect);
-            svg.appendChild(text);
-        });
-    },
-
-    spawnBubble(xPct, yPct, type) {
-        const layer = document.getElementById('bubbleLayer');
-        const el = document.createElement('div');
-        el.classList.add('bubble');
-        el.classList.add(type === 'dna' ? 'bubble-dna' : 'bubble-cure');
-        el.style.left = (xPct * 800 - 20) + 'px';
-        el.style.top = (yPct * 500 - 20) + 'px';
-        el.dataset.type = type;
-        
-        if (type === 'dna') el.innerHTML = "DNA";
-        
-        layer.appendChild(el);
-        
-        // Auto fade
-        setTimeout(() => {
-            if (el.parentNode) el.remove();
-        }, 4000);
-    },
-
-    updateHUD() {
-        document.getElementById('valDNA').innerText = Game.dna;
-        document.getElementById('valInf').innerText = Game.infectedPop;
-        document.getElementById('valSafe').innerText = Game.totalPop - Game.infectedPop;
-        document.getElementById('valDay').innerText = Game.day;
-
-        document.getElementById('barBan').style.width = Game.banProgress + '%';
-        document.getElementById('lblBan').innerText = Math.floor(Game.banProgress) + '%';
-        
-        let infPct = (Game.infectedPop / Game.totalPop) * 100;
-        document.getElementById('barInf').style.width = infPct + '%';
-        document.getElementById('lblInf').innerText = Math.floor(infPct) + '%';
-        
-        // Sync Modal DNA
-        document.getElementById('modalDNA').innerText = Game.dna;
-    },
-
-    ticker(msg) {
-        const t = document.getElementById('newsTicker');
-        t.innerText = msg;
-        // Reset animation to show new text immediately
-        t.style.animation = 'none';
-        t.offsetHeight; 
-        t.style.animation = 'ticker 20s linear infinite';
-    },
-
-    toggleModal(show) {
-        const m = document.getElementById('evoModal');
-        m.style.display = show ? 'flex' : 'none';
-        if (show) this.renderEvo();
-    },
-
-    setTab(tab) {
-        this.activeTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        this.renderEvo();
-    },
-
-    renderEvo() {
-        const body = document.getElementById('evoBody');
-        body.innerHTML = '';
-        const list = document.createElement('div');
-        list.className = 'upgrade-grid';
-
-        DATA.upgrades[this.activeTab].forEach(u => {
-            let owned = Game.hasUpgrade(u.id);
-            let locked = false;
-            if (u.req && !Game.hasUpgrade(u.req)) locked = true;
-
-            let card = document.createElement('div');
-            card.className = `upgrade-card ${owned ? 'owned' : ''} ${locked ? 'locked' : ''}`;
-            card.innerHTML = `
-                <div class="card-header">
-                    <span class="card-name">${u.name}</span>
-                    <span class="card-cost">${owned ? 'OWNED' : u.cost}</span>
-                </div>
-                <div class="card-desc">${u.desc}</div>
-            `;
-            
-            if (!owned && !locked) {
-                card.onclick = () => Game.buyUpgrade(u);
-            }
-            
-            list.appendChild(card);
-        });
-        
-        body.appendChild(list);
-    }
-};
-
-// --- BOOT ---
-Game.init();
-
+// START
+window.onload = Game.init;
 </script>
 </body>
 </html>
