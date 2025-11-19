@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Meme Outbreak: Yale Edition</title>
+    <title>Meme Outbreak: Yale Edition (Pandemic Mod)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         :root {
@@ -16,6 +16,7 @@
             --border-subtle: #1e293b;
             --green-active: #22c55e;
             --purple-glow: #a855f7;
+            --yellow-glow: #facc15; /* Added for visual cues */
         }
 
         body {
@@ -286,6 +287,26 @@
             transition: width 0.2s ease-out;
         }
 
+        /* Access List */
+        .access-list {
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .access-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .access-item.unlocked .status {
+            color: var(--green-active);
+        }
+        .access-item.locked .status {
+            color: var(--yellow-glow);
+        }
 
         /* Tab Navigation */
         .tab-navigation {
@@ -467,26 +488,6 @@
         .log-entry.mutation {
             color: var(--purple-glow);
             font-weight: 500;
-        }
-
-        .log-filter-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        .log-filter-btn {
-            background: transparent;
-            border: 1px solid var(--border-subtle);
-            color: var(--text-muted);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-        .log-filter-btn.active {
-            background: var(--accent);
-            color: var(--card);
-            border-color: var(--accent);
         }
 
         /* General Button Styles (for speed controls and tab buttons) */
@@ -677,6 +678,12 @@
                         <div class="college-detail-row">Virality Multiplier: <span id="detailSpreadMod">1.0x</span></div>
                         <div class="college-detail-row">Relatability Multiplier: <span id="detailStickinessMod">1.0x</span></div>
                         <div class="college-detail-row">Current Status: <span id="detailStatus">Mostly Safe</span></div>
+                        
+                        <div class="footer-note" style="margin-top: 10px;">
+                            College Access Points (Required Vectors):
+                        </div>
+                        <div class="access-list" id="detailAccessList">
+                            </div>
                     </div>
                 </div>
             </div>
@@ -684,20 +691,20 @@
             <div class="panel">
                 <div class="tab-navigation">
                     <button class="tab-button active" onclick="switchTab('traits')">Meme Traits</button>
-                    <button class="tab-button" onclick="switchTab('upgrades')">Upgrades</button>
+                    <button class="tab-button" onclick="switchTab('upgrades')">Vectors & Upgrades</button>
                     <button class="tab-button" onclick="switchTab('log')">Game Log</button>
                 </div>
 
                 <div id="tabContent" class="tab-content">
                     <div id="traits" class="tab-panel active">
                         <p class="subtitle">
-                            Every in-game hour, you gain 1 upgrade point. Spend them on themed upgrades that tweak the four core traits.
+                            Every in-game hour, you gain 1 UP. Focus on **V**irality, **R**elatability, and **E**dginess. Use Upgrades to unlock **Transmission Vectors**.
                         </p>
                         <div class="traits-list" id="traitsList"></div>
                     </div>
 
                     <div id="upgrades" class="tab-panel">
-                        <h3>Available Upgrades</h3>
+                        <h3>Available Transmission Vectors & Upgrades</h3>
                         <div id="upgradesGrid" class="upgrades-grid"></div>
                     </div>
 
@@ -708,7 +715,7 @@
                 </div>
 
                 <div class="footer-note">
-                    Win by infecting at least <strong>80%</strong> of the overall population before Admin Tolerance hits zero or campus moves on to a new drama (after Day 7).
+                    Win by infecting at least <strong>80%</strong> of the overall population before Admin Tolerance hits zero or campus moves on to a new drama (after Day 7). **Uninfected colleges must be exposed via an unlocked Transmission Vector.**
                 </div>
             </div>
         </div>
@@ -736,57 +743,55 @@
             "#f59e0b", "#dc2626", "#2563eb", "#22c55e",
             "#16a34a", "#047857",
         ];
-
-        const UPGRADES = [
-            { id: "trumpify", name: "Trumpify", desc: "Your meme applies to Trump; V & E spike, admins panic.", v: 2, r: 0, e: 2, tol: -8, prerequisite: null },
-            { id: "commons-feature", name: "Commons Feature", desc: "The meme hits the screens in Schwarzman.", v: 2, r: 1, e: 0, tol: -4, prerequisite: null },
-            { id: "ydn-article", name: "YDN Article", desc: "Yale Daily News writes a think-piece.", v: 1, r: 2, e: 0, tol: -3, prerequisite: null },
-            { id: "stonks", name: "Stonks Template", desc: "You lean into 'stonks'. Easy shares.", v: 2, r: 1, e: 1, tol: -2, prerequisite: "ydn-article" },
-            { id: "six-seven", name: "Six–Seven Chant", desc: "Students adopt your meme as a chant in the Bowl.", v: 3, r: 1, e: 0, tol: -5, prerequisite: null },
-            { id: "bulldog-days", name: "Bulldog Days Leak", desc: "Prefrosh see the meme before they even enroll.", v: 2, r: 2, e: 0, tol: -4, prerequisite: null },
-            { id: "froco-endorsement", name: "FroCo Endorsement", desc: "FroCos ironically include your meme in group emails.", v: 1, r: 2, e: 0, tol: -1, prerequisite: null },
-            { id: "section-meme-page", name: "Section Meme Page", desc: "Becomes default language of a section meme page.", v: 1, r: 3, e: 1, tol: -3, prerequisite: "froco-endorsement" },
-            { id: "sig-blast", name: "SIG Blast", desc: "A big student org sends it out in a listserv blast.", v: 2, r: 1, e: 0, tol: -2, prerequisite: null },
-            { id: "yale-facebook", name: "Yale Facebook Group", desc: "The old guard picks it up on Facebook.", v: 1, r: 1, e: 0, tol: -1, prerequisite: null },
-            { id: "bass-whiteboard", name: "Bass Whiteboard", desc: "Someone draws your meme on a Bass study room whiteboard.", v: 1, r: 2, e: 0, tol: -1, prerequisite: null },
-            { id: "lecture-slide", name: "Lecture Slide Cameo", desc: "A professor uses your meme in their lecture slides.", v: 1, r: 2, e: 0, tol: +3, prerequisite: null },
-            { id: "groupme-stickers", name: "GroupMe Stickers", desc: "Your meme becomes a cursed sticker pack.", v: 1, r: 3, e: 1, tol: -2, prerequisite: "section-meme-page" },
-            { id: "yalies-tiktok", name: "Yalies on TikTok", desc: "The meme jumps to TikTok with a trending sound.", v: 3, r: 2, e: 1, tol: -5, prerequisite: "six-seven" },
-            { id: "cs-piazza", name: "CS Piazza Thread", desc: "CS majors turn a Piazza post into a meme thread.", v: 1, r: 2, e: 1, tol: -2, prerequisite: null },
-            { id: "econ-pset", name: "Econ Pset Joke", desc: "Your meme features in an Econ pset hint.", v: 1, r: 1, e: 0, tol: +2, prerequisite: null },
-            { id: "beinecke-projection", name: "Beinecke Projection", desc: "A meme variant gets projected on Beinecke in a stunt.", v: 2, r: 1, e: 2, tol: -6, prerequisite: "trumpify" },
-            { id: "td-buttery", name: "TD Buttery Graffiti", desc: "It appears in TD buttery graffiti and menu names.", v: 1, r: 2, e: 1, tol: -2, prerequisite: null },
-            { id: "hopper-courtyard", name: "Hopper Courtyard Projector", desc: "Hopper plays the meme on a projector at night.", v: 2, r: 1, e: 1, tol: -3, prerequisite: null },
-            { id: "gheav-sighting", name: "GHeav Sighting", desc: "Someone captures the meme at GHeav at 2 a.m.", v: 2, r: 1, e: 2, tol: -4, prerequisite: null },
-            { id: "woads-night", name: "Woads Theme Night", desc: "The meme becomes a Woads pregame theme.", v: 3, r: 1, e: 2, tol: -6, prerequisite: "yalies-tiktok" },
-            { id: "secret-society", name: "Secret Society Cameo", desc: "A secret-society tap joke references your meme.", v: 1, r: 1, e: 2, tol: -3, prerequisite: "beinecke-projection" },
-            { id: "ycc-referendum", name: "YCC Referendum", desc: "A serious YCC resolution is framed by your meme.", v: 1, r: 2, e: 1, tol: -3, prerequisite: null },
-            { id: "reddit-frontpage", name: "Yale Reddit Front Page", desc: "It hits the front page of /r/yale.", v: 2, r: 2, e: 1, tol: -4, prerequisite: "cs-piazza" },
-            { id: "dining-hall", name: "Dining Hall Announcements", desc: "Dining staff adopt the meme in menu announcements.", v: 1, r: 2, e: 0, tol: 0, prerequisite: null },
-            { id: "im-trash-talk", name: "IM Trash Talk", desc: "Intramural captains weaponize your meme.", v: 2, r: 1, e: 2, tol: -3, prerequisite: null },
-            { id: "acappella-beef", name: "A Cappella Beef", desc: "Competing groups subtweet each other using your meme.", v: 1, r: 2, e: 2, tol: -3, prerequisite: null },
-            { id: "alumni-twitter", name: "Alumni Twitter", desc: "Alumni discover the meme and misinterpret it slightly.", v: 1, r: 1, e: 0, tol: +1, prerequisite: null },
-            { id: "ct-news", name: "CT News Pickup", desc: "Local news runs a lighthearted segment on the meme.", v: 2, r: 1, e: 0, tol: -2, prerequisite: "ydn-article" },
-            { id: "national-media", name: "National Media Moment", desc: "A national outlet uses your meme as shorthand.", v: 3, r: 1, e: 1, tol: -7, prerequisite: "ct-news" },
-        ];
         
+        // --- PANDEMIC MOD: COLLEGE ACCESS TYPES ---
+        // Access determines how the meme can first infect a 0% college.
+        // The key must match the 'id' of a Transmission Vector upgrade.
+        const ACCESS_TYPES = {
+            Social: 'Social', 
+            Digital: 'Digital', 
+            Academic: 'Academic', 
+            Physical: 'Physical'
+        };
+
         const collegeArchetypes = [
-            // College Name: [spreadMod, stickinessMod, resistance]
-            { name: "Benjamin Franklin", mods: [1.0, 1.2, 0.4] }, // Newer, high density
-            { name: "Berkeley", mods: [1.1, 1.0, 0.5] },
-            { name: "Branford", mods: [0.9, 1.1, 0.6] },
-            { name: "Davenport", mods: [1.0, 0.9, 0.7] },
-            { name: "Ezra Stiles", mods: [1.2, 0.8, 0.4] }, // Fast spread, fast fade
-            { name: "Grace Hopper", mods: [1.1, 1.1, 0.5] },
-            { name: "Jonathan Edwards", mods: [0.8, 1.3, 0.9] }, // Highly resistant, but very sticky
-            { name: "Morse", mods: [1.2, 0.9, 0.5] },
-            { name: "Pauli Murray", mods: [1.0, 1.2, 0.4] },
-            { name: "Pierson", mods: [1.1, 1.0, 0.6] },
-            { name: "Saybrook", mods: [0.9, 1.1, 0.7] },
-            { name: "Silliman", mods: [1.3, 0.8, 0.3] }, // The viral center
-            { name: "Timothy Dwight", mods: [1.1, 1.0, 0.5] },
-            { name: "Trumbull", mods: [0.9, 1.2, 0.8] },
+            // Name: [V_Mod, R_Mod, Resistance, Access_Type]
+            { name: "Benjamin Franklin", mods: [1.0, 1.2, 0.4, ACCESS_TYPES.Physical] }, 
+            { name: "Berkeley", mods: [1.1, 1.0, 0.6, ACCESS_TYPES.Social] },
+            { name: "Branford", mods: [0.9, 1.1, 0.7, ACCESS_TYPES.Physical] },
+            { name: "Davenport", mods: [1.0, 0.9, 0.8, ACCESS_TYPES.Academic] },
+            { name: "Ezra Stiles", mods: [1.2, 0.8, 0.5, ACCESS_TYPES.Social] },
+            { name: "Grace Hopper", mods: [1.1, 1.1, 0.5, ACCESS_TYPES.Digital] },
+            { name: "Jonathan Edwards", mods: [0.8, 1.3, 0.9, ACCESS_TYPES.Academic] }, 
+            { name: "Morse", mods: [1.2, 0.9, 0.6, ACCESS_TYPES.Physical] },
+            { name: "Pauli Murray", mods: [1.0, 1.2, 0.4, ACCESS_TYPES.Digital] }, // Digital only access
+            { name: "Pierson", mods: [1.1, 1.0, 0.7, ACCESS_TYPES.Digital] },     // Digital only access
+            { name: "Saybrook", mods: [0.9, 1.1, 0.8, ACCESS_TYPES.Academic] },
+            { name: "Silliman", mods: [1.3, 0.8, 0.4, ACCESS_TYPES.Social] }, 
+            { name: "Timothy Dwight", mods: [1.1, 1.0, 0.7, ACCESS_TYPES.Social] },
+            { name: "Trumbull", mods: [0.9, 1.2, 0.9, ACCESS_TYPES.Academic] },
         ];
+        // --- END PANDEMIC MOD: COLLEGE ACCESS TYPES ---
+
+        // --- PANDEMIC MOD: REDUCED & VECTOR-FOCUSED UPGRADES ---
+        const UPGRADES = [
+            // Tier 1: Core Trait Upgrades
+            { id: "froco-endorsement", name: "FroCo Endorsement", desc: "FroCos ironically include your meme in group emails.", v: 1, r: 2, e: 0, tol: -1, prerequisite: null, vector: null },
+            { id: "commons-feature", name: "Commons Feature", desc: "The meme hits screens in Schwarzman.", v: 2, r: 1, e: 0, tol: -4, prerequisite: null, vector: null },
+            
+            // Tier 2: Transmission Vectors (Unlocks Access Types)
+            { id: "Digital", name: "GroupMe Stickers (Vector: Digital)", desc: "Meme spreads across GroupMe/Instagram. Enables Digital access.", v: 1, r: 3, e: 1, tol: -3, prerequisite: "froco-endorsement", vector: ACCESS_TYPES.Digital },
+            { id: "Social", name: "Woads Theme Night (Vector: Social)", desc: "Meme becomes a party theme. Enables Social access.", v: 3, r: 1, e: 2, tol: -8, prerequisite: "commons-feature", vector: ACCESS_TYPES.Social },
+            { id: "Academic", name: "Lecture Slide Cameo (Vector: Academic)", desc: "Professor uses meme. Enables Academic access.", v: 1, r: 2, e: 0, tol: +2, prerequisite: "froco-endorsement", vector: ACCESS_TYPES.Academic },
+            { id: "Physical", name: "Bass Whiteboard (Vector: Physical)", desc: "Meme appears on campus whiteboards/graffiti. Enables Physical access.", v: 1, r: 2, e: 0, tol: -1, prerequisite: "commons-feature", vector: ACCESS_TYPES.Physical },
+            
+            // Tier 3: High-Impact / High-Risk Upgrades
+            { id: "trumpify", name: "Trumpify (Risk)", desc: "Meme applies to political figure; V/E spike, admins panic.", v: 2, r: 0, e: 3, tol: -10, prerequisite: "Social", vector: null },
+            { id: "national-media", name: "National Media Moment", desc: "Meme hits national news. Max Relatability boost.", v: 1, r: 4, e: 0, tol: -5, prerequisite: "Academic", vector: null },
+            { id: "reddit-frontpage", name: "Reddit Front Page", desc: "Hits /r/yale front page. Major Virality boost.", v: 4, r: 0, e: 1, tol: -4, prerequisite: "Digital", vector: null },
+            { id: "beinecke-projection", name: "Beinecke Projection (Max Risk)", desc: "Stunt projects meme on Beinecke. Massive Edginess.", v: 2, r: 1, e: 4, tol: -15, prerequisite: "Physical", vector: null },
+        ];
+        // --- END PANDEMIC MOD: REDUCED & VECTOR-FOCUSED UPGRADES ---
 
 
         const gameState = {
@@ -803,6 +808,7 @@
             speed: 1,
             timeAccHours: 0,
             purchased: {},
+            unlockedVectors: {}, // Stores IDs of purchased vector upgrades
             lastFrameTime: null,
             activeTab: 'traits',
             selectedCollegeIndex: null,
@@ -811,8 +817,8 @@
         const studentsState = {
             dots: [],
             lastSpawn: 0,
-            infectedDotColor: 'rgba(34, 197, 94, 0.8)', // Green for infected dots
-            safeDotColor: 'rgba(148, 236, 255, 0.8)', // Cyan for safe dots
+            infectedDotColor: 'rgba(34, 197, 94, 0.8)',
+            safeDotColor: 'rgba(148, 236, 255, 0.8)',
         };
 
         function formatTime(h) {
@@ -834,7 +840,7 @@
                 activePanel.style.display = 'block';
                 activePanel.classList.add('active');
             }
-            renderUI(); // Re-render content for the new tab
+            renderUI();
         }
 
         function initGame() {
@@ -848,34 +854,36 @@
             gameState.speed = 1;
             gameState.timeAccHours = 0;
             gameState.purchased = {};
+            gameState.unlockedVectors = {};
             gameState.lastFrameTime = null;
             gameState.activeTab = 'traits';
             gameState.selectedCollegeIndex = null;
             
-            // Assign college modifiers and initial state
             gameState.colleges = collegeArchetypes.map((archetype, index) => {
-                const baseInfection = index === 0 ? 20 : 0; // BF starts the outbreak
-                const [spreadModifier, stickinessModifier, resistance] = archetype.mods;
+                // Only Benjamin Franklin starts infected (the "ground zero")
+                const baseInfection = index === 0 ? 30 : 0; 
+                const [spreadModifier, stickinessModifier, resistance, accessType] = archetype.mods;
 
                 return { 
                     name: COLLEGE_NAMES[index], 
                     infection: baseInfection, 
-                    moderation: 0.2 + Math.random() * 0.4, // Base moderation 
-                    spreadModifier: spreadModifier, // V trait multiplier
-                    stickinessModifier: stickinessModifier, // R trait multiplier
-                    resistance: resistance, // Overall resistance modifier
+                    moderation: 0.2 + Math.random() * 0.4,
+                    spreadModifier: spreadModifier,
+                    stickinessModifier: stickinessModifier,
+                    resistance: resistance,
+                    accessType: accessType, // The key vulnerability
                 };
             });
 
             gameState.log = [];
-            addLog("New game started. Welcome to Meme Outbreak: Yale Edition.", 'event');
+            addLog("New game started. Outbreak begins in Benjamin Franklin.", 'event');
 
             hideGameOverOverlay();
             hideCollegeDetails();
             attachMapClickHandlers();
             initStudents();
             updateSpeedButtons();
-            switchTab(gameState.activeTab); // Set initial tab
+            switchTab(gameState.activeTab); 
             renderUI();
         }
 
@@ -908,7 +916,7 @@
             const traitMeta = {
                 virality: { name: "Virality", desc: "How quickly the meme jumps into new colleges." },
                 relatability: { name: "Relatability", desc: "How much already-infected students keep sharing it." },
-                edginess: { name: "Edginess", desc: "Bypasses moderation, but melts Admin Tolerance." },
+                edginess: { name: "Edginess", desc: "Bypasses moderation, but melts Admin Tolerance (High Risk)." },
             };
 
             Object.entries(gameState.traits).forEach(([key, value]) => {
@@ -951,6 +959,11 @@
             if (u.prerequisite && !gameState.purchased[u.prerequisite]) return false;
             return true;
         }
+        
+        function isVectorUnlocked(vectorType) {
+            // Check if the upgrade ID matching the vector type has been purchased
+            return !!gameState.unlockedVectors[vectorType];
+        }
 
         function renderUpgrades() {
             const grid = document.getElementById("upgradesGrid");
@@ -971,7 +984,7 @@
                 btn.className = "upgrade-card";
                 const taken = !!gameState.purchased[u.id];
                 const available = isUpgradeAvailable(u);
-
+                
                 if (taken) {
                     btn.classList.add('purchased');
                 } else if (!available) {
@@ -991,9 +1004,9 @@
                 const meta = document.createElement("div");
                 meta.className = "upgrade-meta";
                 const parts = [];
-                if (u.v) parts.push(`V+${u.v}`);
-                if (u.r) parts.push(`R+${u.r}`);
-                if (u.e) parts.push(`E+${u.e}`);
+                if (u.v) parts.push(`V${u.v > 0 ? '+' : ''}${u.v}`);
+                if (u.r) parts.push(`R${u.r > 0 ? '+' : ''}${u.r}`);
+                if (u.e) parts.push(`E${u.e > 0 ? '+' : ''}${u.e}`);
                 if (u.tol) {
                     parts.push(u.tol > 0 ? `Tolerance +${u.tol}` : `Tolerance ${u.tol}`);
                 }
@@ -1054,6 +1067,29 @@
             else status = "Mostly Safe";
             document.getElementById('detailStatus').textContent = status;
             
+            // Render Access List
+            const accessList = document.getElementById('detailAccessList');
+            accessList.innerHTML = '';
+            
+            Object.values(ACCESS_TYPES).forEach(type => {
+                const isUnlocked = isVectorUnlocked(type);
+                const isRequired = c.accessType === type;
+                
+                const item = document.createElement('div');
+                item.className = `access-item ${isUnlocked ? 'unlocked' : 'locked'}`;
+                
+                if (isRequired) {
+                     item.innerHTML = `
+                        <div>${type} Access (Required)</div>
+                        <div class="status">${isUnlocked ? '✓ UNLOCKED' : '✗ LOCKED'}</div>
+                     `;
+                } else {
+                    item.style.display = 'none'; // Only show the required access type
+                }
+                
+                accessList.appendChild(item);
+            });
+
             document.getElementById('collegeDetailsPanel').classList.add('visible');
             renderMap();
         }
@@ -1076,7 +1112,6 @@
                 Math.round(avg) + "%";
 
             const tol = Math.max(0, Math.round(gameState.adminTolerance));
-            // Tolerance bar scales from 0 to 120 (max initial value)
             const tolPercent = Math.min(100, (tol / 120) * 100); 
             document.getElementById("toleranceText").textContent = tol + "%";
             document.getElementById("toleranceBar").style.width = tolPercent + "%";
@@ -1087,7 +1122,7 @@
             renderUpgrades();
             renderMeta();
             renderMap();
-            // Only render log if the tab is active to avoid excessive DOM manipulation
+            if (gameState.selectedCollegeIndex !== null) showCollegeDetails(gameState.selectedCollegeIndex);
             if (gameState.activeTab === 'log') renderLog(); 
         }
 
@@ -1114,6 +1149,12 @@
 
             gameState.upgradePoints -= 1;
             gameState.purchased[id] = true;
+            
+            // Check if this upgrade is a Vector upgrade
+            if (u.vector) {
+                gameState.unlockedVectors[u.vector] = true;
+                addLog(`Vector Unlocked: ${u.vector}. New infection path enabled!`, 'event');
+            }
 
             gameState.traits.virality = clampTrait(gameState.traits.virality + (u.v || 0));
             gameState.traits.relatability = clampTrait(gameState.traits.relatability + (u.r || 0));
@@ -1125,28 +1166,27 @@
                 );
             }
 
-            addLog(`Upgrade unlocked: ${u.name}. New traits: V:${gameState.traits.virality}, R:${gameState.traits.relatability}, E:${gameState.traits.edginess}.`, 'event');
+            addLog(`Upgrade unlocked: ${u.name}. Traits: V:${gameState.traits.virality}, R:${gameState.traits.relatability}, E:${gameState.traits.edginess}.`, 'event');
             renderUI();
         }
 
         function triggerModerationEvent(avgInfection) {
             const { edginess } = gameState.traits;
-            // Chance increases with edginess and overall infection
-            const baseChance = 0.08 + (edginess * 0.02) + (avgInfection / 100) * 0.1;
+            // Higher base chance and stronger influence from edginess (Game is harder now)
+            const baseChance = 0.15 + (edginess * 0.03) + (avgInfection / 100) * 0.15; 
 
             if (Math.random() < baseChance) {
                 const affectedColleges = [];
                 let totalReduction = 0;
                 
-                // Select 1 to 3 random colleges to affect
                 const numAffected = 1 + Math.floor(Math.random() * 3);
                 const shuffledColleges = [...gameState.colleges].sort(() => 0.5 - Math.random());
                 
                 for (let i = 0; i < numAffected && i < shuffledColleges.length; i++) {
                     const c = shuffledColleges[i];
-                    if (c.infection > 15) { // Only moderate if infection is significant
-                         // Larger reduction for higher infection, moderated by the college's resistance
-                        const reduction = Math.min(c.infection, 10 + Math.random() * 15) * (1 / c.resistance);
+                    if (c.infection > 15) { 
+                        // Tougher reduction: scales up to 20 base, reduced by resistance
+                        const reduction = Math.min(c.infection, 15 + Math.random() * 5) * (1.2 - c.resistance); 
                         c.infection = Math.max(0, c.infection - reduction);
                         affectedColleges.push(c.name);
                         totalReduction += reduction;
@@ -1155,7 +1195,7 @@
 
                 if (affectedColleges.length > 0) {
                     addLog(
-                        `Campus-wide content moderation event in ${affectedColleges.join(', ')}. Posts were deleted and accounts were temporarily suspended. Total infection reduced by ~${Math.round(totalReduction)} points.`, 
+                        `Content moderation event in ${affectedColleges.join(', ')}. Admins clamped down. Total infection reduced by ~${Math.round(totalReduction)} points.`, 
                         'moderation'
                     );
                 }
@@ -1163,7 +1203,7 @@
         }
         
         function triggerDailyTraitShift() {
-            if (gameState.day === 1 || gameState.hour !== 0) return; // Only run at midnight on Day 2+
+            if (gameState.day === 1 || gameState.hour !== 0) return;
 
             const traitKeys = ['virality', 'relatability', 'edginess'];
             const traitToShift = traitKeys[Math.floor(Math.random() * traitKeys.length)];
@@ -1176,7 +1216,7 @@
                 const direction = shift > 0 ? 'increased' : 'decreased';
                 const traitName = traitToShift.charAt(0).toUpperCase() + traitToShift.slice(1);
                 addLog(
-                    `Daily Mutation: The meme's ${traitName} randomly ${direction} by 1. Check your traits!`,
+                    `Daily Mutation: Meme's ${traitName} randomly ${direction} by 1.`,
                     'mutation'
                 );
             }
@@ -1185,7 +1225,7 @@
         function advanceHour() {
             if (gameState.gameOver) return;
             
-            triggerDailyTraitShift(); // Check for mutation at midnight
+            triggerDailyTraitShift(); 
 
             gameState.hour += 1;
             if (gameState.hour >= 24) {
@@ -1194,22 +1234,37 @@
             }
             gameState.turn += 1;
 
-            gameState.upgradePoints += 1; // Gain 1 upgrade point per hour
+            gameState.upgradePoints += 1; 
 
             const { virality, relatability, edginess } = gameState.traits;
 
             let newlyHigh = [];
             
-            // --- CORE INFECTION LOGIC ---
+            // --- CORE PANDEMIC INFECTION LOGIC ---
             gameState.colleges.forEach((c) => {
-                const spreadBoost = virality * c.spreadModifier * 0.7;
+                
+                // PANDEMIC MOD: Check for Initial Access (First contact)
+                if (c.infection <= 0.01) {
+                    if (isVectorUnlocked(c.accessType)) {
+                        // Success: Initial infection is established via unlocked vector
+                        c.infection = 0.5 + Math.random() * 2; // Small initial boost
+                        addLog(`${c.name} is now exposed via ${c.accessType} Vector. Meme is established!`, 'event');
+                        return; // Skip complex calculation, the infection starts low
+                    } else {
+                        // Failed: Infection cannot start in this college yet.
+                        return;
+                    }
+                }
+                
+                // Normal spread calculation for established infection
+                const spreadBoost = virality * c.spreadModifier * 0.5; // Reduced base spread
                 const stickinessBoost = (relatability * c.stickinessModifier * c.infection) / 100;
                 
-                // Resistance is now compounded: high resistance colleges fight base moderation better
-                const resistanceFactor = c.moderation * c.resistance * 4; 
+                // Increased difficulty: Higher resistance factor
+                const resistanceFactor = c.moderation * c.resistance * 5; 
                 
                 const edgyBonus = edginess * 0.35;
-                const chaos = (Math.random() - 0.5) * 3;
+                const chaos = (Math.random() - 0.5) * 4;
 
                 let delta = spreadBoost + stickinessBoost + edgyBonus - resistanceFactor + chaos;
                 
@@ -1217,9 +1272,9 @@
                 if (c.infection < 5) delta *= 0.6;
                 if (c.infection > 95) delta *= 0.7; 
                 
-                // Soft clamping on delta
-                if (delta < -4) delta = -4;
-                if (delta > 12) delta = 12;
+                // Tougher clamping on delta
+                if (delta < -5) delta = -5;
+                if (delta > 10) delta = 10;
 
                 const oldInfection = c.infection;
                 c.infection = Math.max(0, Math.min(100, c.infection + delta));
@@ -1228,7 +1283,7 @@
                     newlyHigh.push(c.name);
                 }
             });
-            // --- END CORE INFECTION LOGIC ---
+            // --- END CORE PANDEMIC INFECTION LOGIC ---
 
             const avg =
                 gameState.colleges.reduce((sum, c) => sum + c.infection, 0) /
@@ -1237,32 +1292,28 @@
             const isDay = gameState.hour >= 8 && gameState.hour <= 22;
             
             // --- EDGINESS PENALTY & TOLERANCE DECAY ---
-            let tolDecayBase = 0.15 + (avg / 100) * 0.7;
-            const edginessPenalty = 1 + (edginess * 0.15); // Scales with edginess
+            let tolDecayBase = 0.2 + (avg / 100) * 1.0; // Increased base decay
+            const edginessPenalty = 1 + (edginess * 0.2); // Stronger edginess influence
             
             if (avg < 40) tolDecayBase *= 0.5;
             
-            const tolDecay = tolDecayBase * (isDay ? 1.1 : 0.8) * edginessPenalty;
+            const tolDecay = tolDecayBase * (isDay ? 1.2 : 0.9) * edginessPenalty;
             gameState.adminTolerance -= tolDecay;
             // --- END TOLERANCE DECAY ---
 
-            // --- ADMIN MODERATION EVENTS ---
             triggerModerationEvent(avg);
-            // --- END ADMIN MODERATION EVENTS ---
 
             if (newlyHigh.length > 0) {
                 addLog(
-                    `${newlyHigh.join(", ")} crossed 50% infection. People are starting to reference the meme offline.`,
+                    `${newlyHigh.join(", ")} crossed 50% infection. Offline discussions are accelerating.`,
                     'event'
                 );
             }
             
-            // General status update, only log every 4 hours or on key events
             if (gameState.hour % 4 === 0 && newlyHigh.length === 0) {
                  addLog(`The meme continues to circulate. Overall infection now ~${Math.round(avg)}%.`);
             }
             
-
             checkGameOver(avg);
             renderUI();
         }
@@ -1276,18 +1327,18 @@
 
             if (avg >= 80) {
                 title = "VICTORY! 🏆";
-                message = `Campus is saturated (avg ${Math.round(avg)}%). You've achieved a very cursed weak-tie revolution!`;
+                message = `Campus is saturated (avg ${Math.round(avg)}%). You successfully won the culture war!`;
                 type = "win";
                 gameState.gameOver = true;
                 gameState.speed = 0;
             } else if (gameState.adminTolerance <= 0) {
                 title = "DEFEAT";
-                message = "Admin Tolerance hit 0%. A campus-wide email goes out. Everyone has to click through a 'Community Standards' training. The meme is dead.";
+                message = "Admin Tolerance hit 0%. The university forced a content clampdown. The meme is dead.";
                 gameState.gameOver = true;
                 gameState.speed = 0;
             } else if (gameState.day > gameState.maxDays) {
                 title = "DEFEAT";
-                message = `It's Day ${gameState.day}. Campus attention has moved on to a new scandal. The meme topped out at ${Math.round(avg)}% average infection.`;
+                message = `It's Day ${gameState.day}. Campus attention has moved on. Meme topped out at ${Math.round(avg)}%.`;
                 gameState.gameOver = true;
                 gameState.speed = 0;
             }
@@ -1295,7 +1346,7 @@
             if (gameState.gameOver) {
                 addLog(message, type === 'win' ? 'event' : 'moderation');
                 showGameOverOverlay(title, message, type);
-                renderUI(); // Final UI render
+                renderUI(); 
             }
         }
         
@@ -1350,11 +1401,9 @@
         function resizeCanvas() {
             const canvas = document.getElementById("studentsCanvas");
             if (!canvas) return;
-            // Get actual dimensions of the map-wrapper area
             const rect = canvas.parentNode.getBoundingClientRect(); 
-            // The canvas element itself should match its CSS dimensions
-            canvas.width = rect.width - 12; // Adjusted for padding in map-wrapper
-            canvas.height = rect.height - 12; // Adjusted for padding in map-wrapper
+            canvas.width = rect.width - 12;
+            canvas.height = rect.height - 12; 
         }
 
         function getCollegeCenters() {
@@ -1362,7 +1411,6 @@
             const canvas = document.getElementById("studentsCanvas");
             if (!svg || !canvas) return [];
             
-            // Calculate scale factors based on the SVG's viewBox (260x320) and canvas size
             const sx = canvas.width / svg.viewBox.baseVal.width;
             const sy = canvas.height / svg.viewBox.baseVal.height;
 
@@ -1373,13 +1421,11 @@
                     centers.push({ x: 0, y: 0, collegeIndex: i });
                     continue;
                 }
-                // Get the SVG coordinates and dimensions
                 const x = parseFloat(el.getAttribute("x"));
                 const y = parseFloat(el.getAttribute("y"));
                 const w = parseFloat(el.getAttribute("width"));
                 const h = parseFloat(el.getAttribute("height"));
                 
-                // Calculate center in canvas coordinates (multiplying by scale factor)
                 centers.push({
                     x: (x + w / 2) * sx,
                     y: (y + h / 2) * sy,
@@ -1394,7 +1440,7 @@
             if (!centers.length) return;
             
             const isDay = gameState.hour >= 8 && gameState.hour <= 22;
-            const baseRate = isDay ? 0.0025 : 0.0007; // Higher rate during the day
+            const baseRate = isDay ? 0.0035 : 0.001; // Slightly increased visual traffic
             const elapsed = now - studentsState.lastSpawn;
             const expected = baseRate * elapsed * COLLEGE_NAMES.length;
             const numNew = Math.floor(expected);
@@ -1406,17 +1452,16 @@
                 if (toIndex === fromIndex) toIndex = (toIndex + 1) % centers.length;
                 
                 const start = centers[fromIndex];
-                const end = centers[toIndex];
                 
-                // Dot status is based on the starting college's infection rate
                 const startCollege = gameState.colleges[fromIndex];
-                const isInfected = Math.random() * 100 < startCollege.infection;
+                // Check if the starting college is at least contaminated (5%)
+                const isInfected = startCollege.infection >= 5 && Math.random() * 100 < startCollege.infection;
 
                 studentsState.dots.push({
                     x0: start.x,
                     y0: start.y,
-                    x1: end.x,
-                    y1: end.y,
+                    x1: centers[toIndex].x,
+                    y1: centers[toIndex].y,
                     t: 0,
                     speed: 0.0005 + Math.random() * 0.0008,
                     size: 2 + Math.random() * 1.5,
@@ -1443,13 +1488,11 @@
                 if (dot.t < 1) { 
                     const x = dot.x0 + (dot.x1 - dot.x0) * dot.t;
                     const y = dot.y0 + (dot.y1 - dot.y0) * dot.t;
-                    // Alpha fades in/out as dot travels
                     const alpha = 0.3 + 0.7 * (1 - Math.abs(dot.t - 0.5) * 2);
 
                     ctx.beginPath();
                     ctx.arc(x, y, dot.size, 0, Math.PI * 2);
                     
-                    // Color code based on infection status
                     ctx.fillStyle = dot.infected 
                         ? studentsState.infectedDotColor.replace('0.8', alpha)
                         : studentsState.safeDotColor.replace('0.8', alpha);
@@ -1458,13 +1501,12 @@
 
                     remaining.push(dot);
                 }
-                // Dots that have reached t >= 1 are discarded (cleaned up by not pushing to remaining)
             });
 
             studentsState.dots = remaining;
         }
 
-        // main loop: 1 hour ~ 2 real seconds at 1x
+        // main loop
         function gameLoop(timestamp) {
             if (gameState.lastFrameTime == null) {
                 gameState.lastFrameTime = timestamp;
