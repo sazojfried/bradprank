@@ -6,16 +6,22 @@
   <title>Grocery Organizer</title>
   <style>
     :root {
-      --bg: #f6f7fb;
-      --card: #ffffff;
+      --bg: #f4ebdf;
+      --card: #fdf8f2;
       --accent: #2b6cb0;
       --accent-strong: #1d4f91;
-      --text: #0f172a;
-      --muted: #475569;
-      --border: #e2e8f0;
-      --badge-warn: #dc2626;
-      --badge-ok: #16a34a;
-      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --text: #2b1b0a;
+      --muted: #6b5d4b;
+      --border: #ecd9c4;
+      --badge-warn: #c53030;
+      --badge-ok: #166534;
+      --shadow: 0 12px 30px rgba(63, 45, 25, 0.12);
+      --soft: #f2e4d4;
+      --soft-strong: #e6d6c3;
+      --picked: #e3ecff;
+      --picked-border: #9bb8f8;
+      --skipped: #fde7e7;
+      --skipped-border: #f3b4b4;
     }
 
     * { box-sizing: border-box; }
@@ -23,7 +29,7 @@
     body {
       margin: 0;
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 40%, #f8fafc 100%);
+      background: linear-gradient(180deg, #f7efe3 0%, #f4ebdf 50%, #f7efe3 100%);
       color: var(--text);
       min-height: 100vh;
     }
@@ -54,7 +60,7 @@
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 18px;
       box-shadow: var(--shadow);
       padding: 20px;
       margin-bottom: 20px;
@@ -134,67 +140,59 @@
     .error { color: #c53030; }
 
     .section {
-      margin-bottom: 14px;
-      border-radius: 14px;
+      margin-bottom: 16px;
+      border-radius: 16px;
       border: 1px solid var(--border);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-      background: #fff;
+      box-shadow: 0 10px 22px rgba(63, 45, 25, 0.08);
+      background: var(--card);
       overflow: hidden;
     }
 
     .section-header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 10px;
       padding: 14px 16px;
-      position: sticky;
-      top: 0;
-      background: #fff;
-      z-index: 2;
+      background: linear-gradient(180deg, var(--soft) 0%, #fff9f4 100%);
       border-bottom: 1px solid var(--border);
     }
 
     .section-title {
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.05rem;
+      font-weight: 760;
       margin: 0;
-      color: #1f2937;
+      color: #2e2416;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .collapse-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      color: var(--muted);
-      font-weight: 600;
-      border: none;
-      background: transparent;
-      padding: 8px 10px;
-      border-radius: 10px;
-    }
-
-    .collapse-toggle:hover { background: #f8fafc; }
-
-    .section-body { padding: 10px 12px 14px; }
+    .section-body { padding: 12px 14px 16px; background: #fff; }
 
     .item-row {
       display: grid;
       grid-template-columns: auto 1fr auto;
       align-items: center;
       gap: 10px;
-      background: #f8fafc;
+      background: #fbf3e8;
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 10px 12px;
+      padding: 12px 14px;
       margin-bottom: 10px;
       transition: border-color 0.2s, background 0.2s, transform 0.1s;
     }
 
-    .item-row:hover { border-color: #cbd5e0; background: #fff; }
+    .item-row:hover { border-color: var(--soft-strong); background: #fff9f3; }
+
+    .item-row[data-status="picked"] {
+      background: var(--picked);
+      border-color: var(--picked-border);
+    }
+
+    .item-row[data-status="not_needed"] {
+      background: var(--skipped);
+      border-color: var(--skipped-border);
+    }
 
     .item-row.hidden { display: none; }
 
@@ -225,7 +223,7 @@
       align-items: center;
       gap: 6px;
       font-weight: 650;
-      color: #475569;
+      color: #4b4234;
       font-size: 0.95rem;
       white-space: nowrap;
       margin-bottom: 0;
@@ -266,20 +264,20 @@
     .badge {
       display: inline-flex;
       align-items: center;
-      padding: 4px 10px;
+      padding: 5px 12px;
       border-radius: 999px;
       font-size: 0.82rem;
       color: var(--badge-warn);
       background: #fef2f2;
       white-space: nowrap;
-      border: 1px solid #fecdd3;
+      border: 1px solid #f6c9c9;
     }
 
     .badge.ok { background: #ecfdf3; color: #166534; border-color: #bbf7d0; }
 
     .hero {
       border: 1px solid var(--border);
-      background: linear-gradient(135deg, #e0f2fe, #fff);
+      background: linear-gradient(135deg, #f6eadc, #fffaf3);
       border-radius: 14px;
       padding: 14px 16px;
       margin-bottom: 14px;
@@ -340,10 +338,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      cursor: pointer;
-      list-style: none;
       padding: 12px 0 8px;
-      color: #0f172a;
+      color: #2b241a;
     }
 
     details summary::-webkit-details-marker { display: none; }
@@ -353,25 +349,30 @@
       gap: 10px;
       flex-wrap: wrap;
       align-items: center;
-      padding: 10px 0 6px;
-      position: sticky;
-      top: 0;
-      background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.9) 100%);
-      z-index: 5;
-      border-bottom: 1px solid var(--border);
+      padding: 10px 0 12px;
+    }
+
+    .panel-block {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: #fffaf4;
+      box-shadow: 0 10px 22px rgba(63, 45, 25, 0.08);
+      margin-bottom: 14px;
     }
 
     .toolbar-item {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: #f8fafc;
+      background: #fff3e5;
       border: 1px solid var(--border);
-      padding: 8px 10px;
-      border-radius: 12px;
-      font-weight: 650;
-      color: #0f172a;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      color: #2b241a;
       min-height: 40px;
+      box-shadow: inset 0 1px 0 #fff;
     }
 
     .toolbar-item input {
@@ -380,30 +381,34 @@
       accent-color: var(--accent);
     }
 
-    #collapse-checklist {
-      padding: 8px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff7ed;
-      color: #c2410c;
-      font-weight: 700;
-      cursor: pointer;
+    .legend {
+      gap: 12px;
     }
 
-    #collapse-checklist:hover { background: #ffedd5; }
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 6px;
+      display: inline-block;
+      border: 1px solid var(--border);
+      margin-right: 6px;
+    }
+
+    .legend-dot.picked { background: var(--picked); border-color: var(--picked-border); }
+    .legend-dot.skipped { background: var(--skipped); border-color: var(--skipped-border); }
 
     #original-list {
       margin: 10px 0 12px;
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 10px 12px;
-      background: #f8fafc;
+      background: #fbf3e8;
     }
 
-    #original-list summary {
+    #original-list .panel-summary {
       font-weight: 750;
-      cursor: pointer;
-      color: #0f172a;
+      color: #2b241a;
+      padding: 4px 0 10px;
     }
 
     #original-list ul { padding-left: 18px; margin: 8px 0 0; }
@@ -462,19 +467,22 @@
 
     <section class="card" id="results-card" aria-label="Checklist" style="display:none;">
       <div id="results-hero"></div>
-      <details id="original-list" open>
-        <summary>Original checklist (tap to collapse)</summary>
+      <div id="original-list" class="panel-block">
+        <div class="panel-summary">Original checklist</div>
         <ul id="original-list-items"></ul>
-      </details>
-      <details id="checklist-panel" open>
-        <summary class="panel-summary">📋 Checklist</summary>
+      </div>
+      <div id="checklist-panel" class="panel-block">
+        <div class="panel-summary">📋 Checklist</div>
         <div id="results-toolbar" aria-label="Checklist filters">
-          <label class="toolbar-item"><input type="checkbox" id="hide-picked" /> Hide picked</label>
-          <label class="toolbar-item"><input type="checkbox" id="hide-skipped" /> Hide not needed</label>
-          <button id="collapse-checklist" type="button">Collapse all</button>
+          <div class="toolbar-item legend">
+            <span class="legend-dot picked"></span>Picked up
+            <span class="legend-dot skipped"></span>Not needed
+          </div>
+          <label class="toolbar-item"><input type="checkbox" id="hide-picked" /> Hide checked</label>
+          <label class="toolbar-item"><input type="checkbox" id="hide-skipped" /> Hide skip</label>
         </div>
         <div id="results-content"></div>
-      </details>
+      </div>
       <div id="suggestions"></div>
     </section>
   </div>
@@ -495,21 +503,25 @@
     const resultsContent = document.getElementById('results-content');
     const suggestionsEl = document.getElementById('suggestions');
     const originalListEl = document.getElementById('original-list-items');
-    const checklistPanel = document.getElementById('checklist-panel');
     const toolbar = document.getElementById('results-toolbar');
     const hidePickedToggle = document.getElementById('hide-picked');
     const hideSkippedToggle = document.getElementById('hide-skipped');
-    const collapseChecklistBtn = document.getElementById('collapse-checklist');
     const backToTopBtn = document.getElementById('back-to-top');
     const toastEl = document.getElementById('toast');
 
     const sectionIcons = {
-      Produce: '🥬', Cheese: '🧀', Household: '🧽', Bakery: '🍞',
-      Pantry: '🥫', Meat: '🥩', Seafood: '🐟', Frozen: '🧊',
-      Dairy: '🥛', Snacks: '🍿', Beverages: '🥤', Other: '🛒'
+      Produce: '🥬', Bakery: '🍞', Deli: '🥪', Cheese: '🧀',
+      Meat: '🥩', Seafood: '🐟', 'Dairy & Eggs': '🥛', Frozen: '🧊',
+      Pantry: '🥫', 'Spices & Seasonings': '🧂', Snacks: '🍿',
+      Beverages: '🥤', Alcohol: '🥃', Household: '🧽', Other: '🛒'
     };
 
-    let sectionCollapseState = {};
+    const sectionOrder = [
+      'Produce', 'Bakery', 'Deli', 'Cheese', 'Meat', 'Seafood', 'Dairy & Eggs',
+      'Pantry', 'Spices & Seasonings', 'Snacks', 'Beverages', 'Alcohol',
+      'Household', 'Frozen', 'Other'
+    ];
+
     let lastRenderedData = null;
 
     // ---------- Storage helpers ----------
@@ -551,9 +563,53 @@
     }
 
     // ---------- Parsing ----------
+    const COMMON_PHRASES = new Set([
+      'apple sauce', 'skirt steak', 'ice cream', 'olive oil', 'soy sauce',
+      'tomato sauce', 'sour cream', 'cream cheese', 'peanut butter',
+      'ground beef', 'brown sugar', 'brown rice', 'garlic bread', 'sparkling water'
+    ]);
+
+    function shouldKeepTogether(text) {
+      const lower = text.toLowerCase();
+      if (lower.split(/\s+/).length <= 3) return true;
+      return /\b(of|for|with|without|and|lb|lbs|oz|pack|bag|box|bottle|jar|carton|dozen|pkg|packet|bunch|head|block|loaf)\b/.test(lower);
+    }
+
+    function splitLoosePart(part) {
+      const trimmed = part.trim();
+      if (!trimmed) return [];
+      if (shouldKeepTogether(trimmed)) return [trimmed];
+
+      const words = trimmed.split(/\s+/);
+      const pieces = [];
+      for (let i = 0; i < words.length; i += 1) {
+        const nextTwo = words[i + 1] ? `${words[i]} ${words[i + 1]}` : '';
+        const nextThree = words[i + 2] ? `${words[i]} ${words[i + 1]} ${words[i + 2]}` : '';
+        const lowerTwo = nextTwo.toLowerCase();
+        const lowerThree = nextThree.toLowerCase();
+
+        if (nextThree && COMMON_PHRASES.has(lowerThree)) {
+          pieces.push(nextThree);
+          i += 2;
+          continue;
+        }
+
+        if (nextTwo && COMMON_PHRASES.has(lowerTwo)) {
+          pieces.push(nextTwo);
+          i += 1;
+          continue;
+        }
+
+        pieces.push(words[i]);
+      }
+
+      return pieces;
+    }
+
     function parseInput(text) {
       return (text || '')
         .split(/[\n,;\/|]+/)
+        .flatMap(splitLoosePart)
         .map(part => part.trim())
         .filter(Boolean);
     }
@@ -657,7 +713,7 @@
       document.querySelectorAll('.item-row').forEach(handleRowVisibility);
     }
 
-    function buildSectionHeader(sectionName, count) {
+    function buildSectionHeader(sectionName) {
       const header = document.createElement('div');
       header.className = 'section-header';
 
@@ -666,20 +722,8 @@
       const icon = sectionIcons[sectionName] || '🛒';
       title.textContent = `${icon} ${sectionName}`;
 
-      const countNote = document.createElement('span');
-      countNote.style.color = '#64748b';
-      countNote.style.fontWeight = '600';
-      countNote.textContent = `${count} item${count !== 1 ? 's' : ''}`;
-      title.appendChild(countNote);
-
-      const toggle = document.createElement('button');
-      toggle.type = 'button';
-      toggle.className = 'collapse-toggle';
-      toggle.innerHTML = '<span aria-hidden="true">▼</span>';
-
       header.appendChild(title);
-      header.appendChild(toggle);
-      return { header, toggle };
+      return { header };
     }
 
     // ---------- Rendering ----------
@@ -713,31 +757,23 @@
       resultsContent.innerHTML = '';
       suggestionsEl.innerHTML = '';
       toolbar.style.display = 'flex';
-      checklistPanel.open = true;
-      collapseChecklistBtn.textContent = 'Collapse all';
 
-      const sectionNames = Object.keys(sections).sort();
+      const sectionNames = Object.keys(sections).sort((a, b) => {
+        const indexA = sectionOrder.indexOf(a);
+        const indexB = sectionOrder.indexOf(b);
+        const safeA = indexA === -1 ? Number.MAX_SAFE_INTEGER : indexA;
+        const safeB = indexB === -1 ? Number.MAX_SAFE_INTEGER : indexB;
+        if (safeA === safeB) return a.localeCompare(b);
+        return safeA - safeB;
+      });
+
       sectionNames.forEach(sectionName => {
         const sectionEl = document.createElement('div');
         sectionEl.className = 'section';
 
-        const { header, toggle } = buildSectionHeader(sectionName, sections[sectionName].length);
+        const { header } = buildSectionHeader(sectionName);
         const body = document.createElement('div');
         body.className = 'section-body';
-
-        const collapseKey = `${store}-${sectionName}`;
-        const isOpen = sectionCollapseState[collapseKey] !== false;
-        body.style.display = isOpen ? 'block' : 'none';
-        toggle.innerHTML = isOpen ? '<span aria-hidden="true">▼</span>' : '<span aria-hidden="true">▶</span>';
-        toggle.setAttribute('aria-expanded', String(isOpen));
-
-        toggle.addEventListener('click', () => {
-          const currentlyOpen = body.style.display !== 'none';
-          body.style.display = currentlyOpen ? 'none' : 'block';
-          toggle.innerHTML = currentlyOpen ? '<span aria-hidden="true">▶</span>' : '<span aria-hidden="true">▼</span>';
-          toggle.setAttribute('aria-expanded', String(!currentlyOpen));
-          sectionCollapseState[collapseKey] = !currentlyOpen;
-        });
 
         sections[sectionName].forEach(item => {
           const normalized = normalizeItem(item.name || item.raw);
@@ -1046,15 +1082,6 @@
 
     hidePickedToggle.addEventListener('change', refreshVisibleRows);
     hideSkippedToggle.addEventListener('change', refreshVisibleRows);
-
-    collapseChecklistBtn.addEventListener('click', () => {
-      checklistPanel.open = !checklistPanel.open;
-      collapseChecklistBtn.textContent = checklistPanel.open ? 'Collapse all' : 'Open checklist';
-    });
-
-    checklistPanel.addEventListener('toggle', () => {
-      collapseChecklistBtn.textContent = checklistPanel.open ? 'Collapse all' : 'Open checklist';
-    });
 
     window.addEventListener('scroll', updateBackToTopVisibility);
     backToTopBtn.addEventListener('click', () => {
