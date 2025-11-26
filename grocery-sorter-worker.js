@@ -1,5 +1,5 @@
 // Cloudflare Worker: grocery-sorter
-// Handles POST /api/grocery-sort with { store, items }
+// Handles POST /api/grocery-sort with { store, raw_text }
 
 const ALLOWED_STORES = new Set([
   "decicco_brewster",
@@ -13,10 +13,10 @@ const ALLOWED_STORES = new Set([
 ]);
 
 const SYSTEM_PROMPT = `You are a grocery list organizer and store-availability assistant.
-\nYou will receive a JSON object with:
+You will receive a JSON object with:
 {
   "store": "<store_id>",
-  "items": ["raw item 1", "raw item 2", ...]
+  "raw_text": "<full messy text the user pasted>"
 }
 
 Valid store_ids and profiles:
@@ -71,7 +71,9 @@ Valid store_ids and profiles:
 - "generic_us"
     → A typical U.S. supermarket (balanced profile).
 
-For each input item, you must output:
+Split raw_text into distinct grocery items. Use sensible boundaries: newlines, commas, semicolons, slashes, or natural breaks (including the word "and" when appropriate). Treat "potato lemon whisky" as three separate items unless it is obviously a single product. Preserve multi-word products like "di bruno bros cheese", "vanilla greek yogurt", or "frozen chicken thighs". Do NOT invent items not present in raw_text.
+
+For each item, you must output:
 - "raw": the original string.
 - "name": a short cleaned name.
 - "section": one of:
@@ -140,6 +142,8 @@ A single JSON object:
     ...
   ]
 }
+Respond with ONE raw JSON object only.
+Do NOT include backticks, code fences, or any explanatory text.
 `;
 
 const JSON_HEADERS = {
@@ -172,9 +176,9 @@ export default {
       );
     }
 
-    const { store, items } = body || {};
+    const { store, raw_text } = body || {};
 
-    if (!ALLOWED_STORES.has(store) || !Array.isArray(items) || items.some((i) => typeof i !== "string")) {
+    if (!ALLOWED_STORES.has(store) || typeof raw_text !== "string" || !raw_text.trim()) {
       return new Response(
         JSON.stringify({ error: "Invalid payload" }),
         { status: 400, headers: JSON_HEADERS }
@@ -189,11 +193,11 @@ export default {
     }
 
     const payload = {
-      model: "llama3-70b-8192",
+      model: "llama-3.3-70b-versatile",
       temperature: 0,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: JSON.stringify({ store, items }) },
+        { role: "user", content: JSON.stringify({ store, raw_text }) },
       ],
     };
 

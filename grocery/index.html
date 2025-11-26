@@ -171,7 +171,8 @@
 
     .item-row {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: 1fr auto auto;
+      grid-template-areas: 'label controls actions';
       align-items: center;
       gap: 10px;
       background: #fbf3e8;
@@ -197,6 +198,7 @@
     .item-row.hidden { display: none; }
 
     .item-label {
+      grid-area: label;
       margin: 0;
       font-weight: 600;
       color: #0f172a;
@@ -206,16 +208,20 @@
     .item-label.faded { color: #94a3b8; font-style: italic; }
 
     .item-actions {
+      grid-area: actions;
       display: flex;
       gap: 10px;
       align-items: center;
       flex-wrap: nowrap;
+      justify-content: flex-end;
     }
 
     .control-group {
+      grid-area: controls;
       display: flex;
       gap: 10px;
       align-items: center;
+      justify-content: flex-end;
     }
 
     .control {
@@ -419,10 +425,10 @@
       header h1 { font-size: 1.65rem; }
       header p { font-size: 0.95rem; }
       .section-title { font-size: 1rem; }
-      .item-row { grid-template-columns: 1fr auto; grid-template-areas: 'controls badge' 'label badge'; }
+      .item-row { grid-template-columns: 1fr auto; grid-template-areas: 'label actions' 'controls actions'; }
       .control-group { grid-area: controls; }
       .item-label { grid-area: label; }
-      .item-actions { grid-area: badge; justify-content: flex-end; }
+      .item-actions { grid-area: actions; justify-content: flex-end; }
       #results-toolbar { top: 52px; }
       .toolbar-item { flex: 1 1 140px; justify-content: center; }
       .card { padding: 16px; }
@@ -454,7 +460,7 @@
 
       <div class="field">
         <label for="items">Your list</label>
-        <textarea id="items" placeholder="You can paste a messy list — we’ll split on commas, slashes, or new lines."></textarea>
+        <textarea id="items" placeholder="Paste a messy list — we’ll handle the splitting."></textarea>
       </div>
 
       <div class="actions">
@@ -563,53 +569,13 @@
     }
 
     // ---------- Parsing ----------
-    const COMMON_PHRASES = new Set([
-      'apple sauce', 'skirt steak', 'ice cream', 'olive oil', 'soy sauce',
-      'tomato sauce', 'sour cream', 'cream cheese', 'peanut butter',
-      'ground beef', 'brown sugar', 'brown rice', 'garlic bread', 'sparkling water'
-    ]);
-
-    function shouldKeepTogether(text) {
-      const lower = text.toLowerCase();
-      if (lower.split(/\s+/).length <= 3) return true;
-      return /\b(of|for|with|without|and|lb|lbs|oz|pack|bag|box|bottle|jar|carton|dozen|pkg|packet|bunch|head|block|loaf)\b/.test(lower);
-    }
-
-    function splitLoosePart(part) {
-      const trimmed = part.trim();
-      if (!trimmed) return [];
-      if (shouldKeepTogether(trimmed)) return [trimmed];
-
-      const words = trimmed.split(/\s+/);
-      const pieces = [];
-      for (let i = 0; i < words.length; i += 1) {
-        const nextTwo = words[i + 1] ? `${words[i]} ${words[i + 1]}` : '';
-        const nextThree = words[i + 2] ? `${words[i]} ${words[i + 1]} ${words[i + 2]}` : '';
-        const lowerTwo = nextTwo.toLowerCase();
-        const lowerThree = nextThree.toLowerCase();
-
-        if (nextThree && COMMON_PHRASES.has(lowerThree)) {
-          pieces.push(nextThree);
-          i += 2;
-          continue;
-        }
-
-        if (nextTwo && COMMON_PHRASES.has(lowerTwo)) {
-          pieces.push(nextTwo);
-          i += 1;
-          continue;
-        }
-
-        pieces.push(words[i]);
-      }
-
-      return pieces;
-    }
-
     function parseInput(text) {
+      return (text || '').trim();
+    }
+
+    function getDisplayItems(text) {
       return (text || '')
-        .split(/[\n,;\/|]+/)
-        .flatMap(splitLoosePart)
+        .split(/[\n,;]+/)
         .map(part => part.trim())
         .filter(Boolean);
     }
@@ -729,8 +695,8 @@
     // ---------- Rendering ----------
     function renderOriginalList(rawText, parsedItems = []) {
       originalListEl.innerHTML = '';
-      const source = rawText || parsedItems.join('\n');
-      const cleaned = parseInput(source);
+      const source = rawText?.trim() ? rawText : parsedItems.join('\n');
+      const cleaned = getDisplayItems(source);
       if (!cleaned.length) {
         originalListEl.innerHTML = '<li style="color:#94a3b8;">Empty list</li>';
         return;
@@ -743,7 +709,7 @@
     }
 
     function renderChecklist(store, data, options = {}) {
-      const storeState = getStoreState(store) || { store, rawText: textarea.value, parsedItems: parseInput(textarea.value), itemState: {} };
+      const storeState = getStoreState(store) || { store, rawText: textarea.value, parsedItems: getDisplayItems(textarea.value), itemState: {} };
       const sections = {};
       let warningCount = 0;
 
@@ -797,7 +763,8 @@
           const pickedWrapper = document.createElement('label');
           pickedWrapper.className = 'control';
           pickedWrapper.htmlFor = pickedInput.id;
-          pickedWrapper.textContent = 'Picked';
+          pickedWrapper.textContent = '✓';
+          pickedWrapper.title = 'Picked up';
           pickedWrapper.prepend(pickedInput);
 
           const skipInput = document.createElement('input');
@@ -807,7 +774,8 @@
           const skipWrapper = document.createElement('label');
           skipWrapper.className = 'control';
           skipWrapper.htmlFor = skipInput.id;
-          skipWrapper.textContent = 'Skip';
+          skipWrapper.textContent = '✕';
+          skipWrapper.title = 'Not needed';
           skipWrapper.prepend(skipInput);
 
           controls.appendChild(pickedWrapper);
@@ -885,11 +853,11 @@
     }
 
     // ---------- API ----------
-    async function callApi(store, items) {
+    async function callApi(store, rawText) {
       const response = await fetch('/api/grocery-sort', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ store, items })
+        body: JSON.stringify({ store, raw_text: rawText })
       });
       if (!response.ok) {
         throw new Error('API error');
@@ -901,9 +869,10 @@
     async function handleGenerate() {
       const store = storeSelect.value;
       const rawText = textarea.value;
-      const items = parseInput(rawText);
+      const rawTextTrimmed = rawText.trim();
+      const displayItems = getDisplayItems(rawText);
 
-      if (!items.length) {
+      if (!rawTextTrimmed) {
         statusEl.textContent = 'Please add at least one item.';
         statusEl.className = 'status error';
         return;
@@ -911,14 +880,14 @@
 
       statusEl.textContent = 'Analyzing list…';
       statusEl.className = 'status';
-      renderHero('loading', { storeName: getStoreLabel(store), itemCount: items.length });
+      renderHero('loading', { storeName: getStoreLabel(store), itemCount: displayItems.length || 1 });
       resultsCard.style.display = 'block';
 
       const existingState = getStoreState(store) || { itemState: {} };
-      persistStoreState(store, { ...existingState, rawText, parsedItems: items });
+      persistStoreState(store, { ...existingState, rawText, parsedItems: displayItems });
 
       try {
-        const data = await callApi(store, items);
+        const data = await callApi(store, rawText);
         if (!data || !Array.isArray(data.items)) {
           throw new Error('Bad payload');
         }
@@ -931,7 +900,7 @@
         statusEl.className = 'status error';
         resultsContent.innerHTML = '';
         suggestionsEl.innerHTML = '';
-        renderHero('error', { storeName: getStoreLabel(store), itemCount: items.length });
+        renderHero('error', { storeName: getStoreLabel(store), itemCount: displayItems.length || 1 });
       }
     }
 
@@ -953,20 +922,20 @@
       const storeState = getStoreState(store) || {
         store,
         rawText: textarea.value,
-        parsedItems: parseInput(textarea.value),
+        parsedItems: getDisplayItems(textarea.value),
         itemState: {}
       };
 
       const payload = {
         store,
         rawText: storeState.rawText || textarea.value,
-        parsedItems: storeState.parsedItems?.length ? storeState.parsedItems : parseInput(storeState.rawText || textarea.value),
+        parsedItems: storeState.parsedItems?.length ? storeState.parsedItems : getDisplayItems(storeState.rawText || textarea.value),
         itemState: storeState.itemState || {},
         sortedItems: lastRenderedData?.store === store ? lastRenderedData.data.items : storeState.sortedItems,
         suggestedItems: lastRenderedData?.data?.suggested_items || storeState.suggestedItems
       };
 
-      if (!payload.parsedItems.length) return null;
+      if (!payload.rawText?.trim() && !payload.parsedItems.length) return null;
 
       const json = JSON.stringify(payload);
       const encoded = btoa(unescape(encodeURIComponent(json)))
