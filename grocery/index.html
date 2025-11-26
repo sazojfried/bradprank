@@ -29,9 +29,9 @@
     }
 
     .container {
-      max-width: 880px;
+      max-width: 860px;
       margin: 0 auto;
-      padding: 32px 16px 64px;
+      padding: 24px 14px 56px;
     }
 
     header {
@@ -134,10 +134,10 @@
     .error { color: #c53030; }
 
     .section {
-      margin-bottom: 18px;
-      border-radius: 16px;
+      margin-bottom: 14px;
+      border-radius: 14px;
       border: 1px solid var(--border);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
       background: #fff;
       overflow: hidden;
     }
@@ -179,25 +179,27 @@
 
     .collapse-toggle:hover { background: #f8fafc; }
 
-    .section-body { padding: 12px 16px 16px; }
+    .section-body { padding: 10px 12px 14px; }
 
     .item-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
       gap: 10px;
       background: #f8fafc;
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 12px;
+      padding: 10px 12px;
       margin-bottom: 10px;
       transition: border-color 0.2s, background 0.2s, transform 0.1s;
     }
 
     .item-row:hover { border-color: #cbd5e0; background: #fff; }
 
+    .item-row.hidden { display: none; }
+
     .item-label {
       margin: 0;
-      flex: 1;
       font-weight: 600;
       color: #0f172a;
     }
@@ -207,8 +209,33 @@
 
     .item-actions {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 650;
+      color: #475569;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      margin-bottom: 0;
+    }
+
+    .control input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      margin: 0;
     }
 
     .pill {
@@ -242,12 +269,13 @@
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 0.82rem;
-      color: #fff;
-      background: var(--badge-warn);
+      color: var(--badge-warn);
+      background: #fef2f2;
       white-space: nowrap;
+      border: 1px solid #fecdd3;
     }
 
-    .badge.ok { background: #d1fae5; color: #166534; }
+    .badge.ok { background: #ecfdf3; color: #166534; border-color: #bbf7d0; }
 
     .hero {
       border: 1px solid var(--border);
@@ -270,10 +298,10 @@
 
     #back-to-top {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 52px;
-      height: 52px;
+      bottom: 18px;
+      right: 18px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       border: none;
       background: var(--accent);
@@ -283,7 +311,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       z-index: 20;
     }
 
@@ -307,11 +335,93 @@
 
     .toast.error { background: #dc2626; }
 
+    .panel-summary {
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      list-style: none;
+      padding: 12px 0 8px;
+      color: #0f172a;
+    }
+
+    details summary::-webkit-details-marker { display: none; }
+
+    #results-toolbar {
+      display: none;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 10px 0 6px;
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.9) 100%);
+      z-index: 5;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toolbar-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-weight: 650;
+      color: #0f172a;
+      min-height: 40px;
+    }
+
+    .toolbar-item input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    #collapse-checklist {
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff7ed;
+      color: #c2410c;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #collapse-checklist:hover { background: #ffedd5; }
+
+    #original-list {
+      margin: 10px 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #f8fafc;
+    }
+
+    #original-list summary {
+      font-weight: 750;
+      cursor: pointer;
+      color: #0f172a;
+    }
+
+    #original-list ul { padding-left: 18px; margin: 8px 0 0; }
+    #original-list li { margin: 4px 0; color: #475569; }
+
     @media (max-width: 540px) {
-      .container { padding: 20px 12px 32px; }
-      header h1 { font-size: 1.8rem; }
+      .container { padding: 16px 10px 28px; }
+      header h1 { font-size: 1.65rem; }
+      header p { font-size: 0.95rem; }
       .section-title { font-size: 1rem; }
-      .pill { min-width: 100px; }
+      .item-row { grid-template-columns: 1fr auto; grid-template-areas: 'controls badge' 'label badge'; }
+      .control-group { grid-area: controls; }
+      .item-label { grid-area: label; }
+      .item-actions { grid-area: badge; justify-content: flex-end; }
+      #results-toolbar { top: 52px; }
+      .toolbar-item { flex: 1 1 140px; justify-content: center; }
+      .card { padding: 16px; }
+      .hero { padding: 12px 14px; }
     }
   </style>
 </head>
@@ -352,7 +462,19 @@
 
     <section class="card" id="results-card" aria-label="Checklist" style="display:none;">
       <div id="results-hero"></div>
-      <div id="results-content"></div>
+      <details id="original-list" open>
+        <summary>Original checklist (tap to collapse)</summary>
+        <ul id="original-list-items"></ul>
+      </details>
+      <details id="checklist-panel" open>
+        <summary class="panel-summary">📋 Checklist</summary>
+        <div id="results-toolbar" aria-label="Checklist filters">
+          <label class="toolbar-item"><input type="checkbox" id="hide-picked" /> Hide picked</label>
+          <label class="toolbar-item"><input type="checkbox" id="hide-skipped" /> Hide not needed</label>
+          <button id="collapse-checklist" type="button">Collapse all</button>
+        </div>
+        <div id="results-content"></div>
+      </details>
       <div id="suggestions"></div>
     </section>
   </div>
@@ -372,6 +494,12 @@
     const resultsHero = document.getElementById('results-hero');
     const resultsContent = document.getElementById('results-content');
     const suggestionsEl = document.getElementById('suggestions');
+    const originalListEl = document.getElementById('original-list-items');
+    const checklistPanel = document.getElementById('checklist-panel');
+    const toolbar = document.getElementById('results-toolbar');
+    const hidePickedToggle = document.getElementById('hide-picked');
+    const hideSkippedToggle = document.getElementById('hide-skipped');
+    const collapseChecklistBtn = document.getElementById('collapse-checklist');
     const backToTopBtn = document.getElementById('back-to-top');
     const toastEl = document.getElementById('toast');
 
@@ -458,7 +586,7 @@
       subtitle.textContent = storeName ? `Store: ${storeName}` : '';
 
       if (mode === 'ready' || mode === 'shared') {
-        meta.textContent = `Items: ${itemCount}${warningCount ? ` (${warningCount} marked as “Might not be here”)` : ''}`;
+        meta.textContent = `Items: ${itemCount}${warningCount ? ` (${warningCount} might not be stocked at this grocery store)` : ''}`;
       } else {
         meta.textContent = `Items: ${itemCount}`;
       }
@@ -495,31 +623,38 @@
       if (item.likely_available === false) {
         const badge = document.createElement('span');
         badge.className = 'badge';
-        badge.textContent = 'Might not be here';
+        badge.textContent = 'Might not be stocked at this grocery store';
         if (item.notes) badge.title = item.notes;
-        return badge;
-      }
-      if (item.likely_available === true) {
-        const badge = document.createElement('span');
-        badge.className = 'badge ok';
-        badge.textContent = 'Likely here';
         return badge;
       }
       return null;
     }
 
-    function applyStatusStyles(label, pickedBtn, skipBtn, status) {
+    function applyStatusStyles(row, label, pickedInput, skipInput, status) {
       label.classList.remove('dim', 'faded');
-      pickedBtn.classList.remove('active-primary');
-      skipBtn.classList.remove('active-secondary');
+      pickedInput.checked = false;
+      skipInput.checked = false;
+      row.dataset.status = status;
 
       if (status === 'picked') {
         label.classList.add('dim');
-        pickedBtn.classList.add('active-primary');
+        pickedInput.checked = true;
       } else if (status === 'not_needed') {
         label.classList.add('faded');
-        skipBtn.classList.add('active-secondary');
+        skipInput.checked = true;
       }
+
+      handleRowVisibility(row);
+    }
+
+    function handleRowVisibility(row) {
+      const status = row.dataset.status;
+      const shouldHide = (hidePickedToggle.checked && status === 'picked') || (hideSkippedToggle.checked && status === 'not_needed');
+      row.classList.toggle('hidden', shouldHide);
+    }
+
+    function refreshVisibleRows() {
+      document.querySelectorAll('.item-row').forEach(handleRowVisibility);
     }
 
     function buildSectionHeader(sectionName, count) {
@@ -548,6 +683,21 @@
     }
 
     // ---------- Rendering ----------
+    function renderOriginalList(rawText, parsedItems = []) {
+      originalListEl.innerHTML = '';
+      const source = rawText || parsedItems.join('\n');
+      const cleaned = parseInput(source);
+      if (!cleaned.length) {
+        originalListEl.innerHTML = '<li style="color:#94a3b8;">Empty list</li>';
+        return;
+      }
+      cleaned.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        originalListEl.appendChild(li);
+      });
+    }
+
     function renderChecklist(store, data, options = {}) {
       const storeState = getStoreState(store) || { store, rawText: textarea.value, parsedItems: parseInput(textarea.value), itemState: {} };
       const sections = {};
@@ -562,6 +712,9 @@
 
       resultsContent.innerHTML = '';
       suggestionsEl.innerHTML = '';
+      toolbar.style.display = 'flex';
+      checklistPanel.open = true;
+      collapseChecklistBtn.textContent = 'Collapse all';
 
       const sectionNames = Object.keys(sections).sort();
       sectionNames.forEach(sectionName => {
@@ -594,42 +747,56 @@
           const row = document.createElement('div');
           row.className = 'item-row';
 
+          const controls = document.createElement('div');
+          controls.className = 'control-group';
+
           const label = document.createElement('p');
           label.className = 'item-label';
           label.textContent = item.name || item.raw;
 
+          const pickedInput = document.createElement('input');
+          pickedInput.type = 'checkbox';
+          pickedInput.id = `picked-${stateId}`;
+          pickedInput.setAttribute('aria-label', `Picked up ${label.textContent}`);
+          const pickedWrapper = document.createElement('label');
+          pickedWrapper.className = 'control';
+          pickedWrapper.htmlFor = pickedInput.id;
+          pickedWrapper.textContent = 'Picked';
+          pickedWrapper.prepend(pickedInput);
+
+          const skipInput = document.createElement('input');
+          skipInput.type = 'checkbox';
+          skipInput.id = `skip-${stateId}`;
+          skipInput.setAttribute('aria-label', `Not needed ${label.textContent}`);
+          const skipWrapper = document.createElement('label');
+          skipWrapper.className = 'control';
+          skipWrapper.htmlFor = skipInput.id;
+          skipWrapper.textContent = 'Skip';
+          skipWrapper.prepend(skipInput);
+
+          controls.appendChild(pickedWrapper);
+          controls.appendChild(skipWrapper);
+
           const actions = document.createElement('div');
           actions.className = 'item-actions';
-
-          const pickedBtn = document.createElement('button');
-          pickedBtn.type = 'button';
-          pickedBtn.className = 'pill';
-          pickedBtn.textContent = '✔ Picked up';
-
-          const skipBtn = document.createElement('button');
-          skipBtn.type = 'button';
-          skipBtn.className = 'pill';
-          skipBtn.textContent = '✖ Not needed';
 
           function updateStatus(next) {
             status = status === next ? 'needed' : next;
             if (!storeState.itemState) storeState.itemState = {};
             storeState.itemState[stateId] = { status };
             persistStoreState(store, { ...storeState, itemState: { ...storeState.itemState } });
-            applyStatusStyles(label, pickedBtn, skipBtn, status);
+            applyStatusStyles(row, label, pickedInput, skipInput, status);
           }
 
-          pickedBtn.addEventListener('click', () => updateStatus('picked'));
-          skipBtn.addEventListener('click', () => updateStatus('not_needed'));
+          pickedInput.addEventListener('change', () => updateStatus('picked'));
+          skipInput.addEventListener('change', () => updateStatus('not_needed'));
 
-          applyStatusStyles(label, pickedBtn, skipBtn, status);
-
-          actions.appendChild(pickedBtn);
-          actions.appendChild(skipBtn);
+          applyStatusStyles(row, label, pickedInput, skipInput, status);
 
           const badge = availabilityBadge(item);
           if (badge) actions.appendChild(badge);
 
+          row.appendChild(controls);
           row.appendChild(label);
           row.appendChild(actions);
           body.appendChild(row);
@@ -672,9 +839,12 @@
         warningCount
       });
 
+      renderOriginalList(storeState.rawText, storeState.parsedItems);
+
       lastRenderedData = { store, data };
       persistStoreState(store, { ...storeState, sortedItems: data.items || [], suggestedItems: data.suggested_items });
 
+      refreshVisibleRows();
       setTimeout(updateBackToTopVisibility, 100);
     }
 
@@ -736,6 +906,9 @@
       resultsContent.innerHTML = '';
       suggestionsEl.innerHTML = '';
       resultsHero.innerHTML = '';
+      toolbar.style.display = 'none';
+      hidePickedToggle.checked = false;
+      hideSkippedToggle.checked = false;
       clearStoreState(storeSelect.value);
     }
 
@@ -869,6 +1042,18 @@
     clearBtn.addEventListener('click', (e) => {
       e.preventDefault();
       handleClear();
+    });
+
+    hidePickedToggle.addEventListener('change', refreshVisibleRows);
+    hideSkippedToggle.addEventListener('change', refreshVisibleRows);
+
+    collapseChecklistBtn.addEventListener('click', () => {
+      checklistPanel.open = !checklistPanel.open;
+      collapseChecklistBtn.textContent = checklistPanel.open ? 'Collapse all' : 'Open checklist';
+    });
+
+    checklistPanel.addEventListener('toggle', () => {
+      collapseChecklistBtn.textContent = checklistPanel.open ? 'Collapse all' : 'Open checklist';
     });
 
     window.addEventListener('scroll', updateBackToTopVisibility);
