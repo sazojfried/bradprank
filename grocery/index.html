@@ -6,22 +6,24 @@
   <title>Grocery Organizer</title>
   <style>
     :root {
-      --bg: #f4ebdf;
-      --card: #fdf8f2;
-      --accent: #2b6cb0;
-      --accent-strong: #1d4f91;
-      --text: #2b1b0a;
-      --muted: #6b5d4b;
-      --border: #ecd9c4;
-      --badge-warn: #c53030;
+      --bg: #e6f2fb;
+      --bg-strong: #a0d2eb;
+      --card: #e2eaf5;
+      --accent: #4f7cdd;
+      --accent-strong: #3a5fb5;
+      --text: #1f2a44;
+      --muted: #4b5563;
+      --border: #c9d6ea;
+      --badge-warn: #b45309;
       --badge-ok: #166534;
-      --shadow: 0 12px 30px rgba(63, 45, 25, 0.12);
-      --soft: #f2e4d4;
-      --soft-strong: #e6d6c3;
-      --picked: #e3ecff;
-      --picked-border: #9bb8f8;
-      --skipped: #fde7e7;
-      --skipped-border: #f3b4b4;
+      --shadow: 0 12px 30px rgba(33, 54, 97, 0.12);
+      --soft: #d0b0fa;
+      --soft-strong: #846bb3;
+      --picked: #dbeafe;
+      --picked-border: #93c5fd;
+      --skipped: #fee2e2;
+      --skipped-border: #fecaca;
+      --skip: #e11d48;
     }
 
     * { box-sizing: border-box; }
@@ -29,7 +31,8 @@
     body {
       margin: 0;
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(180deg, #f7efe3 0%, #f4ebdf 50%, #f7efe3 100%);
+      background: radial-gradient(circle at 15% 20%, rgba(63, 127, 196, 0.14), transparent 36%),
+        linear-gradient(180deg, var(--bg-strong) 0%, var(--bg) 45%, #e8f1fb 100%);
       color: var(--text);
       min-height: 100vh;
     }
@@ -110,10 +113,11 @@
       border: none;
       cursor: pointer;
       font-weight: 700;
+      box-shadow: 0 10px 24px rgba(53, 100, 187, 0.2);
     }
 
     .btn-secondary {
-      background: #eef2ff;
+      background: #f5f7fb;
       color: var(--text);
       border: 1px solid var(--border);
       cursor: pointer;
@@ -121,7 +125,7 @@
     }
 
     .btn-ghost {
-      background: #f8fafc;
+      background: #eef2f9;
       color: var(--text);
       border: 1px solid var(--border);
       cursor: pointer;
@@ -143,7 +147,7 @@
       margin-bottom: 16px;
       border-radius: 16px;
       border: 1px solid var(--border);
-      box-shadow: 0 10px 22px rgba(63, 45, 25, 0.08);
+      box-shadow: 0 10px 22px rgba(33, 54, 97, 0.08);
       background: var(--card);
       overflow: hidden;
     }
@@ -153,7 +157,7 @@
       align-items: center;
       gap: 10px;
       padding: 14px 16px;
-      background: linear-gradient(180deg, var(--soft) 0%, #fff9f4 100%);
+      background: linear-gradient(180deg, #f1f5ff 0%, #ffffff 100%);
       border-bottom: 1px solid var(--border);
     }
 
@@ -161,7 +165,7 @@
       font-size: 1.05rem;
       font-weight: 760;
       margin: 0;
-      color: #2e2416;
+      color: #1f2a44;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -175,7 +179,7 @@
       grid-template-areas: 'label controls actions';
       align-items: center;
       gap: 10px;
-      background: #fbf3e8;
+      background: #f4f7fd;
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 12px 14px;
@@ -183,7 +187,7 @@
       transition: border-color 0.2s, background 0.2s, transform 0.1s;
     }
 
-    .item-row:hover { border-color: var(--soft-strong); background: #fff9f3; }
+    .item-row:hover { border-color: var(--accent); background: #edf2ff; }
 
     .item-row[data-status="picked"] {
       background: var(--picked);
@@ -238,9 +242,11 @@
     .control input[type="checkbox"] {
       width: 18px;
       height: 18px;
-      accent-color: var(--accent);
       margin: 0;
     }
+
+    .control.picked input[type="checkbox"] { accent-color: var(--accent); }
+    .control.skip input[type="checkbox"] { accent-color: var(--skip); }
 
     .pill {
       padding: 8px 12px;
@@ -283,7 +289,7 @@
 
     .hero {
       border: 1px solid var(--border);
-      background: linear-gradient(135deg, #f6eadc, #fffaf3);
+      background: linear-gradient(135deg, #dbeafe, #f8fbff);
       border-radius: 14px;
       padding: 14px 16px;
       margin-bottom: 14px;
@@ -345,7 +351,7 @@
       align-items: center;
       gap: 8px;
       padding: 12px 0 8px;
-      color: #2b241a;
+      color: #1f2a44;
     }
 
     details summary::-webkit-details-marker { display: none; }
@@ -362,21 +368,21 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 10px 12px;
-      background: #fffaf4;
-      box-shadow: 0 10px 22px rgba(63, 45, 25, 0.08);
+      background: #f4f7fd;
+      box-shadow: 0 10px 22px rgba(33, 54, 97, 0.08);
       margin-bottom: 14px;
     }
 
     .toolbar-item {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: #fff3e5;
+      gap: 10px;
+      background: #eef2fb;
       border: 1px solid var(--border);
       padding: 8px 12px;
       border-radius: 999px;
       font-weight: 700;
-      color: #2b241a;
+      color: #1f2a44;
       min-height: 40px;
       box-shadow: inset 0 1px 0 #fff;
     }
@@ -388,20 +394,30 @@
     }
 
     .legend {
-      gap: 12px;
+      gap: 14px;
     }
 
-    .legend-dot {
-      width: 14px;
-      height: 14px;
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-icon {
+      width: 18px;
+      height: 18px;
       border-radius: 6px;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: #fff;
       border: 1px solid var(--border);
-      margin-right: 6px;
     }
 
-    .legend-dot.picked { background: var(--picked); border-color: var(--picked-border); }
-    .legend-dot.skipped { background: var(--skipped); border-color: var(--skipped-border); }
+    .legend-icon.picked { background: var(--accent); }
+    .legend-icon.skipped { background: var(--skip); }
 
     #original-list {
       margin: 10px 0 12px;
@@ -433,6 +449,41 @@
       .toolbar-item { flex: 1 1 140px; justify-content: center; }
       .card { padding: 16px; }
       .hero { padding: 12px 14px; }
+    }
+
+    /* Mobile-specific tightening to keep rows compact */
+    @media (max-width: 480px) {
+      .item-row {
+        grid-template-columns: 1fr auto auto;
+        grid-template-areas: 'label controls actions';
+        align-items: center;
+        padding: 10px 12px;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .item-label { line-height: 1.3; }
+
+      .control-group {
+        grid-area: controls;
+        justify-content: flex-start;
+        gap: 8px;
+      }
+
+      .control {
+        font-size: 0.9rem;
+        gap: 4px;
+      }
+
+      .control input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+      }
+
+      .item-actions {
+        grid-area: actions;
+        align-self: center;
+      }
     }
   </style>
 </head>
@@ -481,8 +532,8 @@
         <div class="panel-summary">📋 Checklist</div>
         <div id="results-toolbar" aria-label="Checklist filters">
           <div class="toolbar-item legend">
-            <span class="legend-dot picked"></span>Picked up
-            <span class="legend-dot skipped"></span>Not needed
+            <span class="legend-item"><span class="legend-icon picked">✓</span>Picked up</span>
+            <span class="legend-item"><span class="legend-icon skipped">✕</span>Not needed</span>
           </div>
           <label class="toolbar-item"><input type="checkbox" id="hide-picked" /> Hide checked</label>
           <label class="toolbar-item"><input type="checkbox" id="hide-skipped" /> Hide skip</label>
@@ -761,7 +812,7 @@
           pickedInput.id = `picked-${stateId}`;
           pickedInput.setAttribute('aria-label', `Picked up ${label.textContent}`);
           const pickedWrapper = document.createElement('label');
-          pickedWrapper.className = 'control';
+          pickedWrapper.className = 'control picked';
           pickedWrapper.htmlFor = pickedInput.id;
           pickedWrapper.textContent = '✓';
           pickedWrapper.title = 'Picked up';
@@ -772,7 +823,7 @@
           skipInput.id = `skip-${stateId}`;
           skipInput.setAttribute('aria-label', `Not needed ${label.textContent}`);
           const skipWrapper = document.createElement('label');
-          skipWrapper.className = 'control';
+          skipWrapper.className = 'control skip';
           skipWrapper.htmlFor = skipInput.id;
           skipWrapper.textContent = '✕';
           skipWrapper.title = 'Not needed';
