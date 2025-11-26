@@ -6,13 +6,16 @@
   <title>Grocery Organizer</title>
   <style>
     :root {
-      --bg: #f5f5f5;
+      --bg: #f6f7fb;
       --card: #ffffff;
       --accent: #2b6cb0;
-      --text: #1a202c;
-      --muted: #4a5568;
+      --accent-strong: #1d4f91;
+      --text: #0f172a;
+      --muted: #475569;
       --border: #e2e8f0;
-      --badge-warn: #e53e3e;
+      --badge-warn: #dc2626;
+      --badge-ok: #16a34a;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
     }
 
     * { box-sizing: border-box; }
@@ -20,60 +23,61 @@
     body {
       margin: 0;
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 40%, #f8fafc 100%);
       color: var(--text);
+      min-height: 100vh;
     }
 
     .container {
-      max-width: 820px;
+      max-width: 880px;
       margin: 0 auto;
-      padding: 32px 16px 48px;
+      padding: 32px 16px 64px;
     }
 
     header {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
     header h1 {
       margin: 0;
-      font-size: 2rem;
+      font-size: 2.2rem;
       letter-spacing: -0.02em;
     }
 
     header p {
       margin: 8px 0 0;
       color: var(--muted);
+      font-size: 1rem;
     }
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
-      padding: 20px 20px 16px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 20px;
       margin-bottom: 20px;
     }
 
-    .field {
-      margin-bottom: 14px;
-    }
+    .field { margin-bottom: 16px; }
 
     label {
       display: block;
       margin-bottom: 6px;
-      font-weight: 600;
+      font-weight: 650;
     }
 
     select, textarea, button {
       width: 100%;
       font-size: 1rem;
       font-family: inherit;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid var(--border);
-      padding: 10px 12px;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      padding: 12px 14px;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
       background: #fff;
+      min-height: 44px;
     }
 
     select:focus, textarea:focus, button:focus {
@@ -99,17 +103,27 @@
       color: #fff;
       border: none;
       cursor: pointer;
+      font-weight: 700;
     }
 
     .btn-secondary {
-      background: #edf2f7;
+      background: #eef2ff;
       color: var(--text);
       border: 1px solid var(--border);
       cursor: pointer;
+      font-weight: 600;
     }
 
-    .btn-primary:hover { background: #225a9d; }
-    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-ghost {
+      background: #f8fafc;
+      color: var(--text);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover { background: var(--accent-strong); }
+    .btn-secondary:hover, .btn-ghost:hover { background: #e2e8f0; }
 
     .status {
       margin-top: 10px;
@@ -121,14 +135,51 @@
 
     .section {
       margin-bottom: 18px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 2;
+      border-bottom: 1px solid var(--border);
     }
 
     .section-title {
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      margin: 0 0 10px;
-      color: #2d3748;
+      margin: 0;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
+    .collapse-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+
+    .collapse-toggle:hover { background: #f8fafc; }
+
+    .section-body { padding: 12px 16px 16px; }
 
     .item-row {
       display: flex;
@@ -136,43 +187,131 @@
       gap: 10px;
       background: #f8fafc;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      transition: border-color 0.2s, background 0.2s;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      transition: border-color 0.2s, background 0.2s, transform 0.1s;
     }
 
-    .item-row:hover {
-      border-color: #cbd5e0;
-      background: #fff;
-    }
+    .item-row:hover { border-color: #cbd5e0; background: #fff; }
 
-    .item-row input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-    }
-
-    .item-row label {
+    .item-label {
       margin: 0;
-      cursor: pointer;
       flex: 1;
-      font-weight: 500;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .item-label.dim { color: #475569; text-decoration: line-through; }
+    .item-label.faded { color: #94a3b8; font-style: italic; }
+
+    .item-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      min-width: 110px;
+      text-align: center;
+    }
+
+    .pill.active-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .pill.active-secondary {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #fecdd3;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      padding: 2px 8px;
+      padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       color: #fff;
       background: var(--badge-warn);
+      white-space: nowrap;
     }
+
+    .badge.ok { background: #d1fae5; color: #166534; }
+
+    .hero {
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #e0f2fe, #fff);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .hero h3 { margin: 0 0 6px; font-size: 1.05rem; }
+    .hero p { margin: 4px 0; color: var(--muted); }
+
+    .suggestions {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .suggestion-note { font-size: 0.9rem; color: var(--muted); }
+
+    #back-to-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      z-index: 20;
+    }
+
+    #back-to-top:hover { background: var(--accent-strong); }
+
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #22c55e;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.16);
+      display: none;
+      z-index: 25;
+      min-width: 180px;
+      text-align: center;
+    }
+
+    .toast.error { background: #dc2626; }
 
     @media (max-width: 540px) {
       .container { padding: 20px 12px 32px; }
-      header h1 { font-size: 1.6rem; }
+      header h1 { font-size: 1.8rem; }
+      .section-title { font-size: 1rem; }
+      .pill { min-width: 100px; }
     }
   </style>
 </head>
@@ -180,7 +319,7 @@
   <div class="container">
     <header>
       <h1>Grocery Organizer</h1>
-      <p>Paste a list, pick a store, get a sorted checklist.</p>
+      <p>Paste a list, pick a store, and get a smart, easy checklist.</p>
     </header>
 
     <section class="card" aria-label="Grocery input">
@@ -199,69 +338,347 @@
       </div>
 
       <div class="field">
-        <label for="items">Your list (one item per line)</label>
-        <textarea id="items" placeholder="e.g.\nbananas\nground beef\nfrench bread\nparmesan"></textarea>
+        <label for="items">Your list</label>
+        <textarea id="items" placeholder="You can paste a messy list — we’ll split on commas, slashes, or new lines."></textarea>
       </div>
 
       <div class="actions">
         <button id="generate" class="btn-primary">Generate checklist</button>
-        <button id="clear" class="btn-secondary" type="button">Clear</button>
+        <button id="share" class="btn-secondary" type="button">Copy shareable link</button>
+        <button id="clear" class="btn-ghost" type="button">Clear list</button>
       </div>
       <div id="status" class="status"></div>
     </section>
 
     <section class="card" id="results-card" aria-label="Checklist" style="display:none;">
+      <div id="results-hero"></div>
       <div id="results-content"></div>
+      <div id="suggestions"></div>
     </section>
   </div>
 
-  <script>
-    const STORAGE_KEY = "groceryChecklistState_v1";
-    const LAST_INPUT_KEY = "groceryLastInput";
+  <button id="back-to-top" aria-label="Back to top" title="Back to top">↑</button>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <script>
+    const STORAGE_KEY = "groceryChecklistState_v2";
     const storeSelect = document.getElementById('store');
     const textarea = document.getElementById('items');
     const generateBtn = document.getElementById('generate');
+    const shareBtn = document.getElementById('share');
     const clearBtn = document.getElementById('clear');
     const statusEl = document.getElementById('status');
     const resultsCard = document.getElementById('results-card');
+    const resultsHero = document.getElementById('results-hero');
     const resultsContent = document.getElementById('results-content');
+    const suggestionsEl = document.getElementById('suggestions');
+    const backToTopBtn = document.getElementById('back-to-top');
+    const toastEl = document.getElementById('toast');
+
+    const sectionIcons = {
+      Produce: '🥬', Cheese: '🧀', Household: '🧽', Bakery: '🍞',
+      Pantry: '🥫', Meat: '🥩', Seafood: '🐟', Frozen: '🧊',
+      Dairy: '🥛', Snacks: '🍿', Beverages: '🥤', Other: '🛒'
+    };
+
+    let sectionCollapseState = {};
+    let lastRenderedData = null;
+
+    // ---------- Storage helpers ----------
+    function safeParse(value, fallback) {
+      try { return JSON.parse(value); } catch (_) { return fallback; }
+    }
 
     function loadState() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      } catch (e) {
-        return {};
-      }
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = safeParse(raw, {});
+      if (!parsed || typeof parsed !== 'object') return {};
+      return parsed;
     }
 
     function saveState(state) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    function loadLastInput() {
-      const saved = localStorage.getItem(LAST_INPUT_KEY);
-      if (saved) {
-        textarea.value = saved;
-      }
-      const savedStore = localStorage.getItem('groceryLastStore');
-      if (savedStore) {
-        storeSelect.value = savedStore;
-      }
+    function getStoreState(store) {
+      const state = loadState();
+      return state?.stores?.[store];
     }
 
-    function saveLastInput(text, store) {
-      localStorage.setItem(LAST_INPUT_KEY, text);
-      localStorage.setItem('groceryLastStore', store);
+    function persistStoreState(store, partial) {
+      const state = loadState();
+      if (!state.stores) state.stores = {};
+      const existing = state.stores[store] || { store, rawText: '', parsedItems: [], itemState: {} };
+      state.stores[store] = { ...existing, ...partial, store };
+      state.lastStore = store;
+      saveState(state);
     }
 
+    function clearStoreState(store) {
+      const state = loadState();
+      if (state.stores) {
+        delete state.stores[store];
+      }
+      saveState(state);
+    }
+
+    // ---------- Parsing ----------
     function parseInput(text) {
-      return text
-        .split(/\r?\n/)
-        .map(line => line.trim())
+      return (text || '')
+        .split(/[\n,;\/|]+/)
+        .map(part => part.trim())
         .filter(Boolean);
     }
 
+    // ---------- UI helpers ----------
+    function getStoreLabel(value) {
+      const option = Array.from(storeSelect.options).find(o => o.value === value);
+      return option ? option.textContent : value;
+    }
+
+    function renderHero(mode, { storeName, itemCount = 0, warningCount = 0 } = {}) {
+      resultsHero.innerHTML = '';
+      const box = document.createElement('div');
+      box.className = 'hero';
+
+      const title = document.createElement('h3');
+      const subtitle = document.createElement('p');
+      const meta = document.createElement('p');
+
+      if (mode === 'loading') {
+        title.textContent = 'Analyzing your list…';
+      } else if (mode === 'ready') {
+        title.textContent = 'Checklist ready';
+      } else if (mode === 'shared') {
+        title.textContent = 'Shared list loaded';
+      } else {
+        title.textContent = 'Something went wrong';
+      }
+
+      subtitle.textContent = storeName ? `Store: ${storeName}` : '';
+
+      if (mode === 'ready' || mode === 'shared') {
+        meta.textContent = `Items: ${itemCount}${warningCount ? ` (${warningCount} marked as “Might not be here”)` : ''}`;
+      } else {
+        meta.textContent = `Items: ${itemCount}`;
+      }
+
+      box.appendChild(title);
+      if (subtitle.textContent) box.appendChild(subtitle);
+      box.appendChild(meta);
+      resultsHero.appendChild(box);
+    }
+
+    function showToast(message, type = 'success') {
+      if (!toastEl) return;
+      toastEl.textContent = message;
+      toastEl.className = type === 'error' ? 'toast error' : 'toast';
+      toastEl.style.display = 'block';
+      setTimeout(() => { toastEl.style.display = 'none'; }, 2500);
+    }
+
+    function updateBackToTopVisibility() {
+      const threshold = resultsCard?.offsetTop || 0;
+      if (!backToTopBtn) return;
+      if (window.scrollY > threshold + 60) {
+        backToTopBtn.style.display = 'flex';
+      } else {
+        backToTopBtn.style.display = 'none';
+      }
+    }
+
+    function normalizeItem(name) {
+      return (name || '').trim().toLowerCase();
+    }
+
+    function availabilityBadge(item) {
+      if (item.likely_available === false) {
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = 'Might not be here';
+        if (item.notes) badge.title = item.notes;
+        return badge;
+      }
+      if (item.likely_available === true) {
+        const badge = document.createElement('span');
+        badge.className = 'badge ok';
+        badge.textContent = 'Likely here';
+        return badge;
+      }
+      return null;
+    }
+
+    function applyStatusStyles(label, pickedBtn, skipBtn, status) {
+      label.classList.remove('dim', 'faded');
+      pickedBtn.classList.remove('active-primary');
+      skipBtn.classList.remove('active-secondary');
+
+      if (status === 'picked') {
+        label.classList.add('dim');
+        pickedBtn.classList.add('active-primary');
+      } else if (status === 'not_needed') {
+        label.classList.add('faded');
+        skipBtn.classList.add('active-secondary');
+      }
+    }
+
+    function buildSectionHeader(sectionName, count) {
+      const header = document.createElement('div');
+      header.className = 'section-header';
+
+      const title = document.createElement('div');
+      title.className = 'section-title';
+      const icon = sectionIcons[sectionName] || '🛒';
+      title.textContent = `${icon} ${sectionName}`;
+
+      const countNote = document.createElement('span');
+      countNote.style.color = '#64748b';
+      countNote.style.fontWeight = '600';
+      countNote.textContent = `${count} item${count !== 1 ? 's' : ''}`;
+      title.appendChild(countNote);
+
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'collapse-toggle';
+      toggle.innerHTML = '<span aria-hidden="true">▼</span>';
+
+      header.appendChild(title);
+      header.appendChild(toggle);
+      return { header, toggle };
+    }
+
+    // ---------- Rendering ----------
+    function renderChecklist(store, data, options = {}) {
+      const storeState = getStoreState(store) || { store, rawText: textarea.value, parsedItems: parseInput(textarea.value), itemState: {} };
+      const sections = {};
+      let warningCount = 0;
+
+      (data.items || []).forEach(item => {
+        const section = item.section || 'Other';
+        if (!sections[section]) sections[section] = [];
+        sections[section].push(item);
+        if (item.likely_available === false) warningCount += 1;
+      });
+
+      resultsContent.innerHTML = '';
+      suggestionsEl.innerHTML = '';
+
+      const sectionNames = Object.keys(sections).sort();
+      sectionNames.forEach(sectionName => {
+        const sectionEl = document.createElement('div');
+        sectionEl.className = 'section';
+
+        const { header, toggle } = buildSectionHeader(sectionName, sections[sectionName].length);
+        const body = document.createElement('div');
+        body.className = 'section-body';
+
+        const collapseKey = `${store}-${sectionName}`;
+        const isOpen = sectionCollapseState[collapseKey] !== false;
+        body.style.display = isOpen ? 'block' : 'none';
+        toggle.innerHTML = isOpen ? '<span aria-hidden="true">▼</span>' : '<span aria-hidden="true">▶</span>';
+        toggle.setAttribute('aria-expanded', String(isOpen));
+
+        toggle.addEventListener('click', () => {
+          const currentlyOpen = body.style.display !== 'none';
+          body.style.display = currentlyOpen ? 'none' : 'block';
+          toggle.innerHTML = currentlyOpen ? '<span aria-hidden="true">▶</span>' : '<span aria-hidden="true">▼</span>';
+          toggle.setAttribute('aria-expanded', String(!currentlyOpen));
+          sectionCollapseState[collapseKey] = !currentlyOpen;
+        });
+
+        sections[sectionName].forEach(item => {
+          const normalized = normalizeItem(item.name || item.raw);
+          const stateId = `${sectionName}|${normalized}`;
+          let status = storeState.itemState?.[stateId]?.status || 'needed';
+
+          const row = document.createElement('div');
+          row.className = 'item-row';
+
+          const label = document.createElement('p');
+          label.className = 'item-label';
+          label.textContent = item.name || item.raw;
+
+          const actions = document.createElement('div');
+          actions.className = 'item-actions';
+
+          const pickedBtn = document.createElement('button');
+          pickedBtn.type = 'button';
+          pickedBtn.className = 'pill';
+          pickedBtn.textContent = '✔ Picked up';
+
+          const skipBtn = document.createElement('button');
+          skipBtn.type = 'button';
+          skipBtn.className = 'pill';
+          skipBtn.textContent = '✖ Not needed';
+
+          function updateStatus(next) {
+            status = status === next ? 'needed' : next;
+            if (!storeState.itemState) storeState.itemState = {};
+            storeState.itemState[stateId] = { status };
+            persistStoreState(store, { ...storeState, itemState: { ...storeState.itemState } });
+            applyStatusStyles(label, pickedBtn, skipBtn, status);
+          }
+
+          pickedBtn.addEventListener('click', () => updateStatus('picked'));
+          skipBtn.addEventListener('click', () => updateStatus('not_needed'));
+
+          applyStatusStyles(label, pickedBtn, skipBtn, status);
+
+          actions.appendChild(pickedBtn);
+          actions.appendChild(skipBtn);
+
+          const badge = availabilityBadge(item);
+          if (badge) actions.appendChild(badge);
+
+          row.appendChild(label);
+          row.appendChild(actions);
+          body.appendChild(row);
+        });
+
+        sectionEl.appendChild(header);
+        sectionEl.appendChild(body);
+        resultsContent.appendChild(sectionEl);
+      });
+
+      if (Array.isArray(data.suggested_items) && data.suggested_items.length) {
+        const title = document.createElement('h4');
+        title.textContent = 'You might also need…';
+        const note = document.createElement('p');
+        note.className = 'suggestion-note';
+        note.textContent = 'Suggestion';
+
+        const list = document.createElement('div');
+        list.className = 'suggestions';
+        data.suggested_items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'item-row';
+          const label = document.createElement('p');
+          label.className = 'item-label';
+          label.textContent = item.name || item;
+          label.classList.add('faded');
+          row.appendChild(label);
+          list.appendChild(row);
+        });
+
+        suggestionsEl.appendChild(title);
+        suggestionsEl.appendChild(note);
+        suggestionsEl.appendChild(list);
+      }
+
+      resultsCard.style.display = 'block';
+      renderHero(options.shared ? 'shared' : 'ready', {
+        storeName: getStoreLabel(store),
+        itemCount: data.items?.length || 0,
+        warningCount
+      });
+
+      lastRenderedData = { store, data };
+      persistStoreState(store, { ...storeState, sortedItems: data.items || [], suggestedItems: data.suggested_items });
+
+      setTimeout(updateBackToTopVisibility, 100);
+    }
+
+    // ---------- API ----------
     async function callApi(store, items) {
       const response = await fetch('/api/grocery-sort', {
         method: 'POST',
@@ -274,67 +691,7 @@
       return response.json();
     }
 
-    function renderChecklist(store, data) {
-      resultsContent.innerHTML = '';
-      const state = loadState();
-      const sections = {};
-
-      (data.items || []).forEach(item => {
-        const section = item.section || 'Other';
-        if (!sections[section]) sections[section] = [];
-        sections[section].push(item);
-      });
-
-      Object.keys(sections).sort().forEach(sectionName => {
-        const sectionEl = document.createElement('div');
-        sectionEl.className = 'section';
-
-        const title = document.createElement('div');
-        title.className = 'section-title';
-        title.textContent = sectionName;
-        sectionEl.appendChild(title);
-
-        sections[sectionName].forEach(item => {
-          const normalized = (item.name || item.raw || '').trim().toLowerCase();
-          const stateId = `${store}|${normalized}`;
-
-          const row = document.createElement('div');
-          row.className = 'item-row';
-
-          const checkbox = document.createElement('input');
-          checkbox.type = 'checkbox';
-          checkbox.id = stateId;
-          checkbox.checked = Boolean(state[stateId]?.picked);
-
-          const label = document.createElement('label');
-          label.setAttribute('for', stateId);
-          label.textContent = item.name || item.raw;
-
-          checkbox.addEventListener('change', () => {
-            state[stateId] = { picked: checkbox.checked };
-            saveState(state);
-          });
-
-          row.appendChild(checkbox);
-          row.appendChild(label);
-
-          if (item.likely_available === false) {
-            const badge = document.createElement('span');
-            badge.className = 'badge';
-            badge.textContent = 'Might not be here';
-            if (item.notes) badge.title = item.notes;
-            row.appendChild(badge);
-          }
-
-          sectionEl.appendChild(row);
-        });
-
-        resultsContent.appendChild(sectionEl);
-      });
-
-      resultsCard.style.display = 'block';
-    }
-
+    // ---------- Actions ----------
     async function handleGenerate() {
       const store = storeSelect.value;
       const rawText = textarea.value;
@@ -348,8 +705,11 @@
 
       statusEl.textContent = 'Analyzing list…';
       statusEl.className = 'status';
+      renderHero('loading', { storeName: getStoreLabel(store), itemCount: items.length });
+      resultsCard.style.display = 'block';
 
-      saveLastInput(rawText, store);
+      const existingState = getStoreState(store) || { itemState: {} };
+      persistStoreState(store, { ...existingState, rawText, parsedItems: items });
 
       try {
         const data = await callApi(store, items);
@@ -359,11 +719,13 @@
         renderChecklist(store, data);
         statusEl.textContent = 'Checklist ready!';
         statusEl.className = 'status';
+        showToast('Checklist ready!');
       } catch (err) {
         statusEl.textContent = 'Something went wrong analyzing your list. Please try again.';
         statusEl.className = 'status error';
-        resultsCard.style.display = 'block';
         resultsContent.innerHTML = '';
+        suggestionsEl.innerHTML = '';
+        renderHero('error', { storeName: getStoreLabel(store), itemCount: items.length });
       }
     }
 
@@ -372,11 +734,126 @@
       statusEl.textContent = '';
       resultsCard.style.display = 'none';
       resultsContent.innerHTML = '';
-      localStorage.removeItem(LAST_INPUT_KEY);
+      suggestionsEl.innerHTML = '';
+      resultsHero.innerHTML = '';
+      clearStoreState(storeSelect.value);
     }
 
+    function encodeStateForShare() {
+      const store = storeSelect.value;
+      const storeState = getStoreState(store) || {
+        store,
+        rawText: textarea.value,
+        parsedItems: parseInput(textarea.value),
+        itemState: {}
+      };
+
+      const payload = {
+        store,
+        rawText: storeState.rawText || textarea.value,
+        parsedItems: storeState.parsedItems?.length ? storeState.parsedItems : parseInput(storeState.rawText || textarea.value),
+        itemState: storeState.itemState || {},
+        sortedItems: lastRenderedData?.store === store ? lastRenderedData.data.items : storeState.sortedItems,
+        suggestedItems: lastRenderedData?.data?.suggested_items || storeState.suggestedItems
+      };
+
+      if (!payload.parsedItems.length) return null;
+
+      const json = JSON.stringify(payload);
+      const encoded = btoa(unescape(encodeURIComponent(json)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+
+      const url = `${window.location.origin}${window.location.pathname}?list=${encoded}`;
+      return url;
+    }
+
+    function tryDecodeSharedData() {
+      const params = new URLSearchParams(window.location.search);
+      let encoded = params.get('list');
+      if (!encoded && window.location.hash.startsWith('#data=')) {
+        encoded = window.location.hash.replace('#data=', '');
+      }
+      if (!encoded) return null;
+
+      try {
+        const padded = encoded.replace(/-/g, '+').replace(/_/g, '/');
+        const json = decodeURIComponent(escape(atob(padded)));
+        const data = JSON.parse(json);
+        return data;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function handleShareClick() {
+      const url = encodeStateForShare();
+      if (!url) {
+        showToast('Add a few items first.', 'error');
+        return;
+      }
+
+      navigator.clipboard?.writeText(url).then(() => {
+        showToast('Link copied!');
+      }).catch(() => {
+        showToast('Unable to copy link', 'error');
+      });
+    }
+
+    function restoreFromSharedData(data) {
+      if (!data || !data.store) return false;
+
+      storeSelect.value = data.store;
+      const parsedItems = Array.isArray(data.parsedItems) ? data.parsedItems : [];
+      const rawText = data.rawText || parsedItems.join('\n');
+      textarea.value = rawText;
+
+      const toRender = data.sortedItems?.length
+        ? { items: data.sortedItems, suggested_items: data.suggestedItems }
+        : { items: parsedItems.map(name => ({ name, section: 'List' })) };
+
+      persistStoreState(data.store, {
+        store: data.store,
+        rawText,
+        parsedItems,
+        itemState: data.itemState || {},
+        sortedItems: data.sortedItems || [],
+        suggestedItems: data.suggestedItems || []
+      });
+
+      renderChecklist(data.store, toRender, { shared: true });
+      statusEl.textContent = 'Shared list loaded.';
+      statusEl.className = 'status';
+      return true;
+    }
+
+    function restoreFromStorage() {
+      const state = loadState();
+      if (state.lastStore) {
+        storeSelect.value = state.lastStore;
+      }
+      const storeState = getStoreState(storeSelect.value);
+      if (storeState?.rawText) {
+        textarea.value = storeState.rawText;
+      }
+
+      if (storeState?.sortedItems?.length) {
+        renderChecklist(storeSelect.value, { items: storeState.sortedItems, suggested_items: storeState.suggestedItems }, { shared: true });
+        statusEl.textContent = 'Restored your last list.';
+      } else if (storeState?.parsedItems?.length) {
+        statusEl.textContent = 'Restoring your list…';
+        handleGenerate();
+      }
+    }
+
+    // ---------- Event wiring ----------
     document.addEventListener('DOMContentLoaded', () => {
-      loadLastInput();
+      const sharedData = tryDecodeSharedData();
+      if (!restoreFromSharedData(sharedData)) {
+        restoreFromStorage();
+      }
+      updateBackToTopVisibility();
     });
 
     generateBtn.addEventListener('click', (e) => {
@@ -384,9 +861,20 @@
       handleGenerate();
     });
 
+    shareBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleShareClick();
+    });
+
     clearBtn.addEventListener('click', (e) => {
       e.preventDefault();
       handleClear();
+    });
+
+    window.addEventListener('scroll', updateBackToTopVisibility);
+    backToTopBtn.addEventListener('click', () => {
+      const top = resultsCard?.offsetTop || 0;
+      window.scrollTo({ top, behavior: 'smooth' });
     });
   </script>
 </body>
