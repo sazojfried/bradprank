@@ -1083,6 +1083,22 @@
       });
     }
 
+    function buildItemLabel(item) {
+      const raw = item?.raw || '';
+      const cleanedRaw = raw.replace(/\s*\[recipe:[^\]]+\]\s*$/, '').trim();
+      const name = item?.name || '';
+
+      const hasQuantityMarker = /[\d¼½¾⅓⅔⅛⅜⅝⅞]/.test(cleanedRaw)
+        || /\b(cups?|cup|tablespoons?|tbsp|teaspoons?|tsp|ounces?|oz|pounds?|lbs?|lb|grams?|g|kilograms?|kg|liters?|litres?|l|ml|pint|quart|gallon|package|pack|can|bottle|dozen)\b/i.test(cleanedRaw)
+        || /—/.test(cleanedRaw);
+
+      if (hasQuantityMarker && cleanedRaw) {
+        return cleanedRaw;
+      }
+
+      return name || cleanedRaw;
+    }
+
     function renderChecklist(store, data, options = {}) {
       const storeState = getStoreState(store) || { store, rawText: textarea.value, parsedItems: getDisplayItems(textarea.value), itemState: {} };
       const sections = {};
@@ -1117,7 +1133,8 @@
         body.className = 'section-body';
 
         sections[sectionName].forEach(item => {
-          const normalized = normalizeItem(item.name || item.raw);
+          const labelText = buildItemLabel(item) || item.name || item.raw;
+          const normalized = normalizeItem(labelText || item.name || item.raw);
           const stateId = `${sectionName}|${normalized}`;
           let status = storeState.itemState?.[stateId]?.status || 'needed';
 
@@ -1129,7 +1146,7 @@
 
           const label = document.createElement('p');
           label.className = 'item-label';
-          label.textContent = item.name || item.raw;
+          label.textContent = labelText;
 
           const pickedInput = document.createElement('input');
           pickedInput.type = 'checkbox';
