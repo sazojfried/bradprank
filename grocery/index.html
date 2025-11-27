@@ -77,7 +77,7 @@
       font-weight: 650;
     }
 
-    select, textarea, button {
+    select, textarea, button, .input {
       width: 100%;
       font-size: 1rem;
       font-family: inherit;
@@ -89,7 +89,7 @@
       min-height: 44px;
     }
 
-    select:focus, textarea:focus, button:focus {
+    select:focus, textarea:focus, button:focus, .input:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(43,108,176,0.2);
@@ -98,6 +98,22 @@
     textarea {
       min-height: 160px;
       resize: vertical;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .field-row .input {
+      flex: 1 1 220px;
+    }
+
+    .field-row button {
+      width: auto;
+      white-space: nowrap;
     }
 
     .actions {
@@ -343,6 +359,49 @@
       text-align: center;
     }
 
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1rem;
+      margin-top: 12px;
+    }
+
+    .recipe-card {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .recipe-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .recipe-content {
+      padding: 0.75rem 1rem 1rem;
+    }
+
+    .recipe-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .recipe-desc {
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .recipe-meta {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+    }
+
     .toast.error { background: #dc2626; }
 
     .panel-summary {
@@ -514,6 +573,23 @@
         <textarea id="items" placeholder="Paste a messy list — we’ll handle the splitting."></textarea>
       </div>
 
+      <section aria-label="Recipe ideas" class="field">
+        <label for="idea-input">Need ideas?</label>
+        <div class="field-row">
+          <input
+            id="idea-input"
+            type="text"
+            class="input"
+            placeholder="e.g. I'm thinking a hamburger or something"
+          />
+          <button id="get-recipes" class="btn-secondary" type="button">
+            Suggest recipes
+          </button>
+        </div>
+        <div id="recipe-status" class="status"></div>
+        <div id="recipe-results" class="recipe-grid"></div>
+      </section>
+
       <div class="actions">
         <button id="generate" class="btn-primary">Generate checklist</button>
         <button id="share" class="btn-secondary" type="button">Copy shareable link</button>
@@ -565,6 +641,11 @@
     const hideSkippedToggle = document.getElementById('hide-skipped');
     const backToTopBtn = document.getElementById('back-to-top');
     const toastEl = document.getElementById('toast');
+    const ideaInput = document.getElementById('idea-input');
+    const getRecipesBtn = document.getElementById('get-recipes');
+    const recipeStatus = document.getElementById('recipe-status');
+    const recipeResults = document.getElementById('recipe-results');
+    const listTextarea = textarea;
 
     const sectionIcons = {
       Produce: '🥬', Bakery: '🍞', Deli: '🥪', Cheese: '🧀',
@@ -676,6 +757,76 @@
       toastEl.className = type === 'error' ? 'toast error' : 'toast';
       toastEl.style.display = 'block';
       setTimeout(() => { toastEl.style.display = 'none'; }, 2500);
+    }
+
+    function renderRecipeCards(recipes) {
+      if (!recipeResults) return;
+      recipeResults.innerHTML = '';
+
+      recipes.forEach((recipe) => {
+        const card = document.createElement('article');
+        card.className = 'recipe-card';
+
+        const emoji = recipe.level === 1 ? '🧩'
+          : recipe.level === 2 ? '🧀'
+          : '✨';
+
+        const keyword = recipe.image_keyword || recipe.name || 'recipe';
+        const imgSrc = 'https://source.unsplash.com/featured/400x260?' + encodeURIComponent(keyword);
+
+        card.innerHTML = `
+          <img src="${imgSrc}" alt="${recipe.name}" class="recipe-image" loading="lazy" />
+          <div class="recipe-content">
+            <h3 class="recipe-title">${emoji} ${recipe.name}</h3>
+            <p class="recipe-desc">${recipe.description || ''}</p>
+            <p class="recipe-meta">Level ${recipe.level || ''} · ${recipe.style || ''}</p>
+            <button type="button" class="btn-primary recipe-add">Add ingredients to list</button>
+          </div>
+        `;
+
+        const btn = card.querySelector('.recipe-add');
+        btn.addEventListener('click', () => addRecipeToList(recipe));
+
+        recipeResults.appendChild(card);
+      });
+    }
+
+    function addRecipeToList(recipe) {
+      if (!listTextarea || !recipe || !Array.isArray(recipe.ingredients)) return;
+
+      const emoji = recipe.level === 1 ? '🧩'
+        : recipe.level === 2 ? '🧀'
+        : '✨';
+
+      const recipeId =
+        recipe.id ||
+        (recipe.name ? recipe.name.toLowerCase().replace(/\s+/g, '-') : 'recipe');
+
+      const lines = [];
+      lines.push(`--- ${emoji} ${recipe.name} ---`);
+
+      recipe.ingredients.forEach((ing) => {
+        const name = ing.name || 'ingredient';
+        const qty = ing.quantity != null ? ing.quantity : '';
+        const unit = ing.unit || '';
+        const notes = ing.notes ? ` (${ing.notes})` : '';
+
+        const qtyUnit = `${qty} ${unit}`.trim();
+        const base = qtyUnit ? `${name} — ${qtyUnit}` : name;
+        const line = `${base}${notes}  [recipe:${recipeId}]`;
+
+        lines.push(line);
+      });
+
+      lines.push('');
+
+      const existing = listTextarea.value.trim();
+      listTextarea.value = existing
+        ? existing + '\n' + lines.join('\n')
+        : lines.join('\n');
+
+      const evt = new Event('input', { bubbles: true });
+      listTextarea.dispatchEvent(evt);
     }
 
     function updateBackToTopVisibility() {
@@ -955,6 +1106,52 @@
       }
     }
 
+    async function handleRecipeIdeas() {
+      if (!ideaInput || !recipeStatus) return;
+      const idea = ideaInput.value.trim();
+      recipeStatus.className = 'status';
+
+      if (!idea) {
+        recipeStatus.textContent = 'Type what you are in the mood for first.';
+        return;
+      }
+
+      recipeStatus.textContent = 'Thinking up recipes...';
+      if (recipeResults) recipeResults.innerHTML = '';
+
+      try {
+        const response = await fetch('/api/recipe-ideas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idea, store: storeSelect ? storeSelect.value : null })
+        });
+
+        if (!response.ok) {
+          let message = 'Error getting recipes.';
+          try {
+            const errorData = await response.json();
+            if (errorData?.error) message = errorData.error;
+          } catch (_) { /* ignore */ }
+          recipeStatus.textContent = message;
+          recipeStatus.className = 'status error';
+          return;
+        }
+
+        const data = await response.json();
+        const recipes = data.recipes || [];
+        if (recipes.length === 0) {
+          recipeStatus.textContent = 'No ideas came back. Try rephrasing.';
+          return;
+        }
+
+        recipeStatus.textContent = 'Here are some ideas:';
+        renderRecipeCards(recipes);
+      } catch (err) {
+        recipeStatus.textContent = 'Error getting recipes.';
+        recipeStatus.className = 'status error';
+      }
+    }
+
     function handleClear() {
       textarea.value = '';
       statusEl.textContent = '';
@@ -1098,6 +1295,11 @@
     clearBtn.addEventListener('click', (e) => {
       e.preventDefault();
       handleClear();
+    });
+
+    getRecipesBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleRecipeIdeas();
     });
 
     hidePickedToggle.addEventListener('change', refreshVisibleRows);
