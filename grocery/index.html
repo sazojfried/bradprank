@@ -373,12 +373,7 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
-    }
-
-    .recipe-image {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
+      height: 100%;
     }
 
     .recipe-content {
@@ -400,6 +395,124 @@
       font-size: 0.8rem;
       color: #6b7280;
       margin-bottom: 0.5rem;
+    }
+
+    /* Recipe modal */
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    #recipe-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    #recipe-modal-overlay.is-open {
+      display: flex;
+    }
+
+    #recipe-modal {
+      background: #ffffff;
+      color: var(--text);
+      width: min(1100px, 100%);
+      max-height: 90vh;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .recipe-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+      gap: 12px;
+    }
+
+    .recipe-modal-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #recipe-modal-close {
+      background: transparent;
+      border: none;
+      color: #1f2a44;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 10px;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    #recipe-modal-close:hover {
+      background: #edf2fb;
+    }
+
+    #recipe-modal-body {
+      padding: 16px 18px 18px;
+      overflow-y: auto;
+    }
+
+    .recipe-modal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .recipe-modal-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #f8fbff;
+      height: 100%;
+    }
+
+    .recipe-modal-card h4 {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.3;
+    }
+
+    .recipe-modal-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .recipe-section-title {
+      margin: 8px 0 4px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #1f2a44;
+    }
+
+    .recipe-modal-card ul, .recipe-modal-card ol {
+      margin: 4px 0 0 18px;
+      padding: 0;
+      color: #1f2a44;
+    }
+
+    .recipe-modal-card button {
+      margin-top: auto;
+      align-self: flex-start;
     }
 
     .toast.error { background: #dc2626; }
@@ -623,6 +736,18 @@
   <button id="back-to-top" aria-label="Back to top" title="Back to top">↑</button>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <div id="recipe-modal-overlay" aria-hidden="true">
+    <div id="recipe-modal" role="dialog" aria-modal="true" aria-labelledby="recipe-modal-title">
+      <div class="recipe-modal-header">
+        <h3 id="recipe-modal-title">Here are some ideas:</h3>
+        <button id="recipe-modal-close" type="button" aria-label="Close recipe ideas">✕ Close</button>
+      </div>
+      <div id="recipe-modal-body">
+        <div id="recipe-modal-grid" class="recipe-modal-grid"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const STORAGE_KEY = "groceryChecklistState_v2";
     const storeSelect = document.getElementById('store');
@@ -645,6 +770,9 @@
     const getRecipesBtn = document.getElementById('get-recipes');
     const recipeStatus = document.getElementById('recipe-status');
     const recipeResults = document.getElementById('recipe-results');
+    const recipeModalOverlay = document.getElementById('recipe-modal-overlay');
+    const recipeModalGrid = document.getElementById('recipe-modal-grid');
+    const recipeModalClose = document.getElementById('recipe-modal-close');
     const listTextarea = textarea;
 
     const sectionIcons = {
@@ -661,6 +789,7 @@
     ];
 
     let lastRenderedData = null;
+    let lastRecipeIdeas = [];
 
     // ---------- Storage helpers ----------
     function safeParse(value, fallback) {
@@ -759,44 +888,86 @@
       setTimeout(() => { toastEl.style.display = 'none'; }, 2500);
     }
 
-    function renderRecipeCards(recipes) {
-      if (!recipeResults) return;
-      recipeResults.innerHTML = '';
+    function getRecipeEmoji(recipe) {
+      return recipe?.level === 1 ? '🧩'
+        : recipe?.level === 2 ? '🧀'
+        : '✨';
+    }
+
+    function buildFallbackSteps(description) {
+      const steps = [
+        'Prep the ingredients.',
+        description ? `Lean on these flavors: ${description}` : 'Season to taste.',
+        'Cook until done and adjust seasoning.',
+        'Assemble and serve.'
+      ];
+      return steps;
+    }
+
+    function closeRecipeModal() {
+      if (!recipeModalOverlay) return;
+      recipeModalOverlay.classList.remove('is-open');
+      recipeModalOverlay.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+    }
+
+    function renderRecipesModal(recipes) {
+      if (!recipeModalOverlay || !recipeModalGrid) return;
+      recipeModalGrid.innerHTML = '';
 
       recipes.forEach((recipe) => {
         const card = document.createElement('article');
-        card.className = 'recipe-card';
+        card.className = 'recipe-modal-card';
 
-        const emoji = recipe.level === 1 ? '🧩'
-          : recipe.level === 2 ? '🧀'
-          : '✨';
+        const emoji = getRecipeEmoji(recipe);
+        const description = recipe.description || '';
+        const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+        const steps = Array.isArray(recipe.steps) && recipe.steps.length
+          ? recipe.steps
+          : buildFallbackSteps(description);
 
-        const keyword = recipe.image_keyword || recipe.name || 'recipe';
-        const imgSrc = 'https://source.unsplash.com/featured/400x260?' + encodeURIComponent(keyword);
+        const ingredientsList = ingredients.map((ing) => {
+          const name = ing.name || 'ingredient';
+          const qty = ing.quantity != null ? ing.quantity : '';
+          const unit = ing.unit || '';
+          const notes = ing.notes ? ` (${ing.notes})` : '';
+          const qtyUnit = `${qty} ${unit}`.trim();
+          const base = qtyUnit ? `${name} — ${qtyUnit}` : name;
+          return `<li>${base}${notes}</li>`;
+        }).join('');
+
+        const stepsList = steps.map((step) => `<li>${step}</li>`).join('');
 
         card.innerHTML = `
-          <img src="${imgSrc}" alt="${recipe.name}" class="recipe-image" loading="lazy" />
-          <div class="recipe-content">
-            <h3 class="recipe-title">${emoji} ${recipe.name}</h3>
-            <p class="recipe-desc">${recipe.description || ''}</p>
-            <p class="recipe-meta">Level ${recipe.level || ''} · ${recipe.style || ''}</p>
-            <button type="button" class="btn-primary recipe-add">Add ingredients to list</button>
+          <h4 class="recipe-title">${emoji} ${recipe.name}</h4>
+          <p class="recipe-desc">${description}</p>
+          <p class="recipe-meta">${recipe.style ? recipe.style : ''}</p>
+          <div>
+            <div class="recipe-section-title">Ingredients</div>
+            <ul>${ingredientsList}</ul>
           </div>
+          <div>
+            <div class="recipe-section-title">Steps</div>
+            <ol>${stepsList}</ol>
+          </div>
+          <button type="button" class="btn-primary recipe-add">Add ingredients to list</button>
         `;
 
         const btn = card.querySelector('.recipe-add');
         btn.addEventListener('click', () => addRecipeToList(recipe));
 
-        recipeResults.appendChild(card);
+        recipeModalGrid.appendChild(card);
       });
+
+      recipeModalOverlay.classList.add('is-open');
+      recipeModalOverlay.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
     }
 
     function addRecipeToList(recipe) {
       if (!listTextarea || !recipe || !Array.isArray(recipe.ingredients)) return;
 
-      const emoji = recipe.level === 1 ? '🧩'
-        : recipe.level === 2 ? '🧀'
-        : '✨';
+      const emoji = getRecipeEmoji(recipe);
 
       const recipeId =
         recipe.id ||
@@ -1144,8 +1315,9 @@
           return;
         }
 
-        recipeStatus.textContent = 'Here are some ideas:';
-        renderRecipeCards(recipes);
+        recipeStatus.textContent = 'Here are some ideas (see popup)!';
+        lastRecipeIdeas = recipes;
+        renderRecipesModal(recipes);
       } catch (err) {
         recipeStatus.textContent = 'Error getting recipes.';
         recipeStatus.className = 'status error';
@@ -1300,6 +1472,13 @@
     getRecipesBtn?.addEventListener('click', (e) => {
       e.preventDefault();
       handleRecipeIdeas();
+    });
+
+    recipeModalClose?.addEventListener('click', closeRecipeModal);
+    recipeModalOverlay?.addEventListener('click', (e) => {
+      if (e.target === recipeModalOverlay) {
+        closeRecipeModal();
+      }
     });
 
     hidePickedToggle.addEventListener('change', refreshVisibleRows);
