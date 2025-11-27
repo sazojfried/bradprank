@@ -998,6 +998,8 @@
 
       const evt = new Event('input', { bubbles: true });
       listTextarea.dispatchEvent(evt);
+
+      closeRecipeModal();
     }
 
     function updateBackToTopVisibility() {
