@@ -1,280 +1,1059 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+/*! normalize.css v2.0.1 | MIT License | git.io/normalize */
 
-:root {
-  --bg: #0d1117;
-  --panel: #111827;
-  --accent: #6ee7ff;
-  --accent-2: #8b5cf6;
-  --text: #e5e7eb;
-  --muted: #9ca3af;
-  --danger: #f87171;
-  --warn: #facc15;
-  --success: #34d399;
+/* ==========================================================================
+   HTML5 display definitions
+   ========================================================================== */
+
+/*
+ * Corrects `block` display not defined in IE 8/9.
+ */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section,
+summary {
+    display: block;
 }
 
-* {
+/*
+ * Corrects `inline-block` display not defined in IE 8/9.
+ */
+
+audio,
+canvas,
+video {
+    display: inline-block;
+}
+
+/*
+ * Prevents modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+/*
+ * Addresses styling for `hidden` attribute not present in IE 8/9.
+ */
+
+[hidden] {
+    display: none;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+/*
+ * 1. Sets default font family to sans-serif.
+ * 2. Prevents iOS text size adjust after orientation change, without disabling
+ *    user zoom.
+ */
+
+html {
+    font-family: sans-serif; /* 1 */
+    -webkit-text-size-adjust: 100%; /* 2 */
+    -ms-text-size-adjust: 100%; /* 2 */
+}
+
+/*
+ * Removes default margin.
+ */
+
+body {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Links
+   ========================================================================== */
+
+/*
+ * Addresses `outline` inconsistency between Chrome and other browsers.
+ */
+
+a:focus {
+    outline: thin dotted;
+}
+
+/*
+ * Improves readability when focused and also mouse hovered in all browsers.
+ */
+
+a:active,
+a:hover {
+    outline: 0;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+/*
+ * Addresses `h1` font sizes within `section` and `article` in Firefox 4+,
+ * Safari 5, and Chrome.
+ */
+
+h1 {
+    font-size: 2em;
+}
+
+/*
+ * Addresses styling not present in IE 8/9, Safari 5, and Chrome.
+ */
+
+abbr[title] {
+    border-bottom: 1px dotted;
+}
+
+/*
+ * Addresses style set to `bolder` in Firefox 4+, Safari 5, and Chrome.
+ */
+
+b,
+strong {
+    font-weight: bold;
+}
+
+/*
+ * Addresses styling not present in Safari 5 and Chrome.
+ */
+
+dfn {
+    font-style: italic;
+}
+
+/*
+ * Addresses styling not present in IE 8/9.
+ */
+
+mark {
+    background: #ff0;
+    color: #000;
+}
+
+
+/*
+ * Corrects font family set oddly in Safari 5 and Chrome.
+ */
+
+code,
+kbd,
+pre,
+samp {
+    font-family: monospace, serif;
+    font-size: 1em;
+}
+
+/*
+ * Improves readability of pre-formatted text in all browsers.
+ */
+
+pre {
+    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/*
+ * Sets consistent quote types.
+ */
+
+q {
+    quotes: "\201C" "\201D" "\2018" "\2019";
+}
+
+/*
+ * Addresses inconsistent and variable font size in all browsers.
+ */
+
+small {
+    font-size: 80%;
+}
+
+/*
+ * Prevents `sub` and `sup` affecting `line-height` in all browsers.
+ */
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+/* ==========================================================================
+   Embedded content
+   ========================================================================== */
+
+/*
+ * Removes border when inside `a` element in IE 8/9.
+ */
+
+img {
+    border: 0;
+}
+
+/*
+ * Corrects overflow displayed oddly in IE 9.
+ */
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Figures
+   ========================================================================== */
+
+/*
+ * Addresses margin not present in IE 8/9 and Safari 5.
+ */
+
+figure {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+/*
+ * Define consistent border, margin, and padding.
+ */
+
+fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+/*
+ * 1. Corrects color not being inherited in IE 8/9.
+ * 2. Remove padding so people aren't caught out if they zero out fieldsets.
+ */
+
+legend {
+    border: 0; /* 1 */
+    padding: 0; /* 2 */
+}
+
+/*
+ * 1. Corrects font family not being inherited in all browsers.
+ * 2. Corrects font size not being inherited in all browsers.
+ * 3. Addresses margins set differently in Firefox 4+, Safari 5, and Chrome
+ */
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit; /* 1 */
+    font-size: 100%; /* 2 */
+    margin: 0; /* 3 */
+}
+
+/*
+ * Addresses Firefox 4+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+
+button,
+input {
+    line-height: normal;
+}
+
+/*
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Corrects inability to style clickable `input` types in iOS.
+ * 3. Improves usability and consistency of cursor style between image-type
+ *    `input` and others.
+ */
+
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+    -webkit-appearance: button; /* 2 */
+    cursor: pointer; /* 3 */
+}
+
+/*
+ * Re-set default cursor for disabled elements.
+ */
+
+button[disabled],
+input[disabled] {
+    cursor: default;
+}
+
+/*
+ * 1. Addresses box sizing set to `content-box` in IE 8/9.
+ * 2. Removes excess padding in IE 8/9.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+}
+
+/*
+ * 1. Addresses `appearance` set to `searchfield` in Safari 5 and Chrome.
+ * 2. Addresses `box-sizing` set to `border-box` in Safari 5 and Chrome
+ *    (include `-moz` to future-proof).
+ */
+
+input[type="search"] {
+    -webkit-appearance: textfield; /* 1 */
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box; /* 2 */
+    box-sizing: content-box;
+}
+
+/*
+ * Removes inner padding and search cancel button in Safari 5 and Chrome
+ * on OS X.
+ */
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/*
+ * Removes inner padding and border in Firefox 4+.
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/*
+ * 1. Removes default vertical scrollbar in IE 8/9.
+ * 2. Improves readability and alignment in all browsers.
+ */
+
+textarea {
+    overflow: auto; /* 1 */
+    vertical-align: top; /* 2 */
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+/*
+ * Remove most spacing between table cells.
+ */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
+  margin: 0px;
+}
+
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  background: #0f172a;
 }
 
 body {
-  margin: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(110, 231, 255, 0.08), transparent 35%),
-    radial-gradient(circle at 80% 10%, rgba(139, 92, 246, 0.1), transparent 35%), var(--bg);
-  color: var(--text);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  min-height: 100vh;
-}
-
-h1, h2, h3 {
-  margin: 0;
-  font-weight: 700;
-}
-
-.app {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1rem clamp(1rem, 2vw, 2.5rem);
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--panel);
-  border: 1px solid #1f2937;
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-}
-
-.tagline {
-  color: var(--muted);
-  margin-top: 0.25rem;
-}
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-label {
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-select, button {
-  background: #1f2937;
-  color: var(--text);
-  border: 1px solid #374151;
-  border-radius: 8px;
-  padding: 0.5rem 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 120ms ease, border-color 120ms ease, color 120ms ease;
-}
-
-select:focus, button:focus {
-  outline: 2px solid var(--accent);
-}
-
-button:hover, select:hover {
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-main {
-  display: grid;
-  grid-template-columns: minmax(260px, 320px) 1fr;
-  gap: 1rem;
-}
-
-.sidebar {
-  background: var(--panel);
-  border: 1px solid #1f2937;
-  border-radius: 12px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.stat-block {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.stat {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  background: #0b1220;
-  border: 1px solid #1f2937;
-  border-radius: 10px;
-  color: var(--muted);
-}
-
-.stat strong {
-  color: var(--text);
-  font-size: 1.05rem;
-}
-
-.cure label {
-  display: block;
-  margin-bottom: 0.35rem;
-  color: var(--muted);
-}
-
-.cure-bar {
   width: 100%;
-  height: 14px;
-  background: #0b1220;
-  border-radius: 999px;
-  border: 1px solid #1f2937;
-  overflow: hidden;
-}
-
-.cure-bar__fill {
   height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  transition: width 250ms ease;
+  margin: 0px;
+  padding: 0px;
+  background: #0f172a;
+  color: rgb(255, 255, 255);
+  font: normal 14px 'Open Sans', sans-serif;
 }
 
-.cure-percent {
-  text-align: right;
-  color: var(--muted);
-  margin-top: 0.35rem;
+h1, h2, h3, h4 {
+  font-family: 'Open Sans', Helvetica, Arial;
+  font-size: 15px;
+  margin: 0px;
 }
 
-.vector-status ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  color: var(--muted);
+p {
+  margin: 0px;
+  line-height: 1.3em;
 }
 
-.vector-status span {
-  color: var(--text);
+a {
+  color: rgb(0, 0, 255);
+  text-decoration: none;
 }
 
-.legend {
-  border-top: 1px solid #1f2937;
-  padding-top: 0.75rem;
+a:hover {
+  text-decoration: underline;
 }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--muted);
-}
-
-.legend .dot {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-}
-
-.dot.low { background: #2563eb; }
-.dot.mid { background: #f59e0b; }
-.dot.high { background: #ef4444; }
-
-.canvas-wrap {
-  background: radial-gradient(circle at 70% 10%, rgba(110, 231, 255, 0.08), transparent 40%),
-    radial-gradient(circle at 10% 80%, rgba(139, 92, 246, 0.08), transparent 35%),
-    var(--panel);
-  border: 1px solid #1f2937;
-  border-radius: 12px;
-  padding: 0.5rem;
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.35);
-}
-
-canvas {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
+img {
   display: block;
+  border: 0px;
 }
 
-.tooltip {
+br {
+  clear: both;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+.clear {
+  clear: both;
+}
+
+.header {
+  position: relative;
+  background: var(--slate-900);
+  height: 50px;
+}
+
+.header .nav {
+  margin-left: 20px;
+}
+
+.header .nav .tab {
+  padding: 0px 20px;
+  padding-top: 15px;
+  height: 50px;
+  cursor: pointer;
+  float: left;
+}
+
+.header .nav .tab:hover {
+  background: var(--yale-blue-hover);
+}
+
+.header .nav .tab.active {
+  background: var(--yale-blue);
+}
+
+.header .days {
+  float: left;
+  padding-top: 15px;
+  margin-left: 20px;
+}
+
+.header .days .value {
+  color: var(--yale-sky);
+}
+
+.header .define {
+  float: left;
+  padding-top: 15px;
+  margin-left: 20px;
+}
+
+.header .define .disease_kind {
+  color: var(--text-muted);
+}
+
+.header .speeds {
   position: absolute;
-  pointer-events: none;
-  background: rgba(17, 24, 39, 0.95);
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #1f2937;
-  color: var(--text);
-  font-size: 0.9rem;
-  opacity: 0;
-  transition: opacity 80ms ease;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+}
+
+.header .speeds .fa {
+  margin: 0px 10px;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.header .speeds .fa:hover {
+  color: var(--text-primary);
+}
+
+.header .speeds .fa.active {
+  color: var(--yale-sky);
+}
+
+.button {
+  color: var(--text-primary);
+  background: var(--yale-blue);
+  border-bottom: solid 3px var(--yale-blue-dark);
+  border-radius: 3px;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px;
+  display: inline-block;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.button:hover {
+  background: var(--yale-blue-hover);
+  border-bottom: solid 3px var(--yale-blue);
+}
+
+.button.active {
+  background: linear-gradient(90deg, var(--yale-blue-hover), var(--yale-sky));
+  border-bottom: solid 3px var(--yale-blue-dark);
+}
+
+.evolution {
+  background: var(--slate-800);
+  border-radius: 6px;
+  padding: 20px;
+  font-size: 13px;
+}
+
+.evolution .section {
+  position: relative;
+  border: solid 3px var(--slate-700);
+  border-radius: 6px;
+  padding: 15px;
+  padding-top: 20px;
+  margin-bottom: 20px;
+  min-height: 100px;
+}
+
+.evolution .title {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  position: absolute;
+  width: 100%;
+  top: -13px;
+  left: 0;
+}
+
+.evolution .title span {
+  background: var(--slate-700);
+  padding: 0px 5px;
+}
+
+.evolution .symptons {
+  text-align: center;
+}
+
+.evolution .symptons .name {
+  display: inline-block;
+  color: var(--text-muted);
+}
+
+.evolution .symptons .button {
+  width: 150px;
+  margin-left: 10px;
+}
+
+.evolution .resistance {
+  width: 450px;
+  float: left;
+}
+
+.evolution .resistance .button {
+  width: 96px;
+  margin: 2px;
+}
+
+.evolution .transmission {
+  margin-top: 0px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  width: 140px;
+  float: left;
+}
+
+.evolution .transmission .button {
+  width: 100%;
+}
+
+.evolution .traits {
+  width: 140px;
+  float: left;
+}
+
+.evolution .disaese_inforamtion .averages {
+  text-align: center;
+}
+
+.evolution .disaese_inforamtion .averages .average {
+  display: inline-block;
+  width: 200px;
+  margin: 20px 10px;
+  font-size: 16px;
+}
+
+.evolution .disaese_inforamtion .averages .average .value {
+  color: var(--yale-sky);
+}
+
+.evolution .disaese_inforamtion .stats {
+  text-align: center;
+}
+
+.evolution .disaese_inforamtion .stats .stat {
+  display: inline-block;
+  width: 200px;
+  margin: 0px 10px;
+}
+
+.evolution .disaese_inforamtion .stats .stat .name {
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: 5px;
+}
+
+.evolution .disaese_inforamtion .stats .stat .bar {
+  position: relative;
+  background: var(--bar-track);
+  height: 15px;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.evolution .disaese_inforamtion .stats .stat .bar .pill {
+  position: absolute;
+  background: #1d4ed8;
+  height: 15px;
+  border-radius: 5px;
+}
+
+.countries {
+  font-size: 12px;
+  background: var(--slate-800);
+  border-radius: 6px;
+  padding: 20px;
+  position: relative;
+}
+
+.countries .paginate {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  font-size: 25px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.countries .paginate .fa:hover {
+  color: var(--text-primary);
+}
+
+.countries .ticker {
+  width: 100%;
+}
+
+.countries .ticker .graph {
+  width: 400px;
+  height: 20px;
+}
+
+.countries .ticker path {
+  stroke-width: 1;
+  fill: none;
+}
+
+.countries .ticker path.population {
+  stroke: rgb(50, 100, 255);
+}
+
+.countries .ticker path.infected {
+  stroke: rgb(255, 255, 0);
+}
+
+.countries .ticker path.deaths {
+  stroke: #1d4ed8;
+}
+
+.countries table {
+  width: 100%;
+}
+
+.countries table td {
+  padding: 5px;
+}
+
+.countries table .true span,
+.countries table .false span {
+  color: var(--text-muted);
+}
+
+.countries table .null span {
+  display: none;
+}
+
+.countries table .population,
+.countries table .infected,
+.countries table .deaths {
+  text-align: right;
+}
+
+.countries table .population {
+  color: rgb(50, 100, 255);
+}
+
+.countries table .infected {
+  color: var(--yale-blue-hover);
+}
+
+.countries table .deaths {
+  color: #bfdbfe;
+}
+
+.countries table .name {
+  width: 215px;
   white-space: nowrap;
 }
 
-.log-section {
-  background: var(--panel);
-  border: 1px solid #1f2937;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+.countries table thead tr td {
+  border-bottom: solid 1px rgba(255, 255, 255, 0.15);
 }
 
-.log {
-  background: #0b1220;
-  border: 1px solid #1f2937;
-  border-radius: 10px;
-  max-height: 180px;
-  overflow-y: auto;
-  padding: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.95rem;
-  color: var(--muted);
+.countries table tbody tr:nth-child(odd) td {
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.log-entry {
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-start;
+.countries table tbody tr.total {
+  border-top: solid 1px rgba(255, 255, 255, 0.15);
 }
 
-.log-time {
-  color: var(--accent);
+.win_game {
+  display: none;
+  background: rgba(0, 0, 0, 0.9);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  padding-top: 50px;
+}
+
+.win_game.active {
+  display: block;
+}
+
+.win_game .screen {
+  height: 400px;
+  width: 700px;
+  margin: 0px auto;
+  padding: 30px;
+  background: rgb(255, 255, 255);
+  border-radius: 3px;
+  color: rgb(30, 30, 30);
+  font-size: 50px;
+  font-weight: 800;
+  text-align: center;
+  position: relative;
+}
+
+.setup {
+  width: 100%;
+  height: 100%;
+  background: var(--slate-800);
+  position: fixed;
+  top: 0;
+  left: 0;
+  text-align: center;
+  padding-top: 40px;
+}
+
+.setup .heading {
+  font-size: 42px;
+  padding-bottom: 20px;
+}
+
+.setup .submit {
+  margin-top: 20px;
+}
+
+.setup .submit .next {
+  width: 150px;
+  font-size: 32px;
+}
+
+.setup .step_name {
+  display: none;
+}
+
+.setup .step_name .text_field input {
+  outline: none;
+  border: none;
+  background: var(--slate-900);
+  color: var(--text-primary);
+  font-size: 25px;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+.setup .step_kind .img {
+  background: rgb(0, 0, 0);
+  border-radius: 6px;
+  height: 160px;
+  margin: 10px 0px;
+}
+
+.setup .step_kind .kind {
+  cursor: pointer;
+  background: var(--slate-700);
+  border-radius: 8px;
+  display: inline-block;
+  width: 320px;
+  padding: 20px;
+  margin: 0px 10px;
+  height: 310px;
+  vertical-align: top;
+  border: solid 4px var(--slate-800);
+}
+
+.setup .step_kind .kind .name {
+  font-size: 30px;
+}
+
+.setup .step_kind .kind .features {
+  text-align: left;
+}
+
+.setup .step_kind .kind:hover {
+  background: var(--slate-700);
+}
+
+.setup .step_kind .kind.active {
+  border: solid 4px var(--yale-blue);
+}
+
+.footer {
+  width: 960px;
+  margin: 0px auto;
+  text-align: right;
+  color: var(--text-muted);
+  font-weight: 300;
+  padding: 20px 0px;
+  padding-top: 0px;
+}
+
+.map {
+  width: 960px;
+  height: 640px;
+  margin: 0px auto;
+  background: var(--slate-800);
+  border-radius: 6px;
+}
+
+body.state_stats .evolution {
+  display: none;
+}
+
+body.state_stats .map,
+body.state_stats .countries {
+  display: none;
+}
+
+body.state_stats .countries {
+  display: block;
+}
+
+body.state_disease .evolution {
+  display: block;
+}
+
+body.state_disease .map,
+body.state_disease .countries {
+  display: none;
+}
+
+body.state_map .evolution,
+body.state_map .countries {
+  display: none;
+}
+
+body.state_map .map {
+  display: block;
+}
+
+.wrapper {
+  width: 960px;
+  margin: 20px auto;
+}
+
+/* Yale blue reskin overrides */
+:root {
+  --yale-blue: #1d4ed8;
+  --yale-blue-hover: #2563eb;
+  --yale-blue-dark: #1e3a8a;
+  --yale-sky: #93c5fd;
+  --slate-900: #0f172a;
+  --slate-800: #0b1120;
+  --slate-700: #111827;
+  --text-primary: #e5e7eb;
+  --text-muted: #94a3b8;
+  --bar-track: #0b1120;
+}
+
+body {
+  background: var(--slate-900);
+  color: var(--text-primary);
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.container {
+  background: var(--slate-800);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.header {
+  background: var(--slate-900);
+  border-bottom: 2px solid var(--yale-blue);
+}
+
+.header .nav .tab {
+  color: var(--text-primary);
   font-weight: 700;
 }
 
-.status-win { color: var(--success); }
-.status-lose { color: var(--danger); }
-.status-warning { color: var(--warn); }
+.header .nav .tab:hover {
+  background: var(--yale-blue-hover);
+}
 
-@media (max-width: 960px) {
-  main {
-    grid-template-columns: 1fr;
-  }
+.header .nav .tab.active {
+  background: var(--yale-blue);
+  box-shadow: inset 0 -3px 0 var(--yale-blue-dark);
+}
 
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
+.header .days .value {
+  color: var(--yale-sky);
+}
 
-  .controls {
-    width: 100%;
-  }
+.header .define .disease_kind,
+.header .define .disease_name {
+  color: var(--text-muted);
+}
+
+.header .speeds .fa {
+  color: var(--text-muted);
+}
+
+.header .speeds .fa:hover {
+  color: var(--text-primary);
+}
+
+.header .speeds .fa.active {
+  color: var(--yale-sky);
+}
+
+.evolution {
+  background: var(--slate-800);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.evolution .section {
+  border-color: var(--slate-700);
+  background: var(--slate-700);
+}
+
+.evolution .title,
+.evolution .symptons .name,
+.evolution .disaese_inforamtion .averages .average .name,
+.evolution .disaese_inforamtion .stats .name {
+  color: var(--text-muted);
+}
+
+.evolution .title span {
+  background: var(--slate-700);
+}
+
+.evolution .disaese_inforamtion .averages .average .value {
+  color: var(--yale-sky);
+}
+
+.evolution .disaese_inforamtion .stats .stat .bar {
+  background: var(--bar-track);
+}
+
+.evolution .disaese_inforamtion .stats .stat .bar .pill {
+  background: #1d4ed8;
+}
+
+.button {
+  background: var(--yale-blue);
+  border-bottom: solid 3px var(--yale-blue-dark);
+  color: var(--text-primary);
+}
+
+.button:hover {
+  background: var(--yale-blue-hover);
+  border-bottom: solid 3px var(--yale-blue);
+}
+
+.button.active {
+  background: linear-gradient(90deg, var(--yale-blue-hover), var(--yale-sky));
+  border-bottom: solid 3px var(--yale-blue-dark);
+  color: var(--slate-900);
+}
+
+.countries table thead tr td,
+.countries table tbody tr.total {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.countries table tbody tr:nth-child(odd) td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.countries table .population {
+  color: var(--yale-sky);
+}
+
+.countries table .infected {
+  color: var(--yale-blue-hover);
+}
+
+.countries table .deaths {
+  color: #bfdbfe;
+}
+
+.map,
+.setup {
+  background: var(--slate-800);
+}
+
+.setup .step_kind .kind {
+  background: var(--slate-700);
+  border-color: var(--yale-blue-dark);
+}
+
+.setup .step_kind .kind:hover {
+  background: var(--slate-700);
+  border-color: var(--yale-blue);
+}
+
+.setup .step_kind .kind.active {
+  border-color: var(--yale-blue);
 }
