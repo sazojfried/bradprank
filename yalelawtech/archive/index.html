@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pandemic: Yale Edition</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Pandemic: Yale Edition</h1>
+      <p class="subtitle">Algorithm • Platform Culture • Loneliness</p>
+    </header>
+
+    <section id="controls">
+      <div class="control-group">
+        <label for="pathogenSelect">Pathogen type:</label>
+        <select id="pathogenSelect">
+          <option value="algorithm">Algorithm (Virus)</option>
+          <option value="platform">Platform Culture (Bacteria)</option>
+          <option value="loneliness">Loneliness (Parasite)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+
+      <div class="control-group">
+        <span class="label">Vectors (auto-unlock as infection grows):</span>
+        <ul class="vector-list">
+          <li><span class="vector-indicator" id="vecFootIndicator"></span> Foot-Traffic</li>
+          <li><span class="vector-indicator" id="vecDiningIndicator"></span> Dining-Hall</li>
+          <li><span class="vector-indicator" id="vecSocialIndicator"></span> Social Media</li>
+        </ul>
+      </div>
+
+      <div class="control-group stats">
+        <div>Infected colleges: <span id="infectedCount">0</span> / 11</div>
+        <div>Average infection: <span id="avgInfection">0%</span></div>
+        <div>Cure progress:</div>
+        <div class="bar">
+          <div class="bar-fill" id="cureBar"></div>
+        </div>
+        <div id="statusText"></div>
+      </div>
+    </section>
+
+    <section id="canvas-section">
+      <canvas id="mapCanvas" width="900" height="600"></canvas>
+      <div id="tooltip" class="tooltip"></div>
+    </section>
+
+    <section id="log-section">
+      <h2>News</h2>
+      <div id="newsLog"></div>
+    </section>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
+
