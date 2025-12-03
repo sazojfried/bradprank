@@ -2,64 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pandemic: Yale Edition</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div id="app">
+  <div class="app">
     <header>
-      <h1>Pandemic: Yale Edition</h1>
-      <p class="subtitle">Algorithm • Platform Culture • Loneliness</p>
-    </header>
-
-    <section id="controls">
-      <div class="control-group">
-        <label for="pathogenSelect">Pathogen type:</label>
-        <select id="pathogenSelect">
-          <option value="algorithm">Algorithm (Virus)</option>
-          <option value="platform">Platform Culture (Bacteria)</option>
-          <option value="loneliness">Loneliness (Parasite)</option>
-        </select>
+      <div>
+        <h1>Pandemic: Yale Edition</h1>
+        <p class="tagline">Lo-fi campus contagion sim inspired by Pandemic 2</p>
       </div>
-
-      <div class="control-group">
+      <div class="controls">
+        <label for="pathogenSelect">Pathogen:</label>
+        <select id="pathogenSelect">
+          <option value="algorithm">Algorithm (fast, volatile)</option>
+          <option value="platform">Platform Culture (balanced)</option>
+          <option value="loneliness">Loneliness (slow, hidden)</option>
+        </select>
         <button id="startBtn">Start</button>
         <button id="pauseBtn">Pause</button>
         <button id="resetBtn">Reset</button>
       </div>
+    </header>
 
-      <div class="control-group">
-        <span class="label">Vectors (auto-unlock as infection grows):</span>
-        <ul class="vector-list">
-          <li><span class="vector-indicator" id="vecFootIndicator"></span> Foot-Traffic</li>
-          <li><span class="vector-indicator" id="vecDiningIndicator"></span> Dining-Hall</li>
-          <li><span class="vector-indicator" id="vecSocialIndicator"></span> Social Media</li>
-        </ul>
-      </div>
-
-      <div class="control-group stats">
-        <div>Infected colleges: <span id="infectedCount">0</span> / 11</div>
-        <div>Average infection: <span id="avgInfection">0%</span></div>
-        <div>Cure progress:</div>
-        <div class="bar">
-          <div class="bar-fill" id="cureBar"></div>
+    <main>
+      <section class="sidebar">
+        <div class="stat-block">
+          <div class="stat"><span>Average Infection:</span><strong id="avgInfection">0%</strong></div>
+          <div class="stat"><span>Visible Colleges:</span><strong id="visibleCount">0 / 11</strong></div>
+          <div class="stat"><span>Pathogen Profile:</span><strong id="pathogenProfile">Algorithm</strong></div>
         </div>
-        <div id="statusText"></div>
-      </div>
-    </section>
+        <div class="cure">
+          <label for="cureBar">Cure Progress</label>
+          <div class="cure-bar" aria-label="Cure progress">
+            <div id="cureBar" class="cure-bar__fill"></div>
+          </div>
+          <div class="cure-percent" id="curePercent">0%</div>
+        </div>
+        <div class="vector-status">
+          <h3>Vectors</h3>
+          <ul>
+            <li><span>Foot-Traffic:</span> <strong id="footStatus">Locked</strong></li>
+            <li><span>Dining Halls:</span> <strong id="diningStatus">Locked</strong></li>
+            <li><span>Social Media:</span> <strong id="socialStatus">Active</strong></li>
+          </ul>
+        </div>
+        <div class="legend">
+          <h3>Legend</h3>
+          <div class="legend-item"><span class="dot low"></span>Low infection</div>
+          <div class="legend-item"><span class="dot mid"></span>Growing</div>
+          <div class="legend-item"><span class="dot high"></span>Critical</div>
+        </div>
+      </section>
 
-    <section id="canvas-section">
-      <canvas id="mapCanvas" width="900" height="600"></canvas>
-      <div id="tooltip" class="tooltip"></div>
-    </section>
+      <section class="canvas-wrap">
+        <canvas id="map" width="900" height="600" aria-label="Yale campus map"></canvas>
+        <div id="tooltip" class="tooltip" role="status" aria-live="polite"></div>
+      </section>
+    </main>
 
-    <section id="log-section">
-      <h2>News</h2>
-      <div id="newsLog"></div>
+    <section class="log-section">
+      <h2>News Feed</h2>
+      <div id="log" class="log" aria-live="polite"></div>
     </section>
   </div>
-
-  <script src="main.js"></script>
+  <script src="game.js"></script>
 </body>
 </html>
-
