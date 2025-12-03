@@ -1,0 +1,101 @@
+.button
+  :color rgb(255,255,255)
+  :background rgb(150,150,150)
+  :border-bottom solid 3px rgb(100,100,100)
+  +border-radius(3px)
+  :font-size 16px
+  :cursor pointer
+  :padding 5px
+  :display inline-block
+  :text-align center
+  :margin
+    :bottom 5px
+  &:hover
+    :background rgb(200,150,150)
+    :border-bottom solid 3px rgb(200,100,100)
+  &.active
+    :background rgb(200,0,0)
+    :border-bottom solid 3px rgb(160,0,0)
+.evolution
+  :background rgb(50,50,50)
+  +border-radius(6px)
+  :padding 20px
+  :font-size 13px
+  .section
+    :position relative
+    :border solid 3px rgb(40,40,40)
+    +border-radius(6px)
+    :padding 15px
+      :top 20px
+    :margin
+      :bottom 20px
+    :min-height 100px
+  .title
+    :color rgb(100,100,100)
+    :font-size 13px
+    :text-align center
+    :position absolute
+    :width 100%
+    :top -13px
+    :left 0
+    span
+      :background rgb(50,50,50)
+      :padding 0px 5px
+  .symptons
+    :text-align center
+    .name
+      :display inline-block
+      :color rgb(100,100,100)
+    .button
+      :width 150px
+      :margin
+        :left 10px
+  .resistance
+    :width 450px
+    :float left
+    .button
+      :width 96px
+      :margin 2px
+  .transmission
+    :margin 20px
+      :top 0px
+    :width 140px
+    :float left
+    .button 
+      :width 100%
+  .traits
+    :width 140px
+    :float left
+  .disaese_inforamtion
+    .averages
+      :text-align center
+      .average
+        :display inline-block
+        :width 200px
+        :margin 20px 10px
+        :font-size 16px
+        .value 
+          :color rgb(255,255,0)
+    .stats
+      :text-align center
+      .stat
+        :display inline-block
+        :width 200px
+        :margin 0px 10px
+        .name
+          :font-size 18px
+          :font-weight 300
+          :margin
+            :bottom 5px
+        .bar
+          :position relative
+          :background rgb(100,100,100)
+          :height 15px
+          :width 100%
+          +border-radius(5px)
+          .pill
+            :position absolute
+            //:width 50%
+            :background rgb(200,50,50)
+            :height 15px
+            +border-radius(5px)

@@ -1,0 +1,46 @@
+.header
+  :position relative
+  :background rgb(30,30,30)
+  :height 50px
+  .nav
+    :margin
+      :left 20px
+    .tab
+      :padding 0px 20px
+        :top 15px
+      :height 50px
+      :cursor pointer
+      :float left
+      &:hover
+        :background rgb(50,50,50)
+      &.active
+        :background rgb(200,50,50)
+  .days
+    :float left
+    :padding
+      :top 15px
+    :margin
+      :left 20px
+    .value
+      :color rgb(255,255,0)
+  .define
+    :float left
+    :padding
+      :top 15px
+    :margin
+      :left 20px
+    .disease_kind
+      :color rgb(150,150,150)
+  .speeds
+    :position absolute
+    :top 10px
+    :right 10px
+    :font-size 20px
+    .fa
+      :margin 0px 10px
+      :cursor pointer
+      :color rgb(100,100,100)
+      &:hover
+        :color rgb(255,255,255)
+      &.active
+        :color rgb(255,255,0)

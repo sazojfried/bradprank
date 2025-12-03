@@ -1,0 +1,56 @@
+.setup
+  :width 100%
+  :height 100%
+  :background rgb(50,50,50)
+  :position fixed
+  :top 0
+  :left 0
+  :text-align center
+  :padding
+    :top 40px
+  .heading
+    :font-size 42px
+    :padding
+      :bottom 20px
+  .submit
+    :margin
+      :top 20px
+    .next
+      :width 150px
+      :font-size 32px
+  .step_name
+    :display none
+    .text_field
+      input
+        :outline none
+        :border none
+        :background rgb(0,0,0)
+        :color rgb(255,255,0)
+        :font-size 25px
+        :padding 8px
+        +border-radius(6px)
+  .step_kind
+    .img
+      :background rgb(0,0,0)
+      +border-radius(6px)
+      :height 160px
+      :margin 10px 0px
+    .kind
+      :cursor pointer
+      :background rgb(100,100,100)
+      +border-radius(8px)
+      :display inline-block
+      :width 320px
+      :padding 20px
+      :margin 0px 10px
+      :height 310px
+      :vertical-align top
+      :border solid 4px rgb(70,70,70)
+      .name
+        :font-size 30px
+      .features
+        :text-align left
+      &:hover
+        :background rgb(130,130,130)
+      &.active
+        :border solid 4px rgb(255,255,0)

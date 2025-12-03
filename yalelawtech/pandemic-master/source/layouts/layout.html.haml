@@ -1,0 +1,22 @@
+!!!
+%html
+  %head
+    %title Pandemic
+    %meta{content: "text/html; charset=US-ASCII", "http-equiv" => "content-type"}/
+    %link{href: "http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", rel: "stylesheet"}/
+    %link{href: "http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700", rel: "stylesheet", type: "text/css"}/
+    %link{href: "/favicon.ico", rel: "shortcut icon", type: "image/x-icon"}/
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    %title= current_page.data.title || 'Monsterbox Productions'
+    = stylesheet_link_tag 'normalize', 'all'
+  %body.state_disease{ class: "#{page_classes}" }
+    .container
+      = partial 'header'
+      .wrapper
+        .content= yield
+      .footer_wrap
+        .footer
+          %p &copy; Pandemic
+    <script src="http://codeorigin.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="http://codeorigin.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+    = javascript_include_tag  'all'
