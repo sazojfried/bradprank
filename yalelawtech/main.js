@@ -1,303 +1,291 @@
-const archetypes = {
-  algorithm: { name: 'Algorithm', reach: 14, burnout: 6, visibility: 10, resilience: 4, news: 'Algorithm detected in endless scroll loops.' },
-  platform: { name: 'Platform Culture', reach: 11, burnout: 7, visibility: 7, resilience: 6, news: 'Platform norms quietly reshape campus routines.' },
-  loneliness: { name: 'Loneliness', reach: 9, burnout: 5, visibility: 5, resilience: 8, news: 'Loneliness creeps through empty lounges.' }
-};
+// Super simple Yale contagion viz
+const canvas = document.getElementById("mapCanvas");
+const ctx = canvas.getContext("2d");
+const tooltip = document.getElementById("tooltip");
 
+const pathogenSelect = document.getElementById("pathogenSelect");
+const startBtn = document.getElementById("startBtn");
+const resetBtn = document.getElementById("resetBtn");
+const infectedCountEl = document.getElementById("infectedCount");
+const avgInfectionEl = document.getElementById("avgInfection");
+const spreadBar = document.getElementById("spreadBar");
+const statusText = document.getElementById("statusText");
+const pathogenNameEl = document.getElementById("pathogenName");
+
+const WIDTH = canvas.width;
+const HEIGHT = canvas.height;
+let running = false;
+let lastTime = 0;
+
+// Hard-coded node layout (rough campus shape)
 const colleges = [
-  { name: 'Branford / Saybrook', population: 1200 },
-  { name: 'Trumbull', population: 1200 },
-  { name: 'Hopper', population: 1200 },
-  { name: 'Jonathan Edwards', population: 1200 },
-  { name: 'Davenport', population: 1200 },
-  { name: 'Pierson', population: 1200 },
-  { name: 'Berkeley', population: 1200 },
-  { name: 'Timothy Dwight', population: 1200 },
-  { name: 'Silliman', population: 1200 },
-  { name: 'Morse / Stiles', population: 1200 },
-  { name: 'Franklin / Murray', population: 1200 }
+  { id: 1, name: "Branford/Saybrook", short: "Branford", x: 260, y: 320, neighbors: [2, 3, 5] },
+  { id: 2, name: "Trumbull",          short: "Trumbull", x: 220, y: 280, neighbors: [1, 4] },
+  { id: 3, name: "Hopper",            short: "Hopper",   x: 290, y: 360, neighbors: [1, 5, 6] },
+  { id: 4, name: "Jonathan Edwards",  short: "JE",       x: 230, y: 330, neighbors: [2, 1] },
+  { id: 5, name: "Davenport",         short: "Davenport",x: 330, y: 340, neighbors: [1, 3, 6, 9] },
+  { id: 6, name: "Pierson",           short: "Pierson",  x: 360, y: 360, neighbors: [3, 5, 9] },
+  { id: 7, name: "Berkeley",          short: "Berkeley", x: 430, y: 300, neighbors: [8, 9, 10] },
+  { id: 8, name: "Timothy Dwight",    short: "Timothy",  x: 470, y: 260, neighbors: [7, 9] },
+  { id: 9, name: "Silliman",          short: "Silliman", x: 400, y: 330, neighbors: [5, 6, 7, 10] },
+  { id: 10,name: "Morse/Stiles",      short: "Morse",    x: 430, y: 380, neighbors: [7, 9] },
+  { id: 11,name: "Franklin/Murray",   short: "Franklin", x: 700, y: 300, neighbors: [] } // remote
 ];
 
-const upgradeGroups = {
-  symptoms: [
-    { id: 'doomscroll', name: 'Doomscrolling', cost: 4, effect: { reach: 2, visibility: 1 }, desc: 'Higher reach via constant feeds.' },
-    { id: 'notif', name: 'Notification Checking', cost: 5, effect: { reach: 2, burnout: 1 }, desc: 'Micro-spikes of attention capture.' },
-    { id: 'lateNight', name: 'Late-night Insomnia', cost: 6, effect: { reach: 3, burnout: 2 }, desc: 'Nighttime spread accelerates growth.' },
-    { id: 'ghosting', name: 'Ghosting & Benching', cost: 6, effect: { visibility: 2, reach: 1 }, desc: 'Social withdrawal increases stealth.' },
-    { id: 'overshare', name: 'Oversharing Regret', cost: 7, effect: { burnout: 2, visibility: 3 }, desc: 'Visible spirals raise cure response.' }
-  ],
-  resilience: [
-    { id: 'distance1', name: 'Distance I', cost: 3, effect: { resilience: 2 }, desc: 'Small buffers against burnout.' },
-    { id: 'architecture1', name: 'Architecture I', cost: 4, effect: { resilience: 2, reach: -1 }, desc: 'Maze-like dorms slow spread but protect morale.' },
-    { id: 'cohesion1', name: 'Cohesion I', cost: 4, effect: { resilience: 3 }, desc: 'Peer support dampens burnout.' },
-    { id: 'policy1', name: 'Policy I', cost: 5, effect: { resilience: 2, visibility: -1 }, desc: 'Quiet guardrails reduce how visible the pathogen is.' }
-  ],
-  transmission: [
-    { id: 'foot', name: 'Foot-Traffic', cost: 5, effect: { reach: 2 }, vector: 'foot', desc: 'Unlock walking routes between colleges.' },
-    { id: 'dining', name: 'Dining Hall', cost: 6, effect: { reach: 3 }, vector: 'dining', desc: 'Enable shared meal-time spread.' },
-    { id: 'social', name: 'Social Media', cost: 3, effect: { reach: 1, visibility: 1 }, vector: 'social', desc: 'Always on but improves with upgrades.' }
-  ]
-};
+// Per-college infection state
+let infection = colleges.map(() => 0); // 0..1
 
-const state = {
-  pathogenName: 'Sickanitus',
-  archetype: archetypes.algorithm,
-  evolutionPoints: 12,
-  day: 0,
-  running: false,
-  interval: null,
-  cureProgress: 0,
-  stats: { reach: 12, burnout: 6, visibility: 8, resilience: 5 },
-  purchased: new Set(),
-  vectors: { foot: false, dining: false, social: true },
-  colleges: []
-};
-
-const ui = {
-  pathogenInput: document.getElementById('pathogenInput'),
-  archetypeSelect: document.getElementById('archetypeSelect'),
-  pathogenName: document.getElementById('pathogenName'),
-  evoPoints: document.getElementById('evoPoints'),
-  dayCount: document.getElementById('dayCount'),
-  reachVal: document.getElementById('reachVal'),
-  burnoutVal: document.getElementById('burnoutVal'),
-  visibilityVal: document.getElementById('visibilityVal'),
-  resilienceVal: document.getElementById('resilienceVal'),
-  reachBar: document.getElementById('reachBar'),
-  burnoutBar: document.getElementById('burnoutBar'),
-  visibilityBar: document.getElementById('visibilityBar'),
-  resilienceBar: document.getElementById('resilienceBar'),
-  vectorFoot: document.getElementById('vectorFoot'),
-  vectorDining: document.getElementById('vectorDining'),
-  vectorSocial: document.getElementById('vectorSocial'),
-  newsLog: document.getElementById('newsLog'),
-  curePercent: document.getElementById('curePercent'),
-  collegeTable: document.getElementById('collegeTable'),
-  simStatus: document.getElementById('simStatus'),
-  buttons: {
-    start: document.getElementById('startBtn'),
-    pause: document.getElementById('pauseBtn'),
-    reset: document.getElementById('resetBtn')
+// Pathogen presets – deliberately simple
+const pathogenConfigs = {
+  algorithm: {
+    label: "Algorithm",
+    internalGrowth: 0.024,
+    edgeSpreadBase: 0.023,
+    socialSpreadBase: 0.02
   },
-  lists: {
-    symptoms: document.getElementById('symptomList'),
-    resilience: document.getElementById('resilienceList'),
-    transmission: document.getElementById('transmissionList')
+  platform: {
+    label: "Platform Culture",
+    internalGrowth: 0.017,
+    edgeSpreadBase: 0.017,
+    socialSpreadBase: 0.015
+  },
+  loneliness: {
+    label: "Loneliness",
+    internalGrowth: 0.011,
+    edgeSpreadBase: 0.010,
+    socialSpreadBase: 0.012
   }
 };
 
-function resetState() {
-  state.purchased = new Set();
-  state.evolutionPoints = 12;
-  state.day = 0;
-  state.cureProgress = 0;
-  state.stats = { ...state.archetype };
-  delete state.stats.name;
-  delete state.stats.news;
-  state.vectors = { foot: false, dining: false, social: true };
-  state.colleges = colleges.map((c, idx) => ({ ...c, infected: idx === 0 ? 0.15 : 0, burnout: 0 }));
-  log(`${state.archetype.name} chosen. ${state.archetype.news}`);
-  renderAll();
+let currentConfig = pathogenConfigs.algorithm;
+
+// Seed infection in one or two starting colleges
+function seedInfection() {
+  infection = colleges.map(() => 0);
+  const type = pathogenSelect.value;
+  currentConfig = pathogenConfigs[type];
+  pathogenNameEl.textContent = currentConfig.label;
+
+  if (type === "algorithm") {
+    // dense hotspot
+    setInfectionByName("Silliman", 0.35);
+  } else if (type === "platform") {
+    // social/nightlife hub
+    setInfectionByName("Hopper", 0.35);
+  } else {
+    // remote + isolated
+    setInfectionByName("Franklin/Murray", 0.35);
+  }
 }
 
-function applyArchetype(key) {
-  state.archetype = archetypes[key];
-  ui.pathogenName.textContent = state.archetype.name;
-  resetState();
+function setInfectionByName(name, value) {
+  const idx = colleges.findIndex((c) => c.name === name);
+  if (idx >= 0) infection[idx] = value;
 }
 
-function renderAll() {
-  ui.pathogenName.textContent = state.archetype.name;
-  ui.evoPoints.textContent = state.evolutionPoints.toFixed(0);
-  ui.dayCount.textContent = state.day;
-  ui.curePercent.textContent = `${state.cureProgress.toFixed(0)}%`;
+// Spread logic – very light
+function step(dt) {
+  if (!running) return;
 
-  const { reach, burnout, visibility, resilience } = state.stats;
-  ui.reachVal.textContent = reach.toFixed(0);
-  ui.burnoutVal.textContent = burnout.toFixed(0);
-  ui.visibilityVal.textContent = visibility.toFixed(0);
-  ui.resilienceVal.textContent = resilience.toFixed(0);
+  const cfg = currentConfig;
 
-  ui.reachBar.style.width = `${Math.min(100, reach * 3)}%`;
-  ui.burnoutBar.style.width = `${Math.min(100, burnout * 3)}%`;
-  ui.visibilityBar.style.width = `${Math.min(100, visibility * 3)}%`;
-  ui.resilienceBar.style.width = `${Math.min(100, resilience * 3)}%`;
+  // copy for simultaneous update
+  const next = infection.slice();
 
-  updateVectorPills();
-  renderUpgrades();
-  renderTable();
-  updateStatus();
-}
+  colleges.forEach((col, i) => {
+    const level = infection[i];
+    if (level <= 0) return;
 
-function updateVectorPills() {
-  [['vectorFoot', 'foot'], ['vectorDining', 'dining'], ['vectorSocial', 'social']].forEach(([key, vector]) => {
-    const pill = ui[key];
-    const active = state.vectors[vector];
-    pill.classList.toggle('active', active);
-    pill.textContent = `${pill.textContent.split(':')[0]}: ${active ? 'Online' : 'Offline'}`;
-  });
-}
+    // Internal growth
+    next[i] = Math.min(1, next[i] + cfg.internalGrowth * dt);
 
-function log(message) {
-  const el = document.createElement('div');
-  el.className = 'log-item';
-  const dayLabel = `Day ${state.day}`;
-  el.innerHTML = `<strong>${dayLabel}:</strong> ${message}`;
-  ui.newsLog.prepend(el);
-  const maxItems = 80;
-  while (ui.newsLog.children.length > maxItems) ui.newsLog.removeChild(ui.newsLog.lastChild);
-}
+    // Spread along foot-traffic edges
+    col.neighbors.forEach((nid) => {
+      const j = colleges.findIndex((c) => c.id === nid);
+      if (j === -1) return;
 
-function renderUpgrades() {
-  ['symptoms', 'resilience', 'transmission'].forEach((groupKey) => {
-    const container = ui.lists[groupKey];
-    container.innerHTML = '';
-    upgradeGroups[groupKey].forEach((up) => {
-      const card = document.createElement('div');
-      card.className = 'upgrade-card';
-      const purchased = state.purchased.has(up.id);
-      card.innerHTML = `
-        <div class="upgrade-meta">
-          <h3>${up.name}</h3>
-          <span class="badge cost">-${up.cost} EP</span>
-        </div>
-        <p>${up.desc}</p>
-        <p class="label">Impact: ${formatEffect(up.effect)}</p>
-        <button ${purchased ? 'disabled' : ''} class="${purchased ? 'purchased' : ''}" data-upgrade="${up.id}">
-          ${purchased ? 'Purchased' : 'Buy Upgrade'}
-        </button>
-      `;
-      container.appendChild(card);
+      const prob = cfg.edgeSpreadBase * level * dt;
+      if (Math.random() < prob) {
+        next[j] = Math.min(1, next[j] + 0.04);
+      }
+    });
+
+    // Social media spread – low chance to all
+    const socialProb = cfg.socialSpreadBase * level * dt;
+    colleges.forEach((other, j) => {
+      if (j === i) return;
+      if (Math.random() < socialProb * 0.15) {
+        next[j] = Math.min(1, next[j] + 0.02);
+      }
     });
   });
+
+  infection = next;
 }
 
-function formatEffect(effect) {
-  const parts = [];
-  Object.entries(effect).forEach(([key, val]) => {
-    const label = key === 'reach' ? 'Reach' : key === 'burnout' ? 'Burnout' : key === 'visibility' ? 'Visibility' : 'Resilience';
-    const prefix = val >= 0 ? '+' : '';
-    parts.push(`${prefix}${val} ${label}`);
-  });
-  return parts.join(' · ');
-}
+// Rendering
 
-function renderTable() {
-  ui.collegeTable.innerHTML = '';
-  state.colleges.forEach((c) => {
-    const row = document.createElement('tr');
-    const infectedPct = (c.infected * 100).toFixed(1);
-    const burnoutPct = (c.burnout * 100).toFixed(1);
-    row.innerHTML = `
-      <td>${c.name}</td>
-      <td>${c.population}</td>
-      <td><div class="progress-chip"><span style="--fill:${Math.min(100, infectedPct)}%"></span>${infectedPct}%</div></td>
-      <td><div class="progress-chip"><span style="--fill:${Math.min(100, burnoutPct)}%"></span>${burnoutPct}%</div></td>
-    `;
-    ui.collegeTable.appendChild(row);
-  });
-}
+function draw() {
+  ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-function handleUpgrade(id) {
-  const upgrade = Object.values(upgradeGroups).flat().find((u) => u.id === id);
-  if (!upgrade || state.purchased.has(id)) return;
-  if (state.evolutionPoints < upgrade.cost) {
-    log(`Not enough evolution points for ${upgrade.name}.`);
-    return;
-  }
+  // Background halo
+  const grad = ctx.createRadialGradient(
+    WIDTH * 0.4,
+    HEIGHT * 0.4,
+    80,
+    WIDTH * 0.4,
+    HEIGHT * 0.4,
+    420
+  );
+  grad.addColorStop(0, "#020617");
+  grad.addColorStop(1, "#020617");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-  state.evolutionPoints -= upgrade.cost;
-  state.purchased.add(id);
-  Object.entries(upgrade.effect).forEach(([key, val]) => {
-    state.stats[key] = Math.max(0, state.stats[key] + val);
-  });
-  if (upgrade.vector) state.vectors[upgrade.vector] = true;
-  log(`${upgrade.name} unlocked.`);
-  renderAll();
-}
-
-function tick() {
-  state.day += 1;
-  const infectionGain = Math.max(0.003, state.stats.reach * 0.0006);
-  const burnoutGain = Math.max(0.001, (state.stats.burnout - state.stats.resilience * 0.4) * 0.0006);
-  const cureGain = Math.max(0.1, state.stats.visibility * 0.12);
-
-  state.colleges.forEach((c) => {
-    const spreadBoost = (state.vectors.foot ? 1.15 : 1) + (state.vectors.dining ? 0.15 : 0) + (state.vectors.social ? 0.2 : 0);
-    c.infected = Math.min(1, c.infected + infectionGain * spreadBoost);
-    c.burnout = Math.min(1, c.burnout + Math.max(0, burnoutGain));
+  // Edges
+  ctx.lineWidth = 1.1;
+  ctx.strokeStyle = "#475569";
+  colleges.forEach((c) => {
+    c.neighbors.forEach((nid) => {
+      const n = colleges.find((cc) => cc.id === nid);
+      if (!n) return;
+      ctx.beginPath();
+      ctx.moveTo(c.x, c.y);
+      ctx.lineTo(n.x, n.y);
+      ctx.stroke();
+    });
   });
 
-  // unlock vectors as campuses heat up
-  const avgInfection = state.colleges.reduce((a, c) => a + c.infected, 0) / state.colleges.length;
-  if (avgInfection > 0.25) state.vectors.foot = true;
-  if (avgInfection > 0.55) state.vectors.dining = true;
+  // Nodes
+  colleges.forEach((c, i) => {
+    const level = infection[i]; // 0..1
+    const r = 20;
 
-  // evolution points
-  const pointsEarned = 1 + Math.floor(avgInfection * 10);
-  state.evolutionPoints += pointsEarned;
+    // Glow
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, r + 6, 0, Math.PI * 2);
+    const glowAlpha = 0.2 + level * 0.4;
+    ctx.fillStyle = `rgba(248, 113, 113, ${glowAlpha})`;
+    ctx.fill();
+    ctx.restore();
 
-  // cure advances
-  state.cureProgress = Math.min(100, state.cureProgress + cureGain * (state.stats.visibility / 10));
+    // Circle fill – cool → warm
+    const t = level;
+    const rCol = Math.round(56 + t * 180);
+    const gCol = Math.round(189 - t * 90);
+    const bCol = Math.round(248 - t * 140);
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgb(${rCol}, ${gCol}, ${bCol})`;
+    ctx.fill();
 
-  renderAll();
-  checkEndgame();
+    // Border
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#e5e7eb";
+    ctx.stroke();
+
+    // Short label above
+    ctx.font = "10px system-ui";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillStyle = "#e5e7eb";
+    ctx.fillText(c.short, c.x, c.y - r - 4);
+
+    // Percentage inside
+    if (level > 0.01) {
+      ctx.font = "9px system-ui";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#facc15";
+      ctx.fillText(`${Math.round(level * 100)}%`, c.x, c.y + 1);
+    }
+  });
+
+  updateStats();
 }
 
-function checkEndgame() {
-  const allInfected = state.colleges.every((c) => c.infected >= 0.98);
-  if (allInfected) {
-    log('Every college transformed. You win!');
-    stopSimulation();
-    ui.simStatus.textContent = 'Victory';
-    return;
-  }
-  if (state.cureProgress >= 100) {
-    log('Cure reached 100%. Campus resists the pathogen.');
-    stopSimulation();
-    ui.simStatus.textContent = 'Cured';
-  }
-}
+// Stats / UI
 
-function startSimulation() {
-  if (state.running) return;
-  state.running = true;
-  ui.simStatus.textContent = 'Running';
-  ui.simStatus.className = 'status status--running';
-  state.interval = setInterval(tick, 800);
-}
+function updateStats() {
+  const infectedCount = infection.filter((v) => v > 0.01).length;
+  infectedCountEl.textContent = infectedCount.toString();
 
-function stopSimulation() {
-  state.running = false;
-  ui.simStatus.className = 'status status--paused';
-  clearInterval(state.interval);
-}
+  const avg =
+    infection.reduce((sum, v) => sum + v, 0) / infection.length || 0;
+  avgInfectionEl.textContent = `${Math.round(avg * 100)}%`;
+  spreadBar.style.width = `${Math.round(avg * 100)}%`;
 
-function resetSimulation() {
-  clearInterval(state.interval);
-  state.running = false;
-  ui.simStatus.className = 'status status--idle';
-  resetState();
-}
-
-function updateStatus() {
-  if (!state.running && state.cureProgress === 0 && state.day === 0) {
-    ui.simStatus.textContent = 'Idle';
-    ui.simStatus.className = 'status status--idle';
+  if (!running) return;
+  if (infection.every((v) => v >= 0.98)) {
+    statusText.textContent = "All colleges saturated. Simulation complete.";
+    running = false;
+  } else {
+    statusText.textContent = "Infection spreading across campus…";
   }
 }
 
-ui.archetypeSelect.addEventListener('change', (e) => applyArchetype(e.target.value));
-ui.pathogenInput.addEventListener('input', (e) => state.pathogenName = e.target.value);
-ui.buttons.start.addEventListener('click', startSimulation);
-ui.buttons.pause.addEventListener('click', stopSimulation);
-ui.buttons.reset.addEventListener('click', resetSimulation);
+// Animation loop
 
-ui.pageListener = document.body;
-ui.pageListener.addEventListener('click', (e) => {
-  const btn = e.target.closest('button[data-upgrade]');
-  if (btn) handleUpgrade(btn.dataset.upgrade);
+function loop(timestamp) {
+  const dt = lastTime ? (timestamp - lastTime) / 1000 : 0;
+  lastTime = timestamp;
+
+  if (running) {
+    step(dt);
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// Tooltip hit detection
+
+canvas.addEventListener("mousemove", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  let found = null;
+  colleges.forEach((c, i) => {
+    const dx = mx - c.x;
+    const dy = my - c.y;
+    if (Math.sqrt(dx * dx + dy * dy) <= 20) {
+      found = { college: c, value: infection[i] };
+    }
+  });
+
+  if (found) {
+    tooltip.style.display = "block";
+    tooltip.style.left = `${mx + 14}px`;
+    tooltip.style.top = `${my + 10}px`;
+    tooltip.textContent = `${found.college.name}: ${Math.round(
+      found.value * 100
+    )}%`;
+  } else {
+    tooltip.style.display = "none";
+  }
 });
 
-resetState();
-renderAll();
+canvas.addEventListener("mouseleave", () => {
+  tooltip.style.display = "none";
+});
+
+// Controls
+
+startBtn.addEventListener("click", () => {
+  seedInfection();
+  running = true;
+  statusText.textContent = "Infection spreading across campus…";
+});
+
+resetBtn.addEventListener("click", () => {
+  infection = colleges.map(() => 0);
+  running = false;
+  lastTime = 0;
+  statusText.textContent = "Click Start to seed the outbreak.";
+  draw();
+});
+
+// Init
+seedInfection();
+draw();
+requestAnimationFrame(loop);
