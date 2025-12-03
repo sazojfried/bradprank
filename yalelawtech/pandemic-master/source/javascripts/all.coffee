@@ -249,17 +249,17 @@ render_map = ->
       highlightOnHover: false
     data: data
     fills:
-      defaultFill : '#FFFFFF'
-      10          : '#FFDFDF'
-      20          : '#FFBEBE'
-      30          : '#FF8181'
-      40          : '#FF5F5F'
-      50          : '#FF3D3D'
-      60          : '#FF0000'
-      70          : '#C10000'
-      80          : '#910000'
-      90          : '#450000'
-      100         : '#000000'
+      defaultFill : '#0f172a'
+      10          : '#e0f2fe'
+      20          : '#bfdbfe'
+      30          : '#93c5fd'
+      40          : '#60a5fa'
+      50          : '#3b82f6'
+      60          : '#2563eb'
+      70          : '#1d4ed8'
+      80          : '#1e40af'
+      90          : '#1e3a8a'
+      100         : '#020617'
   $('.map').html('').datamaps map_options
 
 data = {}

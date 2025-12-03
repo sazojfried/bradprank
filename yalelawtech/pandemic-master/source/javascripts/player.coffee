@@ -4,9 +4,9 @@ window.Player =
   disease_kind: 1
   disease_kind_name: ->
     switch window.Player.disease_kind
-      when 1 then 'Virus'
-      when 2 then 'Bacteria'
-      when 3 then 'Parasite'
+      when 1 then 'Algorithm'
+      when 2 then 'Platform Culture'
+      when 3 then 'Loneliness'
   lethality:
     cur : 0
     max : 20
