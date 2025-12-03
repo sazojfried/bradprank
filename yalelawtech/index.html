@@ -1,258 +1,141 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <title>Pandemic</title>
-  <meta http-equiv="content-type" content="text/html; charset=US-ASCII" />
-  <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" />
-  <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700" rel="stylesheet" type="text/css" />
-  <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
-  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pandemic: Yale Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="state_disease">
-  <div class="container">
-    <div class="header">
-      <div class="nav">
-        <div class="tab tab_disease active">Pathogen</div>
-        <div class="tab tab_stats">Stats</div>
-        <div class="tab tab_map">Map</div>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Campus Simulation</p>
+        <h1>Pandemic: Yale Edition</h1>
+        <p class="lede">Shape a campus-wide social contagion. Spend evolution points to unlock upgrades, spread faster, or resist burnout.</p>
       </div>
-      <div class="define">
-        <span class="disease_kind"></span>
-        <span class="disease_name"></span>
-      </div>
-      <div class="days">
-        <span class="value">0</span>
-        <span class="name">Days Since Infection</span>
-      </div>
-      <div class="speeds">
-        <div class="fa fa-pause"></div>
-        <div class="fa fa-play active"></div>
-        <div class="fa fa-forward"></div>
-      </div>
-    </div>
-    <div class="wrapper">
-      <div class="content">
-        <div class="win_game">
-          <div class="screen">
-            Every college is transformed.
-            You win!
-          </div>
+      <div class="hero__meta">
+        <div>
+          <p class="label">Days Running</p>
+          <p class="metric"><span id="dayCount">0</span></p>
         </div>
-        <div class="evolution">
-          <div class="section disaese_inforamtion">
-            <div class="title">
-              <span>Pathogen Information</span>
-            </div>
-            <div class="averages">
-              <div class="average evolution_points">
-                <span class="value">0</span>
-                <span class="name">Evolution Points</span>
-              </div>
-              <div class="average infections">
-                <span class="value">0</span>
-                <span class="name">Average new cases a day</span>
-              </div>
-              <div class="average deaths">
-                <span class="value">0</span>
-                <span class="name">Average burnout a day</span>
-              </div>
-            </div>
-            <div class="stats">
-              <div class="stat lethality">
-                <div class="name">Burnout</div>
-                <div class="bar">
-                  <div class="pill"></div>
-                </div>
-              </div>
-              <div class="stat infectivity">
-                <div class="name">Reach</div>
-                <div class="bar">
-                  <div class="pill"></div>
-                </div>
-              </div>
-              <div class="stat visibility">
-                <div class="name">Visibility</div>
-                <div class="bar">
-                  <div class="pill"></div>
-                </div>
-              </div>
-              <div class="clear"></div>
-            </div>
-          </div>
-          <div class="section symptons">
-            <div class="title">
-              <span>Effects</span>
-            </div>
-            <div class="tier">
-              <div class="name">Tier 1</div>
-              <div class="button sneezing">Doomscrolling</div>
-              <div class="button coughing">Constant notification checking</div>
-              <div class="button fever">Checking TikTok in lecture</div>
-              <div class="button sweating">Scrolling through meals</div>
-              <div class="button vomiting">Late-night screen insomnia</div>
-            </div>
-            <div class="tier">
-              <div class="name">Tier 2</div>
-              <div class="button fatigue">Canceling plans at the last minute</div>
-              <div class="button diarreha">Leaving texts on read</div>
-              <div class="button nausea">Ghosting and benching</div>
-              <div class="button puloneary_edma">Opening apps before saying hello</div>
-              <div class="button dementia">Forgetting in-person conversations</div>
-            </div>
-            <div class="tier">
-              <div class="name">Tier 3</div>
-              <div class="button hypersensitivity">Checking notifications every few minutes</div>
-              <div class="button ataxia">Double-screening during events</div>
-              <div class="button kidney_failure">Endless For You Page loops</div>
-              <div class="button depression">Doomy compare-and-despair scrolling</div>
-              <div class="button hemorhaging">Oversharing online then regretting it</div>
-            </div>
-            <div class="tier">
-              <div class="name">Tier 4</div>
-              <div class="button liver_failure">Staying inside all weekend</div>
-              <div class="button heart_failure">Feeling disconnected from suitemates</div>
-              <div class="button blindness">Ignoring people right next to you</div>
-              <div class="button hypotonia">Muting group chats instead of showing up</div>
-              <div class="button encephalitis">Total social burnout</div>
-            </div>
-          </div>
-          <div class="section resistance">
-            <div class="title">
-              <span>Resilience</span>
-            </div>
-            <div class="tier">
-              <div class="button">Distance I</div>
-              <div class="button">Architecture I</div>
-              <div class="button">Cohesion I</div>
-              <div class="button">Policy I</div>
-            </div>
-            <div class="tier2">
-              <div class="button">Distance II</div>
-              <div class="button">Architecture II</div>
-              <div class="button">Cohesion II</div>
-              <div class="button">Policy II</div>
-            </div>
-            <div class="tier3">
-              <div class="button">Distance III</div>
-              <div class="button">Architecture III</div>
-              <div class="button">Cohesion III</div>
-              <div class="button">Policy III</div>
-            </div>
-            <div class="tier4">
-              <div class="button">Distance IV</div>
-              <div class="button">Architecture IV</div>
-              <div class="button">Cohesion IV</div>
-              <div class="button">Policy IV</div>
-            </div>
-          </div>
-          <div class="section transmission">
-            <div class="title">
-              <span>Spread Channels</span>
-            </div>
-            <div class="button">Foot-Traffic</div>
-            <div class="button">Dining Hall</div>
-            <div class="button">Social Media</div>
-            <div class="button">Events</div>
-          </div>
-          <div class="section traits">
-            <div class="title">
-              <span>Traits</span>
-            </div>
-          </div>
-          <div class="clear"></div>
-        </div>
-        <div class="countries">
-          <div class="paginate">
-            <span class="cur">1</span>
-            / 9
-            <div class="fa fa-chevron-circle-up"></div>
-            <div class="fa fa-chevron-circle-down"></div>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <td class="name">College</td>
-                <td class="population">Students</td>
-                <td class="infected">Infected</td>
-                <td class="deaths">Burnout</td>
-                <td class="extra" colspan="7"></td>
-              </tr>
-              <tr class="total">
-                <td class="name">Total</td>
-                <td class="population"></td>
-                <td class="infected"></td>
-                <td class="deaths"></td>
-                <td class="airport"></td>
-                <td class="hospital"></td>
-                <td class="shipyard"></td>
-                <td class="transit"></td>
-                <td class="border"></td>
-                <td class="school"></td>
-                <td></td>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="clear"></div>
-        <div class="map" id="map"></div>
-        <div class="setup">
-          <div class="step_kind">
-            <div class="heading">Select a Kind of Pathogen</div>
-            <div class="choose_kind">
-              <div class="kind active" kind="1">
-                <div class="name">Algorithm</div>
-                <div class="img"></div>
-                <div class="features">
-                  <div class="feature">Fastest spread across feeds</div>
-                  <div class="feature">Most shaped by the environment</div>
-                  <div class="feature">Bonus to infectivity</div>
-                </div>
-              </div>
-              <div class="kind" kind="2">
-                <div class="name">Platform Culture</div>
-                <div class="img"></div>
-                <div class="features">
-                  <div class="feature">Medium evolution</div>
-                  <div class="feature">Norms shift steadily</div>
-                  <div class="feature">Bonus to drug resistance</div>
-                </div>
-              </div>
-              <div class="kind" kind="3">
-                <div class="name">Loneliness</div>
-                <div class="img"></div>
-                <div class="features">
-                  <div class="feature">Slowest evolution</div>
-                  <div class="feature">Least affected by enviroment</div>
-                  <div class="feature">Low visibility</div>
-                </div>
-              </div>
-              <div class="submit">
-                <div class="next button">Next</div>
-              </div>
-            </div>
-          </div>
-          <div class="step_name">
-            <div class="heading">Select a Name for your Pathogen</div>
-            <div class="text_field">
-              <input type="name" value="Sickanitus" />
-            </div>
-            <div class="submit">
-              <div class="next button">Start</div>
-            </div>
-          </div>
+        <div>
+          <p class="label">Evolution Points</p>
+          <p class="metric metric--accent"><span id="evoPoints">12</span></p>
         </div>
       </div>
-    </div>
-    <div class="footer_wrap">
-      <div class="footer">
-        <p>&copy; Pandemic</p>
+    </header>
+
+    <section class="panel controls">
+      <div>
+        <label for="pathogenInput" class="label">Pathogen Name</label>
+        <input id="pathogenInput" type="text" value="Sickanitus" />
       </div>
-    </div>
+      <div>
+        <label for="archetypeSelect" class="label">Archetype</label>
+        <select id="archetypeSelect">
+          <option value="algorithm">Algorithm (fast, visible)</option>
+          <option value="platform">Platform Culture (balanced)</option>
+          <option value="loneliness">Loneliness (slow, hidden)</option>
+        </select>
+      </div>
+      <div class="control-buttons">
+        <button id="startBtn" class="primary">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="resetBtn" class="ghost">Reset</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel stats">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Pathogen Profile</p>
+            <h2 id="pathogenName">Algorithm</h2>
+          </div>
+          <div class="status status--running" id="simStatus">Idle</div>
+        </div>
+        <div class="stat-group">
+          <div class="stat">
+            <div class="stat__top">
+              <span>Reach</span><span id="reachVal">12</span>
+            </div>
+            <div class="bar"><div id="reachBar" class="bar__fill"></div></div>
+          </div>
+          <div class="stat">
+            <div class="stat__top">
+              <span>Burnout</span><span id="burnoutVal">6</span>
+            </div>
+            <div class="bar"><div id="burnoutBar" class="bar__fill"></div></div>
+          </div>
+          <div class="stat">
+            <div class="stat__top">
+              <span>Visibility</span><span id="visibilityVal">8</span>
+            </div>
+            <div class="bar"><div id="visibilityBar" class="bar__fill"></div></div>
+          </div>
+          <div class="stat">
+            <div class="stat__top">
+              <span>Resilience</span><span id="resilienceVal">5</span>
+            </div>
+            <div class="bar"><div id="resilienceBar" class="bar__fill"></div></div>
+          </div>
+        </div>
+        <div class="pill-row">
+          <span class="pill" id="vectorFoot">Foot Traffic: Offline</span>
+          <span class="pill" id="vectorDining">Dining Hall: Offline</span>
+          <span class="pill" id="vectorSocial">Social Media: Online</span>
+        </div>
+      </div>
+
+      <div class="panel log">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Campus Pulse</p>
+            <h2>News Feed</h2>
+          </div>
+          <p class="label">Cure Progress: <span id="curePercent">0%</span></p>
+        </div>
+        <div id="newsLog" class="log__body"></div>
+      </div>
+    </section>
+
+    <section class="grid upgrades">
+      <div class="panel">
+        <div class="panel__header"><div><p class="eyebrow">Effects</p><h2>Behavioral Upgrades</h2></div><p class="label">Costs consume evolution points</p></div>
+        <div class="upgrade-grid" id="symptomList"></div>
+      </div>
+      <div class="panel">
+        <div class="panel__header"><div><p class="eyebrow">Resilience</p><h2>Campus Buffers</h2></div><p class="label">Keep burnout in check</p></div>
+        <div class="upgrade-grid" id="resilienceList"></div>
+      </div>
+      <div class="panel">
+        <div class="panel__header"><div><p class="eyebrow">Spread Channels</p><h2>Transmission</h2></div><p class="label">Open new vectors</p></div>
+        <div class="upgrade-grid" id="transmissionList"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel__header"><div><p class="eyebrow">Campuses</p><h2>Colleges Overview</h2></div><p class="label">Infection & Burnout per college</p></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>College</th>
+              <th>Students</th>
+              <th>Infected</th>
+              <th>Burnout</th>
+            </tr>
+          </thead>
+          <tbody id="collegeTable"></tbody>
+        </table>
+      </div>
+    </section>
   </div>
-  <script src="https://codeorigin.jquery.com/jquery-2.0.3.min.js"></script>
-  <script src="https://codeorigin.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+
   <script src="main.js"></script>
 </body>
 </html>
