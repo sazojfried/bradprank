@@ -1,139 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pandemic: Yale Edition</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+  <title>Pandemic: Yale Campus Mini-Sim</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="page">
-    <header class="hero">
+    <header class="top-bar">
       <div>
-        <p class="eyebrow">Campus Simulation</p>
-        <h1>Pandemic: Yale Edition</h1>
-        <p class="lede">Shape a campus-wide social contagion. Spend evolution points to unlock upgrades, spread faster, or resist burnout.</p>
+        <h1>Pandemic: Yale Campus</h1>
+        <p class="subtitle">A tiny social-contagion visualization</p>
       </div>
-      <div class="hero__meta">
-        <div>
-          <p class="label">Days Running</p>
-          <p class="metric"><span id="dayCount">0</span></p>
-        </div>
-        <div>
-          <p class="label">Evolution Points</p>
-          <p class="metric metric--accent"><span id="evoPoints">12</span></p>
-        </div>
+      <div class="controls">
+        <select id="pathogenSelect">
+          <option value="algorithm">Algorithm</option>
+          <option value="platform">Platform Culture</option>
+          <option value="loneliness">Loneliness</option>
+        </select>
+        <button id="startBtn">Start</button>
+        <button id="resetBtn">Reset</button>
       </div>
     </header>
 
-    <section class="panel controls">
-      <div>
-        <label for="pathogenInput" class="label">Pathogen Name</label>
-        <input id="pathogenInput" type="text" value="Sickanitus" />
-      </div>
-      <div>
-        <label for="archetypeSelect" class="label">Archetype</label>
-        <select id="archetypeSelect">
-          <option value="algorithm">Algorithm (fast, visible)</option>
-          <option value="platform">Platform Culture (balanced)</option>
-          <option value="loneliness">Loneliness (slow, hidden)</option>
-        </select>
-      </div>
-      <div class="control-buttons">
-        <button id="startBtn" class="primary">Start</button>
-        <button id="pauseBtn">Pause</button>
-        <button id="resetBtn" class="ghost">Reset</button>
-      </div>
-    </section>
+    <main class="content">
+      <section class="canvas-wrap">
+        <canvas id="mapCanvas" width="900" height="520"></canvas>
+        <div id="tooltip" class="tooltip"></div>
+      </section>
 
-    <section class="grid">
-      <div class="panel stats">
-        <div class="panel__header">
-          <div>
-            <p class="eyebrow">Pathogen Profile</p>
-            <h2 id="pathogenName">Algorithm</h2>
-          </div>
-          <div class="status status--running" id="simStatus">Idle</div>
+      <section class="side-panel">
+        <h2>Run summary</h2>
+        <p>Pathogen: <span id="pathogenName">Algorithm</span></p>
+        <p>Infected colleges: <span id="infectedCount">0</span> / 11</p>
+        <p>Average infection: <span id="avgInfection">0%</span></p>
+        <div class="bar-label">Global spread</div>
+        <div class="bar">
+          <div class="bar-fill" id="spreadBar"></div>
         </div>
-        <div class="stat-group">
-          <div class="stat">
-            <div class="stat__top">
-              <span>Reach</span><span id="reachVal">12</span>
-            </div>
-            <div class="bar"><div id="reachBar" class="bar__fill"></div></div>
-          </div>
-          <div class="stat">
-            <div class="stat__top">
-              <span>Burnout</span><span id="burnoutVal">6</span>
-            </div>
-            <div class="bar"><div id="burnoutBar" class="bar__fill"></div></div>
-          </div>
-          <div class="stat">
-            <div class="stat__top">
-              <span>Visibility</span><span id="visibilityVal">8</span>
-            </div>
-            <div class="bar"><div id="visibilityBar" class="bar__fill"></div></div>
-          </div>
-          <div class="stat">
-            <div class="stat__top">
-              <span>Resilience</span><span id="resilienceVal">5</span>
-            </div>
-            <div class="bar"><div id="resilienceBar" class="bar__fill"></div></div>
-          </div>
-        </div>
-        <div class="pill-row">
-          <span class="pill" id="vectorFoot">Foot Traffic: Offline</span>
-          <span class="pill" id="vectorDining">Dining Hall: Offline</span>
-          <span class="pill" id="vectorSocial">Social Media: Online</span>
-        </div>
-      </div>
+        <p id="statusText" class="status">Click <strong>Start</strong> to seed the outbreak.</p>
 
-      <div class="panel log">
-        <div class="panel__header">
-          <div>
-            <p class="eyebrow">Campus Pulse</p>
-            <h2>News Feed</h2>
-          </div>
-          <p class="label">Cure Progress: <span id="curePercent">0%</span></p>
-        </div>
-        <div id="newsLog" class="log__body"></div>
-      </div>
-    </section>
-
-    <section class="grid upgrades">
-      <div class="panel">
-        <div class="panel__header"><div><p class="eyebrow">Effects</p><h2>Behavioral Upgrades</h2></div><p class="label">Costs consume evolution points</p></div>
-        <div class="upgrade-grid" id="symptomList"></div>
-      </div>
-      <div class="panel">
-        <div class="panel__header"><div><p class="eyebrow">Resilience</p><h2>Campus Buffers</h2></div><p class="label">Keep burnout in check</p></div>
-        <div class="upgrade-grid" id="resilienceList"></div>
-      </div>
-      <div class="panel">
-        <div class="panel__header"><div><p class="eyebrow">Spread Channels</p><h2>Transmission</h2></div><p class="label">Open new vectors</p></div>
-        <div class="upgrade-grid" id="transmissionList"></div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="panel__header"><div><p class="eyebrow">Campuses</p><h2>Colleges Overview</h2></div><p class="label">Infection & Burnout per college</p></div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>College</th>
-              <th>Students</th>
-              <th>Infected</th>
-              <th>Burnout</th>
-            </tr>
-          </thead>
-          <tbody id="collegeTable"></tbody>
-        </table>
-      </div>
-    </section>
+        <h3>How it works</h3>
+        <ul class="info-list">
+          <li>Each circle is a residential college.</li>
+          <li>Color warms from cool blue → orange → red as infection increases.</li>
+          <li>Lines show foot-traffic routes; infection hops along them.</li>
+          <li>Hover to see exact infection percentage.</li>
+        </ul>
+      </section>
+    </main>
   </div>
 
   <script src="main.js"></script>
