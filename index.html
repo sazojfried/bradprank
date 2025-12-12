@@ -22,6 +22,7 @@
       align-items:center;
       justify-content:center;
       padding:32px;
+      position:relative;
     }
     .card{
       width:min(1100px, 96vw);
@@ -30,6 +31,7 @@
       overflow:hidden;
       background:linear-gradient(180deg, rgba(255,255,255,.03), transparent);
       box-shadow: 0 24px 70px rgba(0,0,0,.6);
+      transition: width .2s ease, box-shadow .2s ease;
     }
     .top{
       padding:18px 22px;
@@ -174,10 +176,39 @@
       border-top:1px solid rgba(42,51,83,.6);
       background:rgba(255,255,255,.015);
     }
+
+    .pirates{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+    }
+    .pirate{
+      position:absolute;
+      font-size:26px;
+      opacity:.9;
+      text-shadow:0 0 18px rgba(0,0,0,.45);
+    }
+    .pirate.top-left{ top:8px; left:12px; }
+    .pirate.top-right{ top:10px; right:14px; }
+    .pirate.bottom-left{ bottom:10px; left:18px; }
+    .pirate.bottom-right{ bottom:12px; right:20px; }
+
+    body.is-fullscreen .wrap{ padding:18px; }
+    body.is-fullscreen .card{
+      width:min(1800px, 92vw);
+      box-shadow: 0 32px 120px rgba(0,0,0,.65);
+    }
+    body.is-fullscreen .pirate{ font-size:32px; }
   </style>
 </head>
 <body>
   <div class="wrap">
+    <div class="pirates" aria-hidden="true">
+      <div class="pirate top-left">🏴‍☠️</div>
+      <div class="pirate top-right">☠️</div>
+      <div class="pirate bottom-left">🏴‍☠️</div>
+      <div class="pirate bottom-right">☠️</div>
+    </div>
     <div class="card">
       <div class="top">
         <div class="title">Torrent Client</div>
@@ -281,6 +312,13 @@
   }
 
   setInterval(tick, 180);
+
+  function updateFullscreenState(){
+    document.body.classList.toggle("is-fullscreen", Boolean(document.fullscreenElement));
+  }
+
+  document.addEventListener("fullscreenchange", updateFullscreenState);
+  updateFullscreenState();
 
   window.addEventListener("keydown", (e) => {
     if(e.key === " "){
