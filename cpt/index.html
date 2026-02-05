@@ -2,102 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#1a1a2e" />
-  <title>CURTILAGE: The 28-Day Grind</title>
-  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CURTILAGE // Dystopian Terminal</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="app-shell">
-    <section class="world-window">
-      <header class="window-title">VISUAL VIEWPORT // CURTILAGE ZONE</header>
+  <main class="shell" id="shell">
+    <section class="viewport-wrap panel">
+      <header class="terminal-header">CURTILAGE VISUAL GRID // TOP-DOWN OPS</header>
+      <div id="viewport" aria-label="10 by 10 simulation grid">
+        <div id="tileLayer"></div>
 
-      <div id="gameWorld" aria-label="Top-down simulation world">
-        <div class="grass-texture"></div>
+        <div id="blueprintOverlay" class="hidden"></div>
 
-        <div id="propertyBoundary">
-          <div id="fenceLayer" class="upgrade hidden"></div>
-          <div id="houseBlock">
-            <div class="roof-main"></div>
-            <div class="roof-shadow"></div>
-            <div class="front-door"></div>
-          </div>
-          <div id="garageLayer" class="upgrade hidden"></div>
-          <div id="driveway"></div>
-          <div id="gateLayer" class="upgrade hidden"></div>
-        </div>
+        <div id="agentsLayer"></div>
 
-        <div id="publicSidewalk"></div>
-        <div id="publicRoad"></div>
+        <div id="house" class="entity house"></div>
+        <div id="car" class="entity car parked"></div>
+        <div id="van" class="entity van hidden"></div>
+        <img id="player" class="entity player" src="./image_2d8edf.png" alt="Player sprite" />
+      </div>
 
-        <div class="patrol-zone">
-          <img class="cop patrol-left" src="https://i.imgur.com/8Y5f4gQ.png" alt="State agent patrol" />
-          <img class="cop patrol-mid" src="https://i.imgur.com/8Y5f4gQ.png" alt="State agent patrol" />
-          <img class="cop patrol-right" src="https://i.imgur.com/8Y5f4gQ.png" alt="State agent patrol" />
-        </div>
-
-        <img
-          id="player"
-          src="https://i.imgur.com/lG6B8XU.png"
-          alt="Consultant commuter"
-          width="56"
-          height="56"
-        />
+      <div id="dialogue" class="dialogue hidden">
+        <strong>STATE AGENT //</strong>
+        <p id="dialogueText"></p>
       </div>
     </section>
 
-    <aside class="sidebar">
-      <section class="panel hero-stats">
-        <h1>CURTILAGE <span>The 28-Day Grind</span></h1>
-        <div class="big-stats">
-          <article><label>DAY</label><strong id="dayLabel">01 / 28</strong></article>
-          <article><label>CAPITAL</label><strong id="capitalLabel">$1,200</strong></article>
-          <article><label>PRIVACY SCORE</label><strong id="privacyLabel">0</strong></article>
-          <article><label>SEARCH METER</label><strong id="searchLabel">0%</strong></article>
-        </div>
+    <aside class="panel sidebar">
+      <h1>DYSTOPIAN TERMINAL</h1>
+      <div class="stats">
+        <p>DAY <span id="dayStat">01 / 28</span></p>
+        <p>CAPITAL <span id="capitalStat">$2500</span></p>
+        <p>PRIVACY SCORE <span id="privacyStat">80</span></p>
+        <p class="alert">SEARCH METER <span id="searchStat">0%</span></p>
+      </div>
 
-        <div class="meter-stack">
-          <div class="meter-group">
-            <span>Privacy Fortification</span>
-            <div class="meter-track"><i id="privacyBar"></i></div>
-          </div>
-          <div class="meter-group danger">
-            <span>State Search Confidence</span>
-            <div class="meter-track"><i id="searchBar"></i></div>
-          </div>
-        </div>
+      <div class="meters">
+        <label>Privacy Integrity</label>
+        <div class="meter"><i id="privacyBar"></i></div>
+        <label class="alert">Search Confidence</label>
+        <div class="meter"><i id="searchBar" class="danger"></i></div>
+      </div>
+
+      <section>
+        <h2>MARKETPLACE</h2>
+        <div id="marketList"></div>
       </section>
 
-      <section class="panel">
-        <h2>Start Condition</h2>
-        <label class="checkbox-row">
-          <input id="trustToggle" type="checkbox" />
-          <span>Born Gated ($1,000,000 trust fund)</span>
-        </label>
-        <button id="restartBtn" class="btn btn-muted" type="button">Reset Simulation</button>
-      </section>
+      <button id="workBtn" class="btn main">GO TO WORK</button>
+      <button id="resetBtn" class="btn">RESET SIM</button>
 
-      <section class="panel">
-        <h2>Legal Marketplace</h2>
-        <div id="shopList"></div>
-        <button id="workBtn" class="btn btn-cta" type="button">GO TO WORK</button>
-      </section>
-
-      <section class="panel log-panel">
-        <h2>System Log</h2>
-        <div id="log"></div>
+      <section>
+        <h2>SYSTEM LOG</h2>
+        <div id="log" class="log"></div>
       </section>
     </aside>
   </main>
 
-  <dialog id="gameOverDialog">
-    <article>
-      <h2 id="gameOverTitle">Judgment Rendered</h2>
-      <p id="gameOverText"></p>
-      <button id="closeDialog" class="btn btn-cta" type="button">Run New 28-Day Cycle</button>
-    </article>
-  </dialog>
+  <section id="endingOverlay" class="ending hidden" aria-live="polite">
+    <pre>
+THE 28-DAY RULE:
+The State physically trespassed on your property
+to tag your vehicle on Day 1.
+
+Your walls were a distraction.
+Wealth cannot buy back what was seized
+before you built them.
+    </pre>
+  </section>
 
   <script src="script.js"></script>
 </body>
