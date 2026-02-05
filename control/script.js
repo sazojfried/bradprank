@@ -15,6 +15,7 @@ const GameEngine = {
   state: {
     day: 1,
     maxDays: 30,
+    fastForwardEndDay: 28,
     phase: 'day',
     money: 0,
     privacy: 0,
@@ -28,6 +29,7 @@ const GameEngine = {
     cops: [{ x: 6, y: 2 }, { x: 8, y: 2 }, { x: 7, y: 1 }],
     bought: new Set(),
     classTuning: { nightlyDecay: 2, dailyHeatDrift: 0, passiveArmorBonus: 0, dailyStipend: 1100 },
+    fastForwarding: false,
   },
 
   classes: {
@@ -85,7 +87,7 @@ const GameEngine = {
     'photos taken from street',
     'license scanner cross-match',
     'neighbor tip forwarded',
-    'door camera footage subpoenaed',
+    'door camera footage surveillance logged',
   ],
 
   init() {
@@ -97,6 +99,7 @@ const GameEngine = {
       buyLifestyle: (id) => this.buyLifestyle(id),
     });
     UIController.bindCommute(() => this.runCommuteLoop());
+    UIController.bindFastForward(() => this.runSecureFastForward());
     UIController.renderEntities(this.state);
     UIController.updateHUD(this.state);
     UIController.renderPropertyUpgrades(this.state, this.grid);
@@ -129,6 +132,7 @@ const GameEngine = {
     UIController.updateHUD(this.state);
     UIController.refreshShops(this.state);
     UIController.renderPropertyUpgrades(this.state, this.grid);
+    UIController.setFastForwardVisible(false);
   },
 
   exposureGain(y) {
@@ -138,7 +142,7 @@ const GameEngine = {
   },
 
   async runCommuteLoop() {
-    if (!this.state.selectedClass || this.state.moving) return;
+    if (!this.state.selectedClass || this.state.moving || this.state.fastForwarding) return;
 
     this.state.moving = true;
     UIController.disableCommute(true);
@@ -186,13 +190,14 @@ const GameEngine = {
 
     this.state.moving = false;
     UIController.disableCommute(false);
+    this.checkFastForwardAvailability();
   },
 
   async followRoute(route) {
     for (const step of route) {
       this.state.player = step;
-      const gain = this.exposureGain(step.y);
-      if (gain > 0) {
+      if (UIController.zoneFor(step.x, step.y, this.grid) === 'public') {
+        const gain = this.exposureGain(step.y);
         this.state.heat = Math.min(100, this.state.heat + gain);
         UIController.flash(`HEAT +${gain.toFixed(1)}% // ${this.randomHeatReason()}`);
       }
@@ -230,16 +235,19 @@ const GameEngine = {
 
   async buyLifestyle(id) {
     const item = this.lifestyleShop.find((i) => i.id === id);
-    if (!item || this.state.money < item.cost) return;
+    if (!item || this.state.money < item.cost || this.state.bought.has(item.id)) return;
     this.state.money -= item.cost;
     const penalty = item.heat * this.state.heatMultiplier;
     this.state.heat = Math.min(100, this.state.heat + penalty);
-    this.state.bought.add(item.id);
-    UIController.renderPropertyUpgrades(this.state, this.grid);
     UIController.updateHUD(this.state);
     UIController.flash(`HEAT +${penalty.toFixed(1)}% // ${this.deliveryLeakReason(item.name)}`);
     UIController.flash('> [3RD-PARTY_SNITCH]: Consumer data shared with State analytics.', { duration: 6000 });
-    await UIController.deliveryEvent(item.name, this.state, this.grid, () => this.pullPoliceToTrash(item.name));
+    await UIController.deliveryEvent(item.name, this.state, this.grid, () => {
+      this.state.bought.add(item.id);
+      UIController.renderPropertyUpgrades(this.state, this.grid);
+      UIController.refreshShops(this.state);
+      this.pullPoliceToTrash(item.name);
+    });
     if (this.checkArrest()) return;
   },
 
@@ -255,6 +263,42 @@ const GameEngine = {
       'Red: "Check the curbside trash pull first."',
     ]);
     UIController.flash('> [GREENWOOD_DOCTRINE]: No expectation of privacy in abandoned property at the curb.', { duration: 5200 });
+  },
+
+  checkFastForwardAvailability() {
+    const canEngage = this.state.privacy >= 95 && this.state.day <= this.state.fastForwardEndDay && !this.state.fastForwarding;
+    UIController.setFastForwardVisible(canEngage);
+  },
+
+  async runSecureFastForward() {
+    if (this.state.fastForwarding || this.state.privacy < 95) return;
+    this.state.fastForwarding = true;
+    this.state.moving = true;
+    UIController.setFastForwardVisible(false);
+    UIController.disableCommute(true);
+    UIController.disableFastForward(true);
+    UIController.lockUI('fast-forward');
+    UIController.flash('SECURE FAST FORWARD ENGAGED // COMMUTE ANIMATIONS BYPASSED', { duration: 2200 });
+
+    while (this.state.day <= this.state.fastForwardEndDay) {
+      const stipend = this.state.classTuning.dailyStipend;
+      const nightlyCooldown = this.state.classTuning.nightlyDecay + (this.state.privacy / 30);
+      this.state.money += stipend;
+      this.state.heat = Math.max(0, this.state.heat - nightlyCooldown);
+      this.state.heat = Math.min(100, this.state.heat + this.state.classTuning.dailyHeatDrift);
+      UIController.flash(`FAST FORWARD DAY ${String(this.state.day).padStart(2, '0')} // +$${stipend.toLocaleString()}`);
+      this.state.day += 1;
+      UIController.updateHUD(this.state);
+      await this.delay(500);
+    }
+
+    this.state.fastForwarding = false;
+    this.state.moving = false;
+    UIController.unlockUI('fast-forward');
+    UIController.showEnding(
+      'SECURE FAST FORWARD COMPLETE // DAY 28 REACHED',
+      'Privacy Armor integrity held above 95%. Remaining commute cycles were executed in hardened automation mode through Day 28.'
+    );
   },
 
   randomHeatReason() {
@@ -286,7 +330,9 @@ const UIController = {
   activeLocks: new Set(),
 
   buildGrid(gridConfig) {
-    const grid = document.getElementById('grid');
+    const grid = document.getElementById('grid-canvas');
+    if (!grid) return;
+    grid.innerHTML = '';
     for (let y = 0; y < gridConfig.size; y++) {
       for (let x = 0; x < gridConfig.size; x++) {
         const tile = document.createElement('div');
@@ -340,6 +386,9 @@ const UIController = {
     document.querySelectorAll('[data-legal]').forEach((el) => {
       if (state.bought.has(el.dataset.legal)) el.classList.add('disabled');
     });
+    document.querySelectorAll('[data-life]').forEach((el) => {
+      if (state.bought.has(el.dataset.life)) el.classList.add('disabled');
+    });
   },
 
   lockForClassSelection(locked) {
@@ -360,8 +409,22 @@ const UIController = {
   },
 
   bindCommute(run) { document.getElementById('commute-btn').onclick = run; },
+  bindFastForward(run) {
+    const btn = document.getElementById('fast-forward-btn');
+    if (btn) btn.onclick = run;
+  },
   enableCommute() { document.getElementById('commute-btn').disabled = false; },
   disableCommute(v) { document.getElementById('commute-btn').disabled = v; },
+  disableFastForward(v) {
+    const btn = document.getElementById('fast-forward-btn');
+    if (btn) btn.disabled = v;
+  },
+  setFastForwardVisible(visible) {
+    const btn = document.getElementById('fast-forward-btn');
+    if (!btn) return;
+    btn.classList.toggle('hidden', !visible);
+    btn.disabled = false;
+  },
 
   updateHUD(state) {
     document.getElementById('day-text').textContent = `Day ${String(state.day).padStart(2, '0')} / ${state.maxDays}`;
