@@ -1,0 +1,10 @@
+{
+  "name": "CURTILAGE: The 28-Day Grind",
+  "short_name": "CURTILAGE",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0a0e14",
+  "theme_color": "#0a0e14",
+  "description": "A satirical dystopian survival sim about the Surveillance Gap.",
+  "icons": []
+}
