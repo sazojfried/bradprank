@@ -12,53 +12,66 @@
 
     <main id="game-container">
         <header id="hud">
-            <div class="stat-box">
-                <span class="label">CALENDAR</span>
-                <span id="day-count" class="value">DAY 01/28</span>
-            </div>
-            <div class="stat-box">
-                <span class="label">CAPITAL</span>
-                <span id="capital-amount" class="value">$0</span>
-            </div>
+            <div class="stat-box"><span class="label">CALENDAR</span><span id="day-count" class="value">DAY 01/28</span></div>
+            <div class="stat-box"><span class="label">CAPITAL</span><span id="capital-amount" class="value">$500</span></div>
             <div class="stat-box">
                 <span class="label">PRIVACY_SCORE</span>
-                <div class="bar-container">
-                    <div id="privacy-bar" class="bar" style="width: 100%;"></div>
-                </div>
+                <div class="bar-container"><div id="privacy-bar" class="bar" style="width: 100%;"></div></div>
             </div>
             <div class="stat-box alert">
                 <span class="label">SEARCH_METER</span>
-                <div class="bar-container">
-                    <div id="search-bar" class="bar danger" style="width: 0%;"></div>
-                </div>
+                <div class="bar-container"><div id="search-bar" class="bar danger" style="width: 0%;"></div></div>
             </div>
         </header>
 
         <section id="main-interface">
-            <aside id="log-console">
-                <h3>SYSTEM_LOGS</h3>
-                <div id="log-entries">
-                    <p class="system-msg">Initializing 4th Amendment Surveillance Loop...</p>
-                    <p class="system-msg">Status: Unfenced. Public. Exposed.</p>
+            <div id="visual-stage">
+                <div id="sky">
+                    <div id="drone" class="surveillance"></div>
+                    <div class="cloud" style="top:20%; left:10%;"></div>
+                    <div class="cloud" style="top:10%; left:60%;"></div>
+                </div>
+                <div id="ground">
+                    <div id="property-lot">
+                        <div id="house-main">
+                            <div id="window-light"></div>
+                            <div id="layer-tint" class="structure hidden"></div>
+                        </div>
+                        <div id="layer-garage" class="structure hidden"></div>
+                        <div id="layer-fence" class="structure hidden"></div>
+                        <div id="layer-gate" class="structure hidden"></div>
+                        
+                        <div id="player-dot"></div>
+                    </div>
+
+                    <div class="cop" id="cop-1" style="left: 5%;"></div>
+                    <div class="cop" id="cop-2" style="left: 15%;"></div>
+                    <div class="cop" id="cop-3" style="right: 10%;"></div>
+                    <div id="police-cruiser">
+                        <div class="siren"></div>
+                    </div>
+                </div>
+            </div>
+
+            <aside id="sidebar">
+                <div id="log-console">
+                    <h3>SYSTEM_LOGS</h3>
+                    <div id="log-entries">
+                        <p class="system-msg">Status: Unfenced. Public. Exposed.</p>
+                    </div>
+                </div>
+                <div id="shop-container">
+                    <h3>LEGAL_UPGRADES</h3>
+                    <div id="item-list"></div>
+                    <button id="next-day-btn">GO TO WORK</button>
                 </div>
             </aside>
-
-            <section id="shop-container">
-                <h3>LEGAL_UPGRADES</h3>
-                <div id="item-list">
-                    </div>
-                <button id="next-day-btn">COMMENCE DAILY GRIND</button>
-            </section>
         </section>
-
-        <footer id="legal-lore">
-            <p>“The Fourth Amendment protects people, not places.” — Stewart, J. (Katz v. U.S.)</p>
-        </footer>
     </main>
 
     <div id="game-over-modal" class="hidden">
         <div class="modal-content">
-            <h1 id="verdict-title">JUDGMENT RENDERED</h1>
+            <h1 id="verdict-header">JUDGMENT RENDERED</h1>
             <p id="verdict-text"></p>
             <button onclick="location.reload()">RE-LITIGATE (RESTART)</button>
         </div>
