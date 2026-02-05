@@ -27,9 +27,12 @@ const GameEngine = {
     player: { x: 7, y: 11 },
     trashCan: { x: 7, y: 3 },
     cops: [{ x: 6, y: 2 }, { x: 8, y: 2 }, { x: 7, y: 1 }],
+    stash: { x: 8, y: 11, label: 'ENCRYPTED_CACHE' },
     bought: new Set(),
     classTuning: { nightlyDecay: 2, dailyHeatDrift: 0, passiveArmorBonus: 0, dailyStipend: 1100 },
     fastForwarding: false,
+    arrestTriggered: false,
+    gameEnded: false,
   },
 
   classes: {
@@ -76,9 +79,24 @@ const GameEngine = {
   ],
 
   lifestyleShop: [
-    { id: 'tv', name: 'Smart TV', cost: 1200, heat: 5 },
-    { id: 'espresso', name: 'Espresso Machine', cost: 1800, heat: 4 },
-    { id: 'sofa', name: 'Designer Sofa', cost: 3600, heat: 6 },
+    {
+      id: 'tv',
+      name: 'Smart TV',
+      cost: 1200,
+      leakMessage: '> [LEAK]: Viewing habits analyzed. Late-night connectivity at [House_Coords] suggests illicit server hosting.',
+    },
+    {
+      id: 'espresso',
+      name: 'Espresso Machine',
+      cost: 1800,
+      leakMessage: '> [LEAK]: IoT arousal patterns logged. Daily routine suggests professional fix-it activity.',
+    },
+    {
+      id: 'sofa',
+      name: 'Designer Sofa',
+      cost: 3600,
+      leakMessage: '> [LEAK]: Financial flag: High-value asset purchase does not match reported income.',
+    },
   ],
 
   surveillanceReasons: [
@@ -104,6 +122,11 @@ const GameEngine = {
     UIController.updateHUD(this.state);
     UIController.renderPropertyUpgrades(this.state, this.grid);
     UIController.placeTrashCan(this.state.trashCan, this.grid);
+    UIController.placeStash(this.state.stash, this.grid);
+    UIController.bindEndingActions({
+      relitigate: () => location.reload(),
+      retainCounsel: () => this.retainEliteCounsel(),
+    });
   },
 
   selectClass(id) {
@@ -237,15 +260,15 @@ const GameEngine = {
     const item = this.lifestyleShop.find((i) => i.id === id);
     if (!item || this.state.money < item.cost || this.state.bought.has(item.id)) return;
     this.state.money -= item.cost;
-    const penalty = item.heat * this.state.heatMultiplier;
-    this.state.heat = Math.min(100, this.state.heat + penalty);
     UIController.updateHUD(this.state);
-    UIController.flash(`HEAT +${penalty.toFixed(1)}% // ${this.deliveryLeakReason(item.name)}`);
-    UIController.flash('> [3RD-PARTY_SNITCH]: Consumer data shared with State analytics.', { duration: 6000 });
     await UIController.deliveryEvent(item.name, this.state, this.grid, () => {
       this.state.bought.add(item.id);
+      this.state.heat = Math.min(100, this.state.heat + 8);
+      UIController.flash(item.leakMessage, { duration: 6200 });
+      UIController.flash('> [MOSAIC_THEORY]: Third-party snitch signal adds +8% Search Confidence.', { duration: 4300 });
       UIController.renderPropertyUpgrades(this.state, this.grid);
       UIController.refreshShops(this.state);
+      UIController.updateHUD(this.state);
       this.pullPoliceToTrash(item.name);
     });
     if (this.checkArrest()) return;
@@ -306,19 +329,32 @@ const GameEngine = {
     return this.surveillanceReasons[i];
   },
 
-  deliveryLeakReason(itemName) {
-    return `${itemName} purchase metadata sold to ad broker`;
-  },
-
   checkArrest() {
     if (this.state.heat < 100) return false;
-    UIController.showEnding(
-      'ARREST // SEARCH CONFIDENCE 100%',
-      'Mosaic tracking reached certainty. The State now models your full pattern-of-life commute and executes arrest.'
-    );
+    if (this.state.arrestTriggered) return true;
+    this.state.arrestTriggered = true;
     this.state.moving = false;
     UIController.disableCommute(true);
+    UIController.runArrestSeizure(this.state, this.grid).then(() => {
+      this.state.gameEnded = true;
+      UIController.showEnding(
+        'ARREST // SEARCH CONFIDENCE 100%',
+        'Mosaic tracking reached certainty. The State now models your full pattern-of-life commute, raids your home, and seizes the ENCRYPTED_CACHE.',
+        { mode: 'arrest', state: this.state }
+      );
+    });
     return true;
+  },
+
+  retainEliteCounsel() {
+    if (!this.state.gameEnded || this.state.money < 100000) return;
+    this.state.money -= 100000;
+    UIController.updateHUD(this.state);
+    UIController.showEnding(
+      'WIN_STATE // CASE DISMISSED',
+      '> [VERDICT]: CASE DISMISSED. Your attorneys successfully suppressed the evidence based on the Fruit of the Poisonous Tree doctrine. You have walked on a technicality.',
+      { mode: 'win', state: this.state }
+    );
   },
 
   delay(ms) { return new Promise((r) => setTimeout(r, ms)); },
@@ -434,6 +470,12 @@ const UIController = {
     document.getElementById('heat-meter').style.width = `${Math.min(100, state.heat)}%`;
     document.getElementById('heat-text').textContent = `${Math.min(100, state.heat).toFixed(1)}%`;
     document.getElementById('cycle-indicator').textContent = state.phase === 'day' ? '☀️' : '🌙';
+    const buff = document.getElementById('passive-buff-text');
+    if (buff) {
+      buff.textContent = state.selectedClass === 'gated'
+        ? 'Audi A5 Passive Buff: +15% Privacy Armor'
+        : 'Passive Buff: none';
+    }
   },
 
   renderEntities(state) {
@@ -455,6 +497,13 @@ const UIController = {
     this.positionElementToTile(can, point, gridConfig);
   },
 
+  placeStash(stash, gridConfig) {
+    const marker = document.getElementById('encrypted-cache');
+    if (!marker) return;
+    marker.textContent = stash.label;
+    this.positionElementToTile(marker, stash, gridConfig);
+  },
+
   tileCenter(x, y, gridConfig) {
     const cell = 100 / gridConfig.size;
     return { left: `${((x + 0.5) * cell).toFixed(2)}%`, top: `${((y + 0.5) * cell).toFixed(2)}%` };
@@ -471,6 +520,42 @@ const UIController = {
       this.positionElementToTile(el, point, gridConfig);
       await new Promise((r) => setTimeout(r, stepMs));
     }
+  },
+
+  pathBetween(start, end) {
+    const path = [];
+    let cursor = { ...start };
+    while (cursor.x !== end.x) {
+      cursor = { ...cursor, x: cursor.x + Math.sign(end.x - cursor.x) };
+      path.push({ ...cursor });
+    }
+    while (cursor.y !== end.y) {
+      cursor = { ...cursor, y: cursor.y + Math.sign(end.y - cursor.y) };
+      path.push({ ...cursor });
+    }
+    return path;
+  },
+
+  async runArrestSeizure(state, gridConfig) {
+    this.lockUI('ending');
+    this.flash('> [AUDIT]: Trash pull complete. Advancing to internal STASH tile for seizure.', { duration: 4200 });
+    const trash = state.trashCan;
+    const stash = state.stash;
+    state.cops = state.cops.map(() => ({ x: trash.x, y: trash.y }));
+    this.renderEntities(state);
+    await new Promise((r) => setTimeout(r, 450));
+
+    const policeEls = [...document.querySelectorAll('.entity.police')];
+    const seizurePath = this.pathBetween(trash, stash);
+    await Promise.all(policeEls.map((el, index) => {
+      const staggered = seizurePath.map((p, i) => ({
+        x: Math.max(0, Math.min(14, p.x + ((index - 1) * ((i % 2) ? 0 : 1)))),
+        y: p.y,
+      }));
+      return this.walkElementPath(el, staggered, gridConfig, 170);
+    }));
+    state.cops = state.cops.map(() => ({ x: stash.x, y: stash.y }));
+    this.renderEntities(state);
   },
 
   async deliveryEvent(itemName, state, gridConfig, onInspect) {
@@ -591,9 +676,28 @@ const UIController = {
     this.processFlashQueue();
   },
 
-  showEnding(title, copy) {
+  bindEndingActions(handlers) {
+    const relitigateBtn = document.getElementById('re-litigate-btn');
+    const counselBtn = document.getElementById('retain-counsel-btn');
+    if (relitigateBtn) relitigateBtn.onclick = handlers.relitigate;
+    if (counselBtn) counselBtn.onclick = handlers.retainCounsel;
+  },
+
+  showEnding(title, copy, options = {}) {
     document.getElementById('ending-title').textContent = title;
     document.getElementById('ending-copy').textContent = copy;
+    const relitigateBtn = document.getElementById('re-litigate-btn');
+    const counselBtn = document.getElementById('retain-counsel-btn');
+    const mode = options.mode || 'default';
+    if (mode === 'arrest') {
+      relitigateBtn.textContent = 'RE-LITIGATE';
+      counselBtn.classList.remove('hidden');
+      counselBtn.disabled = !(options.state && options.state.money >= 100000);
+    } else {
+      relitigateBtn.textContent = 'RUN AGAIN';
+      counselBtn.classList.add('hidden');
+    }
+    document.body.classList.add('game-ended');
     document.getElementById('ending-modal').classList.remove('hidden');
   },
 };

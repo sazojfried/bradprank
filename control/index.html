@@ -27,6 +27,7 @@
       <div class="hud-cell">
         <span>CASH</span>
         <strong id="cash-text">$0</strong>
+        <small id="passive-buff-text">Passive Buff: none</small>
       </div>
       <div class="hud-cell wide">
         <span>Privacy Armor</span>
@@ -50,6 +51,7 @@
         <div id="delivery-driver" class="delivery-driver hidden">DRIVER</div>
         <div id="delivery-item" class="delivery-item hidden"></div>
         <div id="trash-can" class="trash-can">🗑</div>
+        <div id="encrypted-cache" class="encrypted-cache">ENCRYPTED_CACHE</div>
         <div id="workday-overlay" class="workday-overlay hidden">
           <div class="workday-box">
             <h2>WORKDAY IN PROGRESS</h2>
@@ -86,7 +88,10 @@
     <div class="ending-box">
       <h1 id="ending-title"></h1>
       <p id="ending-copy"></p>
-      <button onclick="location.reload()">Run Again</button>
+      <div class="ending-actions">
+        <button id="re-litigate-btn">RUN AGAIN</button>
+        <button id="retain-counsel-btn" class="hidden">RETAIN ELITE COUNSEL ($100,000)</button>
+      </div>
     </div>
   </div>
 
