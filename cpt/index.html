@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CURTILAGE // The 28-Day Grind</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="crt-glow"></div>
+
+    <main id="game-container">
+        <header id="hud">
+            <div class="stat-box">
+                <span class="label">CALENDAR</span>
+                <span id="day-count" class="value">DAY 01/28</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">CAPITAL</span>
+                <span id="capital-amount" class="value">$0</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">PRIVACY_SCORE</span>
+                <div class="bar-container">
+                    <div id="privacy-bar" class="bar" style="width: 100%;"></div>
+                </div>
+            </div>
+            <div class="stat-box alert">
+                <span class="label">SEARCH_METER</span>
+                <div class="bar-container">
+                    <div id="search-bar" class="bar danger" style="width: 0%;"></div>
+                </div>
+            </div>
+        </header>
+
+        <section id="main-interface">
+            <aside id="log-console">
+                <h3>SYSTEM_LOGS</h3>
+                <div id="log-entries">
+                    <p class="system-msg">Initializing 4th Amendment Surveillance Loop...</p>
+                    <p class="system-msg">Status: Unfenced. Public. Exposed.</p>
+                </div>
+            </aside>
+
+            <section id="shop-container">
+                <h3>LEGAL_UPGRADES</h3>
+                <div id="item-list">
+                    </div>
+                <button id="next-day-btn">COMMENCE DAILY GRIND</button>
+            </section>
+        </section>
+
+        <footer id="legal-lore">
+            <p>“The Fourth Amendment protects people, not places.” — Stewart, J. (Katz v. U.S.)</p>
+        </footer>
+    </main>
+
+    <div id="game-over-modal" class="hidden">
+        <div class="modal-content">
+            <h1 id="verdict-title">JUDGMENT RENDERED</h1>
+            <p id="verdict-text"></p>
+            <button onclick="location.reload()">RE-LITIGATE (RESTART)</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
