@@ -4,6 +4,8 @@
   --public: #1a1a22;
   --yard: #142114;
   --home: #2a1f18;
+  --garage: #56453a;
+  --driveway: #3a3a3a;
   --text: #dcf8dc;
   --green: #3aff5c;
   --red: #ff355c;
@@ -52,6 +54,8 @@ body {
 .tile.public { background: var(--public); }
 .tile.yard { background: var(--yard); }
 .tile.home { background: var(--home); }
+.tile.garage { background: var(--garage); }
+.tile.driveway { background: var(--driveway); }
 .night .tile { filter: brightness(0.45) saturate(0.8); }
 
 .entity { position: absolute; inset: 18%; }
@@ -81,19 +85,15 @@ body {
 }
 .viz-fence {
   position: absolute;
-  left: 33.2%;
-  top: 58.8%;
-  width: 33.5%;
-  height: 34.2%;
-  border: 3px solid #a0a0a0;
+  border: 1px solid #8e8e8e;
 }
 .viz-gate {
   position: absolute;
-  left: 47.8%;
-  top: 58.8%;
-  width: 4.2%;
-  height: 3px;
-  background: #c7c7c7;
+  transform: translate(-50%, -50%);
+  color: #d6d6d6;
+  text-shadow: 0 0 6px #fff8;
+  font-size: 14px;
+  font-weight: 700;
 }
 .viz-cam {
   position: absolute;
@@ -132,8 +132,9 @@ body {
   position: absolute;
   width: 16%;
   height: 6%;
-  left: -20%;
-  top: 20%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   background: var(--yellow);
   color: #111;
   font-weight: 700;
@@ -143,11 +144,11 @@ body {
   border: 1px solid #fff7;
   z-index: 11;
 }
-.delivery-van.arrive { animation: vanArrive 1.4s ease-out forwards; }
 .delivery-driver {
   position: absolute;
-  left: 42%;
-  top: 20%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -159,18 +160,17 @@ body {
   font-weight: 700;
   z-index: 12;
 }
-.delivery-driver.walk-out { animation: driverWalk 0.9s ease-out forwards; }
 .delivery-item {
   position: absolute;
-  left: 43.6%;
-  top: 27%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   font-size: 10px;
   padding: 2px 5px;
   border: 1px solid #fff;
   background: #000d;
   z-index: 11;
 }
-.delivery-item.drop { animation: itemDrop 0.8s ease-out forwards; }
 
 .police-chatter {
   position: absolute;
@@ -218,6 +218,8 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .legend-dot.you { background: #fff; box-shadow: 0 0 8px #fff; }
 .legend-dot.police-flash { animation: siren .42s infinite alternate; }
 
+body.class-locked .app-shell { pointer-events: none; }
+
 .class-overlay {
   position: fixed;
   inset: 0;
@@ -253,7 +255,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border: 2px solid #fff8;
   padding: 14px 18px;
   text-shadow: 0 0 12px #fff;
-  animation: alertFade 2s forwards;
+  animation: alertFade var(--alert-duration, 2000ms) forwards;
 }
 
 .ending {
@@ -272,7 +274,4 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   0% { background: #3d8fff; box-shadow: 0 0 8px #3d8fff; }
   100% { background: #ff315a; box-shadow: 0 0 8px #ff315a; }
 }
-@keyframes vanArrive { from { left: -20%; } to { left: 36%; } }
-@keyframes driverWalk { from { transform: translate(0, 0); } to { transform: translate(5px, 52px); } }
-@keyframes itemDrop { from { transform: translateY(-6px); opacity: 0.4; } to { transform: translateY(8px); opacity: 1; } }
 @keyframes alertFade { 0% { opacity: 0; transform: scale(0.95);} 8%,70% {opacity: 1;} 100% {opacity: 0; transform: scale(1.03);} }
