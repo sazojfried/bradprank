@@ -3,18 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CURTILAGE: The 28-Day Grind</title>
+  <title>CURTILAGE: The 30-Day Grind</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="crt-overlay"></div>
   <div id="alert-layer"></div>
 
+  <div id="class-overlay" class="class-overlay">
+    <div class="class-modal">
+      <h1>Choose Your Class to Begin</h1>
+      <p class="subtitle">Kozinski Residence // Selection is permanent</p>
+      <section id="class-select" class="card"></section>
+    </div>
+  </div>
+
   <main class="app-shell">
     <header class="hud">
       <div class="hud-cell">
         <span id="cycle-indicator" class="cycle">☀️ DAY</span>
-        <span id="day-text">Day 01 / 28</span>
+        <span id="day-text">Day 01 / 30</span>
       </div>
       <div class="hud-cell">
         <span>CASH</span>
@@ -35,11 +43,20 @@
     <section class="main-layout">
       <section class="grid-wrap">
         <div id="grid" class="grid"></div>
-        <div id="delivery-van" class="delivery-van hidden"></div>
+        <div class="residence-label">KOZINSKI RESIDENCE</div>
+        <div id="upgrade-visuals" class="upgrade-visuals"></div>
+        <div id="police-chatter" class="police-chatter"></div>
+        <div id="delivery-van" class="delivery-van hidden">TRUCK</div>
+        <div id="delivery-driver" class="delivery-driver hidden">DRIVER</div>
+        <div id="delivery-item" class="delivery-item hidden"></div>
       </section>
 
       <aside class="panel">
-        <section id="class-select" class="card"></section>
+        <section class="card legend">
+          <h2>Legend</h2>
+          <div><span class="legend-dot you"></span> You (Kozinski)</div>
+          <div><span class="legend-dot police-flash"></span> Police (blue/red flashing)</div>
+        </section>
 
         <section class="card">
           <h2>Upgrades</h2>

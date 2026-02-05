@@ -1,7 +1,7 @@
 const GameEngine = {
   state: {
     day: 1,
-    maxDays: 28,
+    maxDays: 30,
     phase: 'day',
     money: 0,
     privacy: 0,
@@ -9,6 +9,7 @@ const GameEngine = {
     heatMultiplier: 1,
     moving: false,
     selectedClass: null,
+    classLocked: false,
     player: { x: 7, y: 11 },
     cops: [{ x: 2, y: 2 }, { x: 12, y: 3 }, { x: 4, y: 1 }],
     bought: new Set(),
@@ -47,9 +48,18 @@ const GameEngine = {
   ],
 
   lifestyleShop: [
-    { id: 'tv', name: 'Smart TV', cost: 1200, heat: 11 },
-    { id: 'espresso', name: 'Espresso Machine', cost: 1800, heat: 9 },
-    { id: 'sofa', name: 'Designer Sofa', cost: 3600, heat: 13 },
+    { id: 'tv', name: 'Smart TV', cost: 1200, heat: 5 },
+    { id: 'espresso', name: 'Espresso Machine', cost: 1800, heat: 4 },
+    { id: 'sofa', name: 'Designer Sofa', cost: 3600, heat: 6 },
+  ],
+
+  surveillanceReasons: [
+    'trash sifted at curb',
+    'vehicle plate spotted near drop lane',
+    'photos taken from street',
+    'license scanner cross-match',
+    'neighbor tip forwarded',
+    'door camera footage subpoenaed',
   ],
 
   init() {
@@ -65,27 +75,34 @@ const GameEngine = {
   },
 
   selectClass(id) {
+    if (this.state.classLocked) return;
     const chosen = this.classes[id];
     this.state.selectedClass = id;
+    this.state.classLocked = true;
     this.state.money = chosen.money;
     this.state.privacy = chosen.privacy;
     this.state.heatMultiplier = chosen.multiplier;
+    if (id === 'gated') {
+      this.state.bought.add('fence');
+      this.state.bought.add('gate');
+    }
+    UIController.hideClassOverlay();
     UIController.flash(`CLASS LOCKED: ${chosen.name}`);
     UIController.enableCommute();
     UIController.updateHUD(this.state);
     UIController.refreshShops(this.state);
+    UIController.renderPropertyUpgrades(this.state);
   },
 
   exposureGain(y) {
     if (y >= 4) return 0;
-    const base = 16 * this.state.heatMultiplier;
+    const base = 1.4 * this.state.heatMultiplier;
     const armor = this.state.privacy / 100;
     return Math.max(1, base * (1 - armor));
   },
 
   async runCommuteLoop() {
     if (!this.state.selectedClass || this.state.moving) return;
-    if (this.state.day === 28) return this.triggerJonesVerdict();
 
     this.state.moving = true;
     UIController.disableCommute(true);
@@ -107,10 +124,22 @@ const GameEngine = {
     UIController.toggleNight(false);
     if (this.checkArrest()) return;
 
-    this.state.money += 900;
+    this.state.money += 1100;
+    const nightlyCooldown = 2 + (this.state.privacy / 25);
+    this.state.heat = Math.max(0, this.state.heat - nightlyCooldown);
     this.state.day += 1;
-    UIController.flash('PAYMENT RECEIVED: +$900');
+    UIController.flash(`PAYMENT RECEIVED: +$1,100 // HEAT -${nightlyCooldown.toFixed(1)}%`);
     UIController.updateHUD(this.state);
+
+    if (this.state.day > this.state.maxDays) {
+      this.state.moving = false;
+      UIController.disableCommute(true);
+      UIController.showEnding(
+        '30-DAY SURVIVAL COMPLETE // KOZINSKI RESIDENCE SECURED',
+        'You survived the full 30-day pressure test at the Kozinski residence. Pattern-of-life certainty never reached arrest threshold.'
+      );
+      return;
+    }
 
     this.state.moving = false;
     UIController.disableCommute(false);
@@ -122,12 +151,12 @@ const GameEngine = {
       const gain = this.exposureGain(step.y);
       if (gain > 0) {
         this.state.heat = Math.min(100, this.state.heat + gain);
-        UIController.flash(`HEAT +${gain.toFixed(1)}%`);
+        UIController.flash(`HEAT +${gain.toFixed(1)}% // ${this.randomHeatReason()}`);
       }
       this.patrolCops();
       UIController.renderEntities(this.state);
       UIController.updateHUD(this.state);
-      await this.delay(420);
+      await this.delay(580);
       if (this.checkArrest()) break;
     }
   },
@@ -151,6 +180,7 @@ const GameEngine = {
     UIController.flash(`PRIVACY ARMOR +${item.privacy}%`);
     UIController.updateHUD(this.state);
     UIController.refreshShops(this.state);
+    UIController.renderPropertyUpgrades(this.state);
   },
 
   async buyLifestyle(id) {
@@ -159,27 +189,34 @@ const GameEngine = {
     this.state.money -= item.cost;
     const penalty = item.heat * this.state.heatMultiplier;
     this.state.heat = Math.min(100, this.state.heat + penalty);
+    this.state.bought.add(item.id);
+    UIController.renderPropertyUpgrades(this.state);
     UIController.updateHUD(this.state);
+    UIController.flash(`HEAT +${penalty.toFixed(1)}% // ${this.deliveryLeakReason(item.name)}`);
     UIController.flash('> [3RD-PARTY_SNITCH]: Consumer data shared with State analytics.');
-    await UIController.deliveryEvent(this.state, () => this.pullPoliceToVan());
+    await UIController.deliveryEvent(item.name, this.state, () => this.pullPoliceToVan(item.name));
     if (this.checkArrest()) return;
   },
 
-  pullPoliceToVan() {
-    this.state.cops = this.state.cops.map(() => ({ x: 8 + Math.floor(Math.random() * 2), y: 8 + Math.floor(Math.random() * 3) }));
+  pullPoliceToVan(itemName) {
+    this.state.cops = this.state.cops.map(() => ({
+      x: 6 + Math.floor(Math.random() * 4),
+      y: 2 + Math.floor(Math.random() * 2),
+    }));
     UIController.renderEntities(this.state);
+    UIController.policeDialogue([
+      `Blue: "Kozinski just got a ${itemName}."`,
+      'Red: "Log the delivery metadata and watch the route."',
+    ]);
   },
 
-  triggerJonesVerdict() {
-    if (this.state.jonesTriggered) return;
-    this.state.jonesTriggered = true;
-    UIController.disableCommute(true);
-    UIController.flash('COMMUTE FAILURE: DAY 28');
-    UIController.tagPlayerGPS();
-    UIController.showEnding(
-      'JONES VERDICT // PHYSICAL TRESPASS CONFIRMED',
-      'A GPS tag was physically placed on Day 1. All later Privacy Armor calculations were rendered moot by the initial trespass into your curtilage.'
-    );
+  randomHeatReason() {
+    const i = Math.floor(Math.random() * this.surveillanceReasons.length);
+    return this.surveillanceReasons[i];
+  },
+
+  deliveryLeakReason(itemName) {
+    return `${itemName} purchase metadata sold to ad broker`;
   },
 
   checkArrest() {
@@ -282,17 +319,64 @@ const UIController = {
     if (p) p.classList.add('gps-tag');
   },
 
-  async deliveryEvent(state, onInspect) {
+  async deliveryEvent(itemName, state, onInspect) {
     const van = document.getElementById('delivery-van');
+    const driver = document.getElementById('delivery-driver');
+    const pkg = document.getElementById('delivery-item');
+    pkg.textContent = itemName;
+
+    driver.classList.add('hidden');
+    pkg.classList.add('hidden');
     van.classList.remove('hidden');
-    van.classList.add('slide');
+    van.classList.add('arrive');
+    await new Promise((r) => setTimeout(r, 1800));
+
+    driver.classList.remove('hidden');
+    driver.classList.add('walk-out');
+    pkg.classList.remove('hidden');
+    pkg.classList.add('drop');
     onInspect();
-    this.flash('DELIVERY EVENT: POLICE DIVERT TO INSPECTION');
-    await new Promise((r) => setTimeout(r, 2100));
-    van.classList.remove('slide');
+    this.flash('DELIVERY EVENT: TRUCK STOPS ON ROAD // DRIVER MAKES DROP');
+    await new Promise((r) => setTimeout(r, 2800));
+
+    driver.classList.remove('walk-out');
+    driver.classList.add('hidden');
+    pkg.classList.add('hidden');
+    pkg.classList.remove('drop');
+    van.classList.remove('arrive');
     van.classList.add('hidden');
     state.cops = state.cops.map((c, i) => ({ x: [2, 12, 4][i] ?? c.x, y: [2, 3, 1][i] ?? c.y }));
     this.renderEntities(state);
+  },
+
+  renderPropertyUpgrades(state) {
+    const visuals = document.getElementById('upgrade-visuals');
+    visuals.innerHTML = '';
+    if (state.bought.has('fence')) visuals.innerHTML += '<div class="viz-fence"></div>';
+    if (state.bought.has('gate')) visuals.innerHTML += '<div class="viz-gate"></div>';
+    if (state.bought.has('cam')) visuals.innerHTML += '<div class="viz-cam c1"></div><div class="viz-cam c2"></div><div class="viz-cam c3"></div><div class="viz-cam c4"></div>';
+    if (state.bought.has('cell')) visuals.innerHTML += '<div class="viz-cell">MAIL</div>';
+    if (state.bought.has('tv')) visuals.innerHTML += '<div class="viz-item tv">TV</div>';
+    if (state.bought.has('espresso')) visuals.innerHTML += '<div class="viz-item espresso">ESP</div>';
+    if (state.bought.has('sofa')) visuals.innerHTML += '<div class="viz-item sofa">SOFA</div>';
+  },
+
+  hideClassOverlay() {
+    document.getElementById('class-overlay').classList.add('hidden');
+  },
+
+  policeDialogue(lines) {
+    const host = document.getElementById('police-chatter');
+    host.innerHTML = '';
+    lines.forEach((line, index) => {
+      setTimeout(() => {
+        const bubble = document.createElement('div');
+        bubble.className = 'speech-bubble';
+        bubble.textContent = line;
+        host.appendChild(bubble);
+        setTimeout(() => bubble.remove(), 2600);
+      }, index * 400);
+    });
   },
 
   toggleNight(on) {
