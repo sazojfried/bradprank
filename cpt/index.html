@@ -17,10 +17,10 @@
 
         <div id="agentsLayer"></div>
 
-        <div id="house" class="entity house"></div>
-        <div id="car" class="entity car parked"></div>
-        <div id="van" class="entity van hidden"></div>
-        <img id="player" class="entity player" src="./image_2d8edf.png" alt="Player sprite" />
+        <div id="house" class="entity house" aria-hidden="true"></div>
+        <div id="car" class="entity car parked" aria-hidden="true"></div>
+        <div id="van" class="entity van hidden" aria-hidden="true"></div>
+        <div id="player" class="entity player" role="img" aria-label="Player sprite"></div>
       </div>
 
       <div id="dialogue" class="dialogue hidden">
@@ -32,10 +32,10 @@
     <aside class="panel sidebar">
       <h1>DYSTOPIAN TERMINAL</h1>
       <div class="stats">
-        <p>DAY <span id="dayStat">01 / 28</span></p>
-        <p>CAPITAL <span id="capitalStat">$2500</span></p>
-        <p>PRIVACY SCORE <span id="privacyStat">80</span></p>
-        <p class="alert">SEARCH METER <span id="searchStat">0%</span></p>
+        <p><span class="label"><i class="hud-icon icon-calendar" aria-hidden="true"></i>DAY</span> <span id="dayStat">01 / 28</span></p>
+        <p><span class="label"><i class="hud-icon icon-coins" aria-hidden="true"></i>CAPITAL</span> <span id="capitalStat">$2500</span></p>
+        <p><span class="label"><i class="hud-icon icon-shield" aria-hidden="true"></i>PRIVACY SCORE</span> <span id="privacyStat">80</span></p>
+        <p class="alert"><span class="label"><i class="hud-icon icon-search" aria-hidden="true"></i>SEARCH METER</span> <span id="searchStat">0%</span></p>
       </div>
 
       <div class="meters">
