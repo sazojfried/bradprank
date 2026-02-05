@@ -47,8 +47,17 @@ body {
 .fill.privacy { background: var(--green); box-shadow: 0 0 8px var(--green); }
 .fill.heat { background: var(--red); box-shadow: 0 0 8px var(--red); }
 
-.main-layout { flex: 1; display: grid; grid-template-columns: 1fr 360px; gap: 12px; padding: 12px; }
-.grid-wrap { position: relative; border: 1px solid #343741; background: #090a0e; overflow: hidden; }
+.main-layout { flex: 1; display: flex; gap: 12px; padding: 12px; min-height: 0; }
+.grid-wrap {
+  position: relative;
+  border: 1px solid #343741;
+  background: #090a0e;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  max-height: calc(100vh - 140px);
+}
 .grid { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr); }
 .tile { border: 1px solid #ffffff0a; position: relative; }
 .tile.public { background: var(--public); }
@@ -173,7 +182,7 @@ body {
   max-width: 280px;
 }
 
-.panel { display: flex; flex-direction: column; gap: 10px; }
+.panel { display: flex; flex-direction: column; gap: 10px; width: 400px; flex-shrink: 0; }
 .card { border: 1px solid #2a2d34; background: #0b0d11; padding: 10px; }
 .card h2 { font-size: 14px; margin: 0 0 8px; color: #bfc9db; }
 .option, .shop-item {
@@ -190,6 +199,14 @@ button#commute-btn {
   border: 1px solid #4fbc64;
   background: #102815;
   color: #d7ffe0;
+  padding: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+button#fast-forward-btn {
+  border: 1px solid #4b83ff;
+  background: #0d1732;
+  color: #d3e3ff;
   padding: 12px;
   font-weight: 700;
   cursor: pointer;
