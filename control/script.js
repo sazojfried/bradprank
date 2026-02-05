@@ -24,42 +24,45 @@ const GameEngine = {
     selectedClass: null,
     classLocked: false,
     player: { x: 7, y: 11 },
-    cops: [{ x: 2, y: 2 }, { x: 12, y: 3 }, { x: 4, y: 1 }],
+    trashCan: { x: 7, y: 3 },
+    cops: [{ x: 6, y: 2 }, { x: 8, y: 2 }, { x: 7, y: 1 }],
     bought: new Set(),
-    jonesTriggered: false,
-    classTuning: { nightlyDecay: 2, dailyHeatDrift: 0, passiveArmorBonus: 0 },
+    classTuning: { nightlyDecay: 2, dailyHeatDrift: 0, passiveArmorBonus: 0, dailyStipend: 1100 },
   },
 
   classes: {
     gated: {
-      name: 'The 1% (Gated)',
-      desc: '$1,000,000, Audi A5 (+15% passive Privacy Armor), Fence/Gate pre-installed, 0.55x State Heat',
+      name: 'The 1% (GATED)',
+      desc: '$1,000,000 start, Audi A5 (+15% passive Privacy Armor), fence/gate pre-installed, stipend $15,000/day',
       money: 1000000,
       privacy: 35,
       multiplier: 0.55,
       nightlyDecay: 3.8,
       dailyHeatDrift: 0,
       passiveArmorBonus: 15,
+      dailyStipend: 15000,
     },
     pro: {
-      name: 'The Professional',
-      desc: '$15,000, duplex + large backyard, tuned for mid-campaign survivability',
+      name: 'The Professional (DUPLEX)',
+      desc: '$15,000 start, duplex with large backyard, stipend $1,800/day',
       money: 15000,
       privacy: 12,
       multiplier: 1.05,
       nightlyDecay: 3.5,
       dailyHeatDrift: 1,
       passiveArmorBonus: 0,
+      dailyStipend: 1800,
     },
     exposed: {
-      name: 'The Exposed',
-      desc: '$1,200, zero protection, accelerated surveillance profile',
+      name: 'The Exposed (GRIND)',
+      desc: '$1,200 start, zero protection, stipend $750/day',
       money: 1200,
       privacy: 0,
       multiplier: 2.9,
       nightlyDecay: 1,
       dailyHeatDrift: 8,
       passiveArmorBonus: 0,
+      dailyStipend: 750,
     },
   },
 
@@ -97,6 +100,7 @@ const GameEngine = {
     UIController.renderEntities(this.state);
     UIController.updateHUD(this.state);
     UIController.renderPropertyUpgrades(this.state, this.grid);
+    UIController.placeTrashCan(this.state.trashCan, this.grid);
   },
 
   selectClass(id) {
@@ -109,6 +113,7 @@ const GameEngine = {
       nightlyDecay: chosen.nightlyDecay,
       dailyHeatDrift: chosen.dailyHeatDrift,
       passiveArmorBonus: chosen.passiveArmorBonus,
+      dailyStipend: chosen.dailyStipend,
     };
     this.state.privacy = Math.min(95, chosen.privacy + chosen.passiveArmorBonus);
     this.state.heatMultiplier = chosen.multiplier;
@@ -144,23 +149,29 @@ const GameEngine = {
     const toHome = [...toDrop].reverse();
 
     this.state.phase = 'day';
-    UIController.flash('☀️ DAY COMMUTE: HOUSE → DEAD DROP');
+    UIController.toggleNight(false);
+    UIController.updateHUD(this.state);
+    UIController.flash('☀️ ARRIVING AT WORK');
     await this.followRoute(toDrop);
     if (this.checkArrest()) return;
 
+    await UIController.runWorkdayProgress();
+
     this.state.phase = 'night';
-    UIController.flash('🌙 NIGHT MODE: RETURN VECTOR');
     UIController.toggleNight(true);
+    UIController.updateHUD(this.state);
+    UIController.flash('🌙 COMMUTING HOME');
     await this.followRoute(toHome);
     UIController.toggleNight(false);
     if (this.checkArrest()) return;
 
-    this.state.money += 1100;
+    const stipend = this.state.classTuning.dailyStipend;
+    this.state.money += stipend;
     const nightlyCooldown = this.state.classTuning.nightlyDecay + (this.state.privacy / 30);
     this.state.heat = Math.max(0, this.state.heat - nightlyCooldown);
     this.state.heat = Math.min(100, this.state.heat + this.state.classTuning.dailyHeatDrift);
     this.state.day += 1;
-    UIController.flash(`PAYMENT RECEIVED: +$1,100 // HEAT -${nightlyCooldown.toFixed(1)}%`);
+    UIController.flash(`PAYMENT RECEIVED: +$${stipend.toLocaleString()} // HEAT -${nightlyCooldown.toFixed(1)}%`);
     UIController.updateHUD(this.state);
 
     if (this.state.day > this.state.maxDays) {
@@ -194,9 +205,11 @@ const GameEngine = {
   },
 
   patrolCops() {
+    const trash = this.state.trashCan;
     this.state.cops = this.state.cops.map((c) => {
-      const dx = Math.sign((Math.random() > 0.6 ? this.state.player.x : 7) - c.x);
-      const dy = Math.sign((Math.random() > 0.55 ? this.state.player.y : 2) - c.y);
+      const anchor = { x: trash.x + Math.floor(Math.random() * 3) - 1, y: trash.y + Math.floor(Math.random() * 2) - 1 };
+      const dx = Math.sign(anchor.x - c.x);
+      const dy = Math.sign(anchor.y - c.y);
       const nx = Math.max(0, Math.min(14, c.x + dx));
       const ny = Math.max(0, Math.min(3, c.y + dy));
       return { x: nx, y: ny };
@@ -226,20 +239,22 @@ const GameEngine = {
     UIController.updateHUD(this.state);
     UIController.flash(`HEAT +${penalty.toFixed(1)}% // ${this.deliveryLeakReason(item.name)}`);
     UIController.flash('> [3RD-PARTY_SNITCH]: Consumer data shared with State analytics.', { duration: 6000 });
-    await UIController.deliveryEvent(item.name, this.state, this.grid, () => this.pullPoliceToVan(item.name));
+    await UIController.deliveryEvent(item.name, this.state, this.grid, () => this.pullPoliceToTrash(item.name));
     if (this.checkArrest()) return;
   },
 
-  pullPoliceToVan(itemName) {
+  pullPoliceToTrash(itemName) {
+    const t = this.state.trashCan;
     this.state.cops = this.state.cops.map(() => ({
-      x: 6 + Math.floor(Math.random() * 4),
-      y: 2 + Math.floor(Math.random() * 2),
+      x: Math.max(0, Math.min(14, t.x - 1 + Math.floor(Math.random() * 3))),
+      y: Math.max(0, Math.min(3, t.y - 1 + Math.floor(Math.random() * 2))),
     }));
     UIController.renderEntities(this.state);
     UIController.policeDialogue([
       `Blue: "Kozinski just got a ${itemName}."`,
-      'Red: "Log the delivery metadata and watch the route."',
+      'Red: "Check the curbside trash pull first."',
     ]);
+    UIController.flash('> [GREENWOOD_DOCTRINE]: No expectation of privacy in abandoned property at the curb.', { duration: 5200 });
   },
 
   randomHeatReason() {
@@ -268,6 +283,7 @@ const GameEngine = {
 const UIController = {
   messageQueue: [],
   showingMessage: false,
+  activeLocks: new Set(),
 
   buildGrid(gridConfig) {
     const grid = document.getElementById('grid');
@@ -306,14 +322,14 @@ const UIController = {
 
   renderShops(legal, life, handlers) {
     const legalHost = document.getElementById('legal-shop');
-    legalHost.innerHTML = legal.map((i) => `<div class="shop-item" data-legal="${i.id}"><strong>${i.name}</strong><small>$${i.cost.toLocaleString()} // +${i.privacy}% armor</small></div>`).join('');
+    legalHost.innerHTML = legal.map((i) => `<button class="shop-item buy-btn" data-legal="${i.id}"><strong>${i.name}</strong><small>$${i.cost.toLocaleString()} // +${i.privacy}% armor</small></button>`).join('');
     legalHost.onclick = (e) => {
       const el = e.target.closest('[data-legal]');
       if (el) handlers.buyLegal(el.dataset.legal);
     };
 
     const lifeHost = document.getElementById('lifestyle-shop');
-    lifeHost.innerHTML = life.map((i) => `<div class="shop-item" data-life="${i.id}"><strong>${i.name}</strong><small>$${i.cost.toLocaleString()} // delivery metadata leak</small></div>`).join('');
+    lifeHost.innerHTML = life.map((i) => `<button class="shop-item buy-btn" data-life="${i.id}"><strong>${i.name}</strong><small>$${i.cost.toLocaleString()} // delivery metadata leak</small></button>`).join('');
     lifeHost.onclick = (e) => {
       const el = e.target.closest('[data-life]');
       if (el) handlers.buyLifestyle(el.dataset.life);
@@ -331,6 +347,18 @@ const UIController = {
     if (locked) document.getElementById('class-overlay').classList.remove('hidden');
   },
 
+  lockUI(reason) {
+    if (reason) this.activeLocks.add(reason);
+    document.body.classList.add('ui-locked');
+  },
+
+  unlockUI(reason) {
+    if (reason) this.activeLocks.delete(reason);
+    if (!this.activeLocks.size && !this.messageQueue.length && !this.showingMessage) {
+      document.body.classList.remove('ui-locked');
+    }
+  },
+
   bindCommute(run) { document.getElementById('commute-btn').onclick = run; },
   enableCommute() { document.getElementById('commute-btn').disabled = false; },
   disableCommute(v) { document.getElementById('commute-btn').disabled = v; },
@@ -342,7 +370,7 @@ const UIController = {
     document.getElementById('privacy-text').textContent = `${state.privacy.toFixed(1)}%`;
     document.getElementById('heat-meter').style.width = `${Math.min(100, state.heat)}%`;
     document.getElementById('heat-text').textContent = `${Math.min(100, state.heat).toFixed(1)}%`;
-    document.getElementById('cycle-indicator').textContent = state.phase === 'day' ? '☀️ DAY' : '🌙 NIGHT';
+    document.getElementById('cycle-indicator').textContent = state.phase === 'day' ? '☀️' : '🌙';
   },
 
   renderEntities(state) {
@@ -359,9 +387,9 @@ const UIController = {
     target.appendChild(e);
   },
 
-  tagPlayerGPS() {
-    const p = document.querySelector('.player');
-    if (p) p.classList.add('gps-tag');
+  placeTrashCan(point, gridConfig) {
+    const can = document.getElementById('trash-can');
+    this.positionElementToTile(can, point, gridConfig);
   },
 
   tileCenter(x, y, gridConfig) {
@@ -383,17 +411,19 @@ const UIController = {
   },
 
   async deliveryEvent(itemName, state, gridConfig, onInspect) {
-    const van = document.getElementById('delivery-van');
+    const truck = document.getElementById('delivery-truck');
     const driver = document.getElementById('delivery-driver');
     const pkg = document.getElementById('delivery-item');
     const garageDrop = { x: gridConfig.garage.x, y: gridConfig.garage.y };
-    const drivewayPath = gridConfig.driveway;
+    const spawn = { x: gridConfig.driveway[0].x, y: 2 };
+    const drivewayPath = [spawn, ...gridConfig.driveway];
     pkg.textContent = itemName;
 
+    this.lockUI('delivery');
     driver.classList.add('hidden');
     pkg.classList.add('hidden');
-    van.classList.remove('hidden');
-    await this.walkElementPath(van, drivewayPath, gridConfig, 210);
+    truck.classList.remove('hidden');
+    await this.walkElementPath(truck, drivewayPath, gridConfig, 210);
 
     driver.classList.remove('hidden');
     this.positionElementToTile(driver, drivewayPath[drivewayPath.length - 1], gridConfig);
@@ -403,13 +433,31 @@ const UIController = {
     this.flash('[DELIVERY EVENT]: TRUCK USES DRIVEWAY // PACKAGE DROPPED AT GARAGE', { duration: 6000 });
     await new Promise((r) => setTimeout(r, 2000));
     const reversePath = [...drivewayPath].reverse();
-    await this.walkElementPath(van, reversePath, gridConfig, 180);
+    await this.walkElementPath(truck, reversePath, gridConfig, 180);
 
     driver.classList.add('hidden');
     pkg.classList.add('hidden');
-    van.classList.add('hidden');
-    state.cops = state.cops.map((c, i) => ({ x: [2, 12, 4][i] ?? c.x, y: [2, 3, 1][i] ?? c.y }));
+    truck.classList.add('hidden');
+    state.cops = state.cops.map((c, i) => ({ x: [6, 8, 7][i] ?? c.x, y: [2, 2, 1][i] ?? c.y }));
     this.renderEntities(state);
+    this.unlockUI('delivery');
+  },
+
+  async runWorkdayProgress() {
+    const overlay = document.getElementById('workday-overlay');
+    const fill = document.getElementById('workday-meter-fill');
+    const text = document.getElementById('workday-text');
+    overlay.classList.remove('hidden');
+    fill.style.width = '0%';
+    text.textContent = '0%';
+    this.lockUI('workday');
+    for (let pct = 0; pct <= 100; pct += 5) {
+      fill.style.width = `${pct}%`;
+      text.textContent = `${pct}%`;
+      await new Promise((r) => setTimeout(r, 120));
+    }
+    overlay.classList.add('hidden');
+    this.unlockUI('workday');
   },
 
   renderPropertyUpgrades(state, gridConfig) {
@@ -463,9 +511,11 @@ const UIController = {
   async processFlashQueue() {
     if (!this.messageQueue.length) {
       this.showingMessage = false;
+      this.unlockUI('messages');
       return;
     }
     this.showingMessage = true;
+    this.lockUI('messages');
     const { text, duration } = this.messageQueue.shift();
     const host = document.getElementById('alert-layer');
     const box = document.createElement('div');
@@ -484,6 +534,5 @@ const UIController = {
     document.getElementById('ending-modal').classList.remove('hidden');
   },
 };
-
 
 GameEngine.init();
