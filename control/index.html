@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CURTILAGE // Tactical Surveillance Sim</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="crt-overlay"></div>
+    <div id="glitch-overlay"></div>
+
+    <main id="game-wrapper">
+        <header id="master-hud">
+            <div class="hud-group">
+                <span class="hud-label">CALENDAR_LOOP</span>
+                <span id="day-display" class="hud-value">01 / 28</span>
+            </div>
+            <div class="hud-group">
+                <span class="hud-label">LIQUID_CAPITAL</span>
+                <span id="capital-display" class="hud-value">$1,200</span>
+            </div>
+            <div class="hud-group wide">
+                <span class="hud-label">PRIVACY_FORTIFICATION (ARMOR)</span>
+                <div class="meter-bg"><div id="privacy-meter" class="meter-fill green" style="width: 0%;"></div></div>
+                <span id="ps-text" class="meter-sub">0% OBFUSCATED</span>
+            </div>
+            <div class="hud-group wide">
+                <span class="hud-label">STATE_SEARCH_CONFIDENCE (HEAT)</span>
+                <div class="meter-bg"><div id="search-meter" class="meter-fill red" style="width: 0%;"></div></div>
+                <span id="sm-text" class="meter-sub">0% KNOWN</span>
+            </div>
+        </header>
+
+        <div id="main-layout">
+            <section id="viewport-container">
+                <div id="grid-canvas">
+                    </div>
+                <div id="visual-overlay">
+                    <div id="delivery-truck" class="hidden"></div>
+                    <div id="drone-shadow" class="hidden"></div>
+                </div>
+            </section>
+
+            <aside id="command-sidebar">
+                <div id="tab-controls">
+                    <button class="tab-btn active" data-tab="legal">LEGAL_UPGRADES</button>
+                    <button class="tab-btn" data-tab="life">LIFESTYLE</button>
+                </div>
+
+                <div id="shop-viewport">
+                    <div id="legal-shop" class="shop-page"></div>
+                    <div id="life-shop" class="shop-page hidden"></div>
+                </div>
+
+                <button id="action-btn">EXECUTE_COMMUTE (GO TO WORK)</button>
+
+                <div id="system-console">
+                    <h3>[ SYSTEM_LOG_OUTPUT ]</h3>
+                    <div id="log-flow"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <div id="audit-modal" class="hidden">
+        <div class="audit-box">
+            <h1 class="red-glow">SEARCH_WARRANT_EXECUTED</h1>
+            <div id="audit-report"></div>
+            <hr>
+            <p id="jones-verdict"></p>
+            <button class="restart-btn" onclick="location.reload()">RE-LITIGATE</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
