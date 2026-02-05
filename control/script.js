@@ -19,8 +19,8 @@ const GameEngine = {
     phase: 'day',
     money: 0,
     privacy: 0,
-    heat: 0,
-    heatMultiplier: 1,
+    policeHeat: 0,
+    policeHeatMultiplier: 1,
     moving: false,
     selectedClass: null,
     classLocked: false,
@@ -99,7 +99,7 @@ const GameEngine = {
     },
   ],
 
-  surveillanceReasons: [
+  policeHeatReasons: [
     'trash sifted at curb',
     'vehicle plate spotted near drop lane',
     'photos taken from street',
@@ -142,7 +142,7 @@ const GameEngine = {
       dailyStipend: chosen.dailyStipend,
     };
     this.state.privacy = Math.min(95, chosen.privacy + chosen.passiveArmorBonus);
-    this.state.heatMultiplier = chosen.multiplier;
+    this.state.policeHeatMultiplier = chosen.multiplier;
     if (id === 'gated') {
       this.state.bought.add('fence');
       this.state.bought.add('gate');
@@ -161,7 +161,7 @@ const GameEngine = {
   exposureGain(y) {
     const riskBase = y >= 10 ? 0.2 : y >= 7 ? 0.5 : y >= 4 ? 0.8 : 1.2;
     const armorMitigation = (this.state.privacy / 100) * 0.75;
-    return Math.max(0.25, (riskBase * this.state.heatMultiplier) * (1 - armorMitigation));
+    return Math.max(0.25, (riskBase * this.state.policeHeatMultiplier) * (1 - armorMitigation));
   },
 
   async runCommuteLoop() {
@@ -194,11 +194,9 @@ const GameEngine = {
 
     const stipend = this.state.classTuning.dailyStipend;
     this.state.money += stipend;
-    const nightlyCooldown = this.state.classTuning.nightlyDecay + (this.state.privacy / 30);
-    this.state.heat = Math.max(0, this.state.heat - nightlyCooldown);
-    this.state.heat = Math.min(100, this.state.heat + this.state.classTuning.dailyHeatDrift);
+    this.state.policeHeat = Math.min(100, this.state.policeHeat + this.state.classTuning.dailyHeatDrift);
     this.state.day += 1;
-    UIController.flash(`PAYMENT RECEIVED: +$${stipend.toLocaleString()} // HEAT -${nightlyCooldown.toFixed(1)}%`);
+    UIController.flash(`PAYMENT RECEIVED: +$${stipend.toLocaleString()} // POLICE HEAT HOLDING`);
     UIController.updateHUD(this.state);
 
     if (this.state.day > this.state.maxDays) {
@@ -221,8 +219,8 @@ const GameEngine = {
       this.state.player = step;
       if (UIController.zoneFor(step.x, step.y, this.grid) === 'public') {
         const gain = this.exposureGain(step.y);
-        this.state.heat = Math.min(100, this.state.heat + gain);
-        UIController.flash(`HEAT +${gain.toFixed(1)}% // ${this.randomHeatReason()}`);
+        this.state.policeHeat = Math.min(100, this.state.policeHeat + gain);
+        UIController.flash(`POLICE HEAT +${gain.toFixed(1)}% // ${this.randomPoliceHeatReason()}`);
       }
       this.patrolCops();
       UIController.renderEntities(this.state);
@@ -263,9 +261,9 @@ const GameEngine = {
     UIController.updateHUD(this.state);
     await UIController.deliveryEvent(item.name, this.state, this.grid, () => {
       this.state.bought.add(item.id);
-      this.state.heat = Math.min(100, this.state.heat + 8);
+      this.state.policeHeat = Math.min(100, this.state.policeHeat + 8);
       UIController.flash(item.leakMessage, { duration: 6200 });
-      UIController.flash('> [MOSAIC_THEORY]: Third-party snitch signal adds +8% Search Confidence.', { duration: 4300 });
+      UIController.flash('> [MOSAIC_THEORY]: Third-party snitch signal adds +8% Police Heat.', { duration: 4300 });
       UIController.renderPropertyUpgrades(this.state, this.grid);
       UIController.refreshShops(this.state);
       UIController.updateHUD(this.state);
@@ -305,10 +303,8 @@ const GameEngine = {
 
     while (this.state.day <= this.state.fastForwardEndDay) {
       const stipend = this.state.classTuning.dailyStipend;
-      const nightlyCooldown = this.state.classTuning.nightlyDecay + (this.state.privacy / 30);
       this.state.money += stipend;
-      this.state.heat = Math.max(0, this.state.heat - nightlyCooldown);
-      this.state.heat = Math.min(100, this.state.heat + this.state.classTuning.dailyHeatDrift);
+      this.state.policeHeat = Math.min(100, this.state.policeHeat + this.state.classTuning.dailyHeatDrift);
       UIController.flash(`FAST FORWARD DAY ${String(this.state.day).padStart(2, '0')} // +$${stipend.toLocaleString()}`);
       this.state.day += 1;
       UIController.updateHUD(this.state);
@@ -324,13 +320,13 @@ const GameEngine = {
     );
   },
 
-  randomHeatReason() {
-    const i = Math.floor(Math.random() * this.surveillanceReasons.length);
-    return this.surveillanceReasons[i];
+  randomPoliceHeatReason() {
+    const i = Math.floor(Math.random() * this.policeHeatReasons.length);
+    return this.policeHeatReasons[i];
   },
 
   checkArrest() {
-    if (this.state.heat < 100) return false;
+    if (this.state.policeHeat < 100) return false;
     if (this.state.arrestTriggered) return true;
     this.state.arrestTriggered = true;
     this.state.moving = false;
@@ -467,8 +463,8 @@ const UIController = {
     document.getElementById('cash-text').textContent = `$${state.money.toLocaleString()}`;
     document.getElementById('privacy-meter').style.width = `${state.privacy}%`;
     document.getElementById('privacy-text').textContent = `${state.privacy.toFixed(1)}%`;
-    document.getElementById('heat-meter').style.width = `${Math.min(100, state.heat)}%`;
-    document.getElementById('heat-text').textContent = `${Math.min(100, state.heat).toFixed(1)}%`;
+    document.getElementById('heat-meter').style.width = `${Math.min(100, state.policeHeat)}%`;
+    document.getElementById('heat-text').textContent = `${Math.min(100, state.policeHeat).toFixed(1)}%`;
     document.getElementById('cycle-indicator').textContent = state.phase === 'day' ? '☀️' : '🌙';
     const buff = document.getElementById('passive-buff-text');
     if (buff) {
