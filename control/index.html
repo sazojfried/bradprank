@@ -1,78 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CURTILAGE // Tactical Surveillance Sim</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CURTILAGE: The 28-Day Grind</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="crt-overlay"></div>
-    <div id="glitch-overlay"></div>
+  <div class="crt-overlay"></div>
+  <div id="alert-layer"></div>
 
-    <main id="game-wrapper">
-        <header id="master-hud">
-            <div class="hud-group">
-                <span class="hud-label">CALENDAR_LOOP</span>
-                <span id="day-display" class="hud-value">01 / 28</span>
-            </div>
-            <div class="hud-group">
-                <span class="hud-label">LIQUID_CAPITAL</span>
-                <span id="capital-display" class="hud-value">$1,200</span>
-            </div>
-            <div class="hud-group wide">
-                <span class="hud-label">PRIVACY_FORTIFICATION (ARMOR)</span>
-                <div class="meter-bg"><div id="privacy-meter" class="meter-fill green" style="width: 0%;"></div></div>
-                <span id="ps-text" class="meter-sub">0% OBFUSCATED</span>
-            </div>
-            <div class="hud-group wide">
-                <span class="hud-label">STATE_SEARCH_CONFIDENCE (HEAT)</span>
-                <div class="meter-bg"><div id="search-meter" class="meter-fill red" style="width: 0%;"></div></div>
-                <span id="sm-text" class="meter-sub">0% KNOWN</span>
-            </div>
-        </header>
+  <main class="app-shell">
+    <header class="hud">
+      <div class="hud-cell">
+        <span id="cycle-indicator" class="cycle">☀️ DAY</span>
+        <span id="day-text">Day 01 / 28</span>
+      </div>
+      <div class="hud-cell">
+        <span>CASH</span>
+        <strong id="cash-text">$0</strong>
+      </div>
+      <div class="hud-cell wide">
+        <span>Privacy Armor</span>
+        <div class="meter"><div id="privacy-meter" class="fill privacy"></div></div>
+        <small id="privacy-text">0%</small>
+      </div>
+      <div class="hud-cell wide">
+        <span>State Search Confidence</span>
+        <div class="meter"><div id="heat-meter" class="fill heat"></div></div>
+        <small id="heat-text">0%</small>
+      </div>
+    </header>
 
-        <div id="main-layout">
-            <section id="viewport-container">
-                <div id="grid-canvas">
-                    </div>
-                <div id="visual-overlay">
-                    <div id="delivery-truck" class="hidden"></div>
-                    <div id="drone-shadow" class="hidden"></div>
-                </div>
-            </section>
+    <section class="main-layout">
+      <section class="grid-wrap">
+        <div id="grid" class="grid"></div>
+        <div id="delivery-van" class="delivery-van hidden"></div>
+      </section>
 
-            <aside id="command-sidebar">
-                <div id="tab-controls">
-                    <button class="tab-btn active" data-tab="legal">LEGAL_UPGRADES</button>
-                    <button class="tab-btn" data-tab="life">LIFESTYLE</button>
-                </div>
+      <aside class="panel">
+        <section id="class-select" class="card"></section>
 
-                <div id="shop-viewport">
-                    <div id="legal-shop" class="shop-page"></div>
-                    <div id="life-shop" class="shop-page hidden"></div>
-                </div>
+        <section class="card">
+          <h2>Upgrades</h2>
+          <div id="legal-shop"></div>
+        </section>
 
-                <button id="action-btn">EXECUTE_COMMUTE (GO TO WORK)</button>
+        <section class="card">
+          <h2>Third-Party Doctrine Lifestyle Shop</h2>
+          <div id="lifestyle-shop"></div>
+        </section>
 
-                <div id="system-console">
-                    <h3>[ SYSTEM_LOG_OUTPUT ]</h3>
-                    <div id="log-flow"></div>
-                </div>
-            </aside>
-        </div>
-    </main>
+        <button id="commute-btn" disabled>EXECUTE COMMUTE LOOP</button>
+      </aside>
+    </section>
+  </main>
 
-    <div id="audit-modal" class="hidden">
-        <div class="audit-box">
-            <h1 class="red-glow">SEARCH_WARRANT_EXECUTED</h1>
-            <div id="audit-report"></div>
-            <hr>
-            <p id="jones-verdict"></p>
-            <button class="restart-btn" onclick="location.reload()">RE-LITIGATE</button>
-        </div>
+  <div id="ending-modal" class="ending hidden">
+    <div class="ending-box">
+      <h1 id="ending-title"></h1>
+      <p id="ending-copy"></p>
+      <button onclick="location.reload()">Run Again</button>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
