@@ -1,5 +1,5 @@
 const GameEngine = {
-  grid: {
+  baseGrid: {
     size: 15,
     house: { x: 5, y: 9, w: 5, h: 5 },
     garage: { x: 7, y: 8, w: 2, h: 1 },
@@ -12,6 +12,7 @@ const GameEngine = {
       { x: 7, y: 8 },
     ],
   },
+  grid: null,
   state: {
     day: 1,
     maxDays: 30,
@@ -27,9 +28,9 @@ const GameEngine = {
     player: { x: 7, y: 11 },
     trashCan: { x: 7, y: 3 },
     cops: [{ x: 6, y: 2 }, { x: 8, y: 2 }, { x: 7, y: 1 }],
-    stash: { x: 8, y: 11, label: 'ENCRYPTED_CACHE' },
+    stash: { x: 7, y: 11, label: 'ENCRYPTED_DATA_CACHE' },
     bought: new Set(),
-    classTuning: { nightlyDecay: 2, dailyHeatDrift: 0, passiveArmorBonus: 0, dailyStipend: 1100 },
+    classTuning: { passiveArmorBonus: 0, dailyStipend: 1100 },
     fastForwarding: false,
     arrestTriggered: false,
     gameEnded: false,
@@ -42,8 +43,6 @@ const GameEngine = {
       money: 1000000,
       privacy: 35,
       multiplier: 0.55,
-      nightlyDecay: 3.8,
-      dailyHeatDrift: 0,
       passiveArmorBonus: 15,
       dailyStipend: 15000,
     },
@@ -53,8 +52,6 @@ const GameEngine = {
       money: 15000,
       privacy: 12,
       multiplier: 1.05,
-      nightlyDecay: 3.5,
-      dailyHeatDrift: 1,
       passiveArmorBonus: 0,
       dailyStipend: 1800,
     },
@@ -64,8 +61,6 @@ const GameEngine = {
       money: 1200,
       privacy: 0,
       multiplier: 2.9,
-      nightlyDecay: 1,
-      dailyHeatDrift: 8,
       passiveArmorBonus: 0,
       dailyStipend: 750,
     },
@@ -109,6 +104,8 @@ const GameEngine = {
   ],
 
   init() {
+    this.grid = this.createGridForClass(null);
+    this.state.stash = this.centerStashForGrid(this.grid);
     UIController.buildGrid(this.grid);
     UIController.lockForClassSelection(true);
     UIController.renderClassSelection(this.classes, (id) => this.selectClass(id));
@@ -132,12 +129,13 @@ const GameEngine = {
   selectClass(id) {
     if (this.state.classLocked) return;
     const chosen = this.classes[id];
+    this.grid = this.createGridForClass(id);
+    this.state.stash = this.centerStashForGrid(this.grid);
+    UIController.buildGrid(this.grid);
     this.state.selectedClass = id;
     this.state.classLocked = true;
     this.state.money = chosen.money;
     this.state.classTuning = {
-      nightlyDecay: chosen.nightlyDecay,
-      dailyHeatDrift: chosen.dailyHeatDrift,
       passiveArmorBonus: chosen.passiveArmorBonus,
       dailyStipend: chosen.dailyStipend,
     };
@@ -155,7 +153,33 @@ const GameEngine = {
     UIController.updateHUD(this.state);
     UIController.refreshShops(this.state);
     UIController.renderPropertyUpgrades(this.state, this.grid);
+    UIController.placeTrashCan(this.state.trashCan, this.grid);
+    UIController.placeStash(this.state.stash, this.grid);
     UIController.setFastForwardVisible(false);
+  },
+
+  createGridForClass(classId) {
+    const grid = JSON.parse(JSON.stringify(this.baseGrid));
+    if (classId === 'pro') {
+      grid.house = { x: 5, y: 8, w: 5, h: 4 };
+      grid.garage = { x: 7, y: 7, w: 2, h: 1 };
+      grid.driveway = [
+        { x: 7, y: 3 },
+        { x: 7, y: 4 },
+        { x: 7, y: 5 },
+        { x: 7, y: 6 },
+        { x: 7, y: 7 },
+      ];
+    }
+    return grid;
+  },
+
+  centerStashForGrid(grid) {
+    return {
+      x: grid.house.x + Math.floor(grid.house.w / 2),
+      y: grid.house.y + Math.floor(grid.house.h / 2),
+      label: 'ENCRYPTED_DATA_CACHE',
+    };
   },
 
   exposureGain(y) {
@@ -182,7 +206,8 @@ const GameEngine = {
     await this.followRoute(toDrop);
     if (this.checkArrest()) return;
 
-    await UIController.runWorkdayProgress();
+    const stipend = this.state.classTuning.dailyStipend;
+    await UIController.runWorkdayProgress(stipend);
 
     this.state.phase = 'night';
     UIController.toggleNight(true);
@@ -192,11 +217,8 @@ const GameEngine = {
     UIController.toggleNight(false);
     if (this.checkArrest()) return;
 
-    const stipend = this.state.classTuning.dailyStipend;
     this.state.money += stipend;
-    this.state.policeHeat = Math.min(100, this.state.policeHeat + this.state.classTuning.dailyHeatDrift);
     this.state.day += 1;
-    UIController.flash(`PAYMENT RECEIVED: +$${stipend.toLocaleString()} // POLICE HEAT HOLDING`);
     UIController.updateHUD(this.state);
 
     if (this.state.day > this.state.maxDays) {
@@ -299,24 +321,36 @@ const GameEngine = {
     UIController.disableCommute(true);
     UIController.disableFastForward(true);
     UIController.lockUI('fast-forward');
+    UIController.setInteractionDisabled(true);
     UIController.flash('SECURE FAST FORWARD ENGAGED // COMMUTE ANIMATIONS BYPASSED', { duration: 2200 });
 
     while (this.state.day <= this.state.fastForwardEndDay) {
       const stipend = this.state.classTuning.dailyStipend;
       this.state.money += stipend;
-      this.state.policeHeat = Math.min(100, this.state.policeHeat + this.state.classTuning.dailyHeatDrift);
       UIController.flash(`FAST FORWARD DAY ${String(this.state.day).padStart(2, '0')} // +$${stipend.toLocaleString()}`);
       this.state.day += 1;
       UIController.updateHUD(this.state);
-      await this.delay(500);
+      await this.delay(50);
     }
 
     this.state.fastForwarding = false;
     this.state.moving = false;
     UIController.unlockUI('fast-forward');
+    UIController.setInteractionDisabled(false);
+    this.executeSearchWarrant();
+  },
+
+  async executeSearchWarrant() {
+    if (this.state.arrestTriggered) return;
+    this.state.arrestTriggered = true;
+    this.state.gameEnded = true;
+    UIController.disableCommute(true);
+    UIController.disableFastForward(true);
+    await UIController.runArrestSeizure(this.state, this.grid);
     UIController.showEnding(
-      'SECURE FAST FORWARD COMPLETE // DAY 28 REACHED',
-      'Privacy Armor integrity held above 95%. Remaining commute cycles were executed in hardened automation mode through Day 28.'
+      'SEARCH WARRANT EXECUTED // CACHE SEIZED',
+      'The State used cumulative search confidence to execute a final raid, moving from the curbside trash pull to your ENCRYPTED_DATA_CACHE.',
+      { mode: 'raid', state: this.state }
     );
   },
 
@@ -328,17 +362,8 @@ const GameEngine = {
   checkArrest() {
     if (this.state.policeHeat < 100) return false;
     if (this.state.arrestTriggered) return true;
-    this.state.arrestTriggered = true;
     this.state.moving = false;
-    UIController.disableCommute(true);
-    UIController.runArrestSeizure(this.state, this.grid).then(() => {
-      this.state.gameEnded = true;
-      UIController.showEnding(
-        'ARREST // SEARCH CONFIDENCE 100%',
-        'Mosaic tracking reached certainty. The State now models your full pattern-of-life commute, raids your home, and seizes the ENCRYPTED_CACHE.',
-        { mode: 'arrest', state: this.state }
-      );
-    });
+    this.executeSearchWarrant();
     return true;
   },
 
@@ -347,8 +372,8 @@ const GameEngine = {
     this.state.money -= 100000;
     UIController.updateHUD(this.state);
     UIController.showEnding(
-      'WIN_STATE // CASE DISMISSED',
-      '> [VERDICT]: CASE DISMISSED. Your attorneys successfully suppressed the evidence based on the Fruit of the Poisonous Tree doctrine. You have walked on a technicality.',
+      '[VERDICT]: CASE DISMISSED',
+      'Your elite legal team successfully filed a Motion to Suppress. The court ruled that the State’s use of a GPS tracker on your Audi A5 constituted a physical trespass into your constitutionally protected space (U.S. v. Jones). Because the initial "Mosaic" data point was gathered illegally, all subsequent evidence—including the discovery of your Encrypted Data Cache—was ruled "Fruit of the Poisonous Tree."\n\nYou have walked on a technicality.',
       { mode: 'win', state: this.state }
     );
   },
@@ -456,6 +481,13 @@ const UIController = {
     if (!btn) return;
     btn.classList.toggle('hidden', !visible);
     btn.disabled = false;
+  },
+
+  setInteractionDisabled(disabled) {
+    document.querySelectorAll('.buy-btn, #commute-btn').forEach((el) => {
+      el.disabled = disabled;
+      el.classList.toggle('disabled', disabled);
+    });
   },
 
   updateHUD(state) {
@@ -587,19 +619,23 @@ const UIController = {
     this.unlockUI('delivery');
   },
 
-  async runWorkdayProgress() {
+  async runWorkdayProgress(stipend) {
     const overlay = document.getElementById('workday-overlay');
     const fill = document.getElementById('workday-meter-fill');
     const text = document.getElementById('workday-text');
+    const payment = document.getElementById('workday-payment');
     overlay.classList.remove('hidden');
     fill.style.width = '0%';
     text.textContent = '0%';
+    payment.textContent = '';
     this.lockUI('workday');
     for (let pct = 0; pct <= 100; pct += 5) {
       fill.style.width = `${pct}%`;
       text.textContent = `${pct}%`;
       await new Promise((r) => setTimeout(r, 120));
     }
+    payment.textContent = `PAYMENT RELEASED: +$${stipend.toLocaleString()}`;
+    await new Promise((r) => setTimeout(r, 800));
     overlay.classList.add('hidden');
     this.unlockUI('workday');
   },
@@ -685,12 +721,12 @@ const UIController = {
     const relitigateBtn = document.getElementById('re-litigate-btn');
     const counselBtn = document.getElementById('retain-counsel-btn');
     const mode = options.mode || 'default';
-    if (mode === 'arrest') {
-      relitigateBtn.textContent = 'RE-LITIGATE';
+    relitigateBtn.textContent = 'RE-LITIGATE';
+    if (mode === 'raid' && options.state && options.state.money >= 100000) {
+      counselBtn.textContent = 'RETAIN ELITE COUNSEL ($100,000)';
       counselBtn.classList.remove('hidden');
-      counselBtn.disabled = !(options.state && options.state.money >= 100000);
+      counselBtn.disabled = false;
     } else {
-      relitigateBtn.textContent = 'RUN AGAIN';
       counselBtn.classList.add('hidden');
     }
     document.body.classList.add('game-ended');
