@@ -1,306 +1,319 @@
-const upgradesCatalog = [
-  {
-    id: "fence",
-    name: "6ft Privacy Fence",
-    cost: 2200,
-    privacyGain: 20,
-    searchReduction: 8,
-    caseRef: "Florida v. Jardines",
-    detail: "Creates curtilage boundary and blocks visual snooping."
-  },
-  {
-    id: "tint",
-    name: "Window Tint",
-    cost: 1600,
-    privacyGain: 12,
-    searchReduction: 5,
-    caseRef: "U.S. v. Karo",
-    detail: "Protects the sacred interior from enhanced sensing."
-  },
-  {
-    id: "gate",
-    name: "Automated Steel Gate",
-    cost: 10000,
-    privacyGain: 28,
-    searchReduction: 12,
-    caseRef: "Pineda-Moreno",
-    detail: "Restricts driveway walk-up access to state agents."
-  },
-  {
-    id: "garage",
-    name: "Attached Garage",
-    cost: 24000,
-    privacyGain: 40,
-    searchReduction: 18,
-    caseRef: "U.S. v. Knotts",
-    detail: "Minimizes public-road exposure with private-to-private transfer."
-  }
-];
+const GRID = 10;
+const tileLayer = document.getElementById("tileLayer");
+const viewport = document.getElementById("viewport");
+const player = document.getElementById("player");
+const van = document.getElementById("van");
+const house = document.getElementById("house");
+const car = document.getElementById("car");
+const agentsLayer = document.getElementById("agentsLayer");
+const blueprint = document.getElementById("blueprintOverlay");
+const dialogue = document.getElementById("dialogue");
+const dialogueText = document.getElementById("dialogueText");
+const endingOverlay = document.getElementById("endingOverlay");
 
 const ui = {
-  dayLabel: document.getElementById("dayLabel"),
-  capitalLabel: document.getElementById("capitalLabel"),
-  privacyLabel: document.getElementById("privacyLabel"),
-  searchLabel: document.getElementById("searchLabel"),
+  day: document.getElementById("dayStat"),
+  capital: document.getElementById("capitalStat"),
+  privacy: document.getElementById("privacyStat"),
+  search: document.getElementById("searchStat"),
   privacyBar: document.getElementById("privacyBar"),
   searchBar: document.getElementById("searchBar"),
-  shopList: document.getElementById("shopList"),
-  workBtn: document.getElementById("workBtn"),
+  market: document.getElementById("marketList"),
   log: document.getElementById("log"),
-  trustToggle: document.getElementById("trustToggle"),
-  restartBtn: document.getElementById("restartBtn"),
-  player: document.getElementById("player"),
-  fenceLayer: document.getElementById("fenceLayer"),
-  gateLayer: document.getElementById("gateLayer"),
-  garageLayer: document.getElementById("garageLayer"),
-  gameOverDialog: document.getElementById("gameOverDialog"),
-  gameOverTitle: document.getElementById("gameOverTitle"),
-  gameOverText: document.getElementById("gameOverText"),
-  closeDialog: document.getElementById("closeDialog")
+  workBtn: document.getElementById("workBtn"),
+  resetBtn: document.getElementById("resetBtn"),
+  shell: document.getElementById("shell")
 };
 
-let state = {};
+const sidewalks = new Set(["0,8", "1,8", "2,8", "3,8", "4,8", "5,8", "6,8", "7,8", "8,8", "9,8"]);
+const road = new Set(["0,9", "1,9", "2,9", "3,9", "4,9", "5,9", "6,9", "7,9", "8,9", "9,9"]);
+const driveway = new Set(["5,6", "5,7"]);
 
-const pathPoints = {
-  home: { x: 50, y: 43 },
-  drivewayMid: { x: 50, y: 58 },
-  propertyLine: { x: 50, y: 72 },
-  sidewalk: { x: 50, y: 79 }
+const state = {
+  day: 1,
+  capital: 2500,
+  privacy: 80,
+  search: 0,
+  lock: false,
+  playerPos: { x: 5, y: 5 },
+  agents: [
+    { x: 2, y: 8, angle: 0, el: null, cone: null },
+    { x: 5, y: 8, angle: 0, el: null, cone: null },
+    { x: 8, y: 8, angle: 0, el: null, cone: null }
+  ]
 };
 
-function createInitialState(trustFund = false) {
-  return {
-    day: 1,
-    capital: trustFund ? 1000000 : 1200,
-    privacyScore: 0,
-    searchMeter: 0,
-    trustFund,
-    gameOver: false,
-    owned: new Set(),
-    gpsAttachedDay1: true
-  };
+const marketItems = [
+  { id: "fence", name: "6ft Fence", cost: 500, privacy: 10, type: "build", footprint: { x: 2, y: 2, w: 6, h: 6 } },
+  { id: "gate", name: "Auto Gate", cost: 800, privacy: 10, type: "build", footprint: { x: 5, y: 7, w: 1, h: 1 } },
+  { id: "espresso", name: "Espresso Machine", cost: 700, privacy: 3, type: "aesthetic", footprint: { x: 4, y: 4, w: 2, h: 1 } },
+  { id: "lights", name: "Architectural Lights", cost: 600, privacy: 2, type: "aesthetic", footprint: { x: 3, y: 3, w: 4, h: 1 } }
+];
+const owned = new Set();
+
+function key(x, y) { return `${x},${y}`; }
+
+function toPx(cellX, cellY) {
+  const size = viewport.clientWidth / GRID;
+  return { x: (cellX + 0.5) * size, y: (cellY + 0.5) * size, size };
 }
 
-function currency(amount) {
-  return `$${Math.round(amount).toLocaleString()}`;
+function placeEntity(el, cellX, cellY) {
+  const pt = toPx(cellX, cellY);
+  el.style.left = `${pt.x}px`;
+  el.style.top = `${pt.y}px`;
 }
 
-function addLog(message, tone = "") {
-  const line = document.createElement("p");
-  line.className = tone;
-  line.textContent = `> ${message}`;
-  ui.log.prepend(line);
+function buildTiles() {
+  tileLayer.innerHTML = "";
+  for (let y = 0; y < GRID; y++) {
+    for (let x = 0; x < GRID; x++) {
+      const tile = document.createElement("div");
+      tile.className = "tile ";
+      if (road.has(key(x, y)) || sidewalks.has(key(x, y))) tile.className += "asphalt";
+      else if (driveway.has(key(x, y))) tile.className += "driveway";
+      else tile.className += "grass";
+      tileLayer.appendChild(tile);
+    }
+  }
 }
 
-function setPlayerPosition(x, y) {
-  ui.player.style.left = `${x}%`;
-  ui.player.style.top = `${y}%`;
-}
+function buildAgents() {
+  agentsLayer.innerHTML = "";
+  state.agents.forEach((agent) => {
+    agent.cone = document.createElement("div");
+    agent.cone.className = "vision";
+    agentsLayer.appendChild(agent.cone);
 
-function render() {
-  ui.dayLabel.textContent = `${String(state.day).padStart(2, "0")} / 28`;
-  ui.capitalLabel.textContent = currency(state.capital);
-  ui.privacyLabel.textContent = `${Math.round(state.privacyScore)}`;
-  ui.searchLabel.textContent = `${Math.round(state.searchMeter)}%`;
-
-  ui.privacyBar.style.width = `${Math.min(100, state.privacyScore)}%`;
-  ui.searchBar.style.width = `${Math.min(100, state.searchMeter)}%`;
-
-  ui.fenceLayer.classList.toggle("hidden", !state.owned.has("fence"));
-  ui.gateLayer.classList.toggle("hidden", !state.owned.has("gate"));
-  ui.garageLayer.classList.toggle("hidden", !state.owned.has("garage"));
-
-  renderShop();
-}
-
-function renderShop() {
-  ui.shopList.innerHTML = "";
-
-  upgradesCatalog.forEach((item) => {
-    const owned = state.owned.has(item.id);
-    const canBuy = !owned && !state.gameOver && state.capital >= item.cost;
-    const card = document.createElement("article");
-    card.className = `shop-item ${owned ? "owned" : ""}`;
-
-    card.innerHTML = `
-      <h3>${item.name}</h3>
-      <p>${item.detail}</p>
-      <p><strong>${item.caseRef}</strong></p>
-      <div class="shop-foot">
-        <span>${owned ? "OWNED" : currency(item.cost)}</span>
-        <button class="btn btn-muted buy-btn" ${canBuy ? "" : "disabled"}>${owned ? "Installed" : "Acquire"}</button>
-      </div>
-    `;
-
-    card.querySelector(".buy-btn")?.addEventListener("click", () => buyUpgrade(item.id));
-    ui.shopList.append(card);
+    agent.el = document.createElement("div");
+    agent.el.className = "entity agent";
+    agentsLayer.appendChild(agent.el);
+    placeEntity(agent.el, agent.x, agent.y);
+    placeEntity(agent.cone, agent.x, agent.y);
   });
 }
 
-function buyUpgrade(id) {
-  const item = upgradesCatalog.find((upgrade) => upgrade.id === id);
-  if (!item || state.owned.has(item.id) || state.capital < item.cost || state.gameOver) {
-    return;
-  }
+function log(msg, cls = "") {
+  const p = document.createElement("p");
+  if (cls) p.className = cls;
+  p.textContent = `[Day ${String(state.day).padStart(2, "0")}] ${msg}`;
+  ui.log.prepend(p);
+}
 
+function renderStats() {
+  ui.day.textContent = `${String(state.day).padStart(2, "0")} / 28`;
+  ui.capital.textContent = `$${state.capital}`;
+  ui.privacy.textContent = `${Math.max(0, Math.round(state.privacy))}`;
+  ui.search.textContent = `${Math.min(100, Math.round(state.search))}%`;
+  ui.privacyBar.style.width = `${Math.max(0, state.privacy)}%`;
+  ui.searchBar.style.width = `${Math.min(100, state.search)}%`;
+}
+
+function renderMarket() {
+  ui.market.innerHTML = "";
+  marketItems.forEach((item) => {
+    const div = document.createElement("div");
+    div.className = "market-item";
+    const canBuy = !owned.has(item.id) && state.capital >= item.cost && !state.lock;
+    div.innerHTML = `<strong>${item.name}</strong> ($${item.cost}) <button ${canBuy ? "" : "disabled"}>${owned.has(item.id) ? "OWNED" : "BUY"}</button>`;
+    div.addEventListener("mouseenter", () => showBlueprint(item));
+    div.addEventListener("mouseleave", hideBlueprint);
+    div.querySelector("button").addEventListener("click", () => buyItem(item));
+    ui.market.appendChild(div);
+  });
+}
+
+function showBlueprint(item) {
+  const p = item.footprint;
+  const cell = toPx(0, 0).size;
+  blueprint.classList.remove("hidden");
+  blueprint.style.left = `${p.x * cell}px`;
+  blueprint.style.top = `${p.y * cell}px`;
+  blueprint.style.width = `${p.w * cell}px`;
+  blueprint.style.height = `${p.h * cell}px`;
+}
+function hideBlueprint() { blueprint.classList.add("hidden"); }
+
+async function buyItem(item) {
+  if (owned.has(item.id) || state.capital < item.cost || state.lock) return;
+  owned.add(item.id);
   state.capital -= item.cost;
-  state.owned.add(item.id);
-  state.privacyScore = Math.min(100, state.privacyScore + item.privacyGain);
-  addLog(`${item.name} installed. ${item.caseRef} doctrine now leveraged.`, "good");
-  render();
+  state.privacy = Math.min(100, state.privacy + item.privacy);
+  log(`${item.name} acquired.`);
+
+  if (item.type === "aesthetic") {
+    await deliverySequence();
+    state.privacy -= 5;
+    log("Third-Party Doctrine: delivery metadata seized. Privacy -5.", "warn");
+    if (state.privacy <= 0) {
+      ui.shell.classList.add("screen-shake");
+      setTimeout(() => ui.shell.classList.remove("screen-shake"), 600);
+    }
+  }
+  renderStats();
+  renderMarket();
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function interpolate(start, end, t) {
+  return { x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t };
 }
 
-async function movePlayerAlong(points, stepDelay = 290) {
-  ui.player.classList.add("walking");
+async function moveEntity(el, start, end, duration = 500, walking = false, onStep) {
+  return new Promise((resolve) => {
+    const started = performance.now();
+    if (walking) player.classList.add("walking");
 
-  for (const point of points) {
-    setPlayerPosition(point.x, point.y);
-    await sleep(stepDelay);
-  }
-
-  ui.player.classList.remove("walking");
-}
-
-async function commuteAnimation() {
-  if (state.owned.has("garage")) {
-    await movePlayerAlong([
-      pathPoints.home,
-      { x: 61, y: 45 },
-      { x: 63, y: 50 },
-      { x: 61, y: 45 },
-      pathPoints.home
-    ], 220);
-    addLog(`Day ${state.day}: Garage transfer minimized exposure time.`, "good");
-    return;
-  }
-
-  await movePlayerAlong([
-    pathPoints.home,
-    pathPoints.drivewayMid,
-    pathPoints.propertyLine,
-    pathPoints.sidewalk,
-    { x: 48, y: 82 },
-    pathPoints.sidewalk,
-    pathPoints.propertyLine,
-    pathPoints.drivewayMid,
-    pathPoints.home
-  ]);
-}
-
-function computeDailySearchIncrease() {
-  const base = 10;
-  const privacyPenalty = (100 - state.privacyScore) * 0.08;
-  const reduction = upgradesCatalog
-    .filter((item) => state.owned.has(item.id))
-    .reduce((sum, item) => sum + item.searchReduction, 0);
-
-  let increase = base + privacyPenalty - reduction;
-
-  if (state.day % 7 === 0) {
-    increase += 12;
-    addLog(`Day ${state.day}: Trash day search event. Curbside garbage inspected. Search +12.`, "warn");
-  }
-
-  if (!state.owned.has("gate")) {
-    addLog(`Day ${state.day}: Open driveway walk-up permitted. Pineda-Moreno disadvantage.`, "warn");
-  }
-
-  if (!state.owned.has("garage")) {
-    addLog(`Day ${state.day}: Public road commute observed. Knotts doctrine applied.`, "warn");
-  }
-
-  if (!state.owned.has("tint")) {
-    addLog(`Day ${state.day}: Untinted windows exposed interior clues.`, "warn");
-  }
-
-  return Math.max(2, increase);
-}
-
-function endGame(title, message) {
-  state.gameOver = true;
-  ui.workBtn.disabled = true;
-  ui.gameOverTitle.textContent = title;
-  ui.gameOverText.textContent = message;
-  if (!ui.gameOverDialog.open) {
-    ui.gameOverDialog.showModal();
-  }
-}
-
-async function processDay() {
-  if (state.gameOver) return;
-
-  ui.workBtn.disabled = true;
-  await commuteAnimation();
-
-  if (state.day === 28) {
-    addLog("Day 28: Trespass reveal activated. U.S. v. Jones lock-in.", "danger");
-    endGame(
-      "THE 28-DAY RULE (U.S. v. Jones)",
-      "You built a fortress, but police physically touched your vehicle and attached a GPS device on Day 1. Wealth can buy expectation privacy, but it cannot erase an early physical trespass."
-    );
-    return;
-  }
-
-  const wage = state.trustFund ? 0 : 900 + Math.floor(Math.random() * 500);
-  if (!state.trustFund) {
-    state.capital += wage;
-  }
-
-  const searchIncrease = computeDailySearchIncrease();
-  state.searchMeter = Math.min(100, state.searchMeter + searchIncrease);
-  state.privacyScore = Math.min(100, state.privacyScore + (state.owned.size ? 1.2 : 0));
-
-  addLog(
-    `Day ${state.day}: Work cycle complete. ${state.trustFund ? "Trust fund mode suppressed wage dependence." : `Earned ${currency(wage)}.`} Search +${searchIncrease.toFixed(1)}.`
-  );
-
-  if (state.searchMeter >= 100) {
-    addLog(`Day ${state.day}: Search meter reached 100%. Arrest sequence executed.`, "danger");
-    endGame(
-      "WARRANT CASCADE",
-      "Your mosaic profile reached operational certainty. Surveillance plus exposure triggered a full enforcement cascade."
-    );
-    return;
-  }
-
-  state.day += 1;
-  render();
-  ui.workBtn.disabled = false;
-}
-
-function resetGame() {
-  if (ui.gameOverDialog.open) {
-    ui.gameOverDialog.close();
-  }
-
-  state = createInitialState(ui.trustToggle.checked);
-  setPlayerPosition(pathPoints.home.x, pathPoints.home.y);
-  ui.log.innerHTML = "";
-  ui.workBtn.disabled = false;
-
-  addLog("Simulation online. Fourth Amendment protection sold as a lifestyle product.");
-  addLog(
-    state.trustFund
-      ? "Born Gated mode active: Trust seeded at $1,000,000."
-      : "Standard mode active: Unfenced, exposed, and commuting through public doctrine."
-  );
-
-  render();
-}
-
-ui.workBtn.addEventListener("click", processDay);
-ui.restartBtn.addEventListener("click", resetGame);
-ui.trustToggle.addEventListener("change", resetGame);
-ui.closeDialog.addEventListener("click", resetGame);
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js").catch(() => {
-    addLog("Service worker unavailable in this environment.", "warn");
+    function frame(now) {
+      const t = Math.min(1, (now - started) / duration);
+      const p = interpolate(start, end, t);
+      placeEntity(el, p.x, p.y);
+      if (onStep) onStep(p);
+      if (t < 1) requestAnimationFrame(frame);
+      else {
+        if (walking) player.classList.remove("walking");
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
   });
 }
 
-resetGame();
+function isPublic(x, y) {
+  return sidewalks.has(key(Math.round(x), Math.round(y))) || road.has(key(Math.round(x), Math.round(y)));
+}
+
+function checkVisionCollision(playerPos) {
+  const pPx = toPx(playerPos.x, playerPos.y);
+  return state.agents.some((a) => {
+    const aPx = toPx(a.x, a.y);
+    const dx = pPx.x - aPx.x;
+    const dy = pPx.y - aPx.y;
+    const dist = Math.hypot(dx, dy);
+    return dist < toPx(0, 0).size * 2;
+  });
+}
+
+async function walkPath(points) {
+  for (let i = 0; i < points.length - 1; i++) {
+    await moveEntity(player, points[i], points[i + 1], 480, true, (p) => {
+      state.playerPos = p;
+      if (isPublic(p.x, p.y) && checkVisionCollision(p)) {
+        if (!viewport.classList.contains("search-pulse")) {
+          state.search = Math.min(100, state.search + 15);
+          viewport.classList.add("search-pulse");
+          setTimeout(() => viewport.classList.remove("search-pulse"), 800);
+          log("Vision cone breach on public tile. Search +15.", "warn");
+          renderStats();
+        }
+      }
+    });
+  }
+}
+
+async function deliverySequence() {
+  van.classList.remove("hidden");
+  await moveEntity(van, { x: 10.5, y: 7 }, { x: 5.9, y: 7 }, 1200);
+
+  const targets = [{ x: 5.2, y: 7.5 }, { x: 6.6, y: 7.5 }, { x: 5.9, y: 8.2 }];
+  for (let i = 0; i < state.agents.length; i++) {
+    const a = state.agents[i];
+    await moveEntity(a.el, { x: a.x, y: a.y }, targets[i], 700);
+    placeEntity(a.cone, targets[i].x, targets[i].y);
+    a.x = targets[i].x;
+    a.y = targets[i].y;
+  }
+
+  dialogueText.textContent = "Nice Espresso Machine. We've logged your high-caffeine lifestyle.";
+  dialogue.classList.remove("hidden");
+  await new Promise((r) => setTimeout(r, 2600));
+  dialogue.classList.add("hidden");
+  await moveEntity(van, { x: 5.9, y: 7 }, { x: 10.5, y: 7 }, 1000);
+  van.classList.add("hidden");
+}
+
+async function goToWork() {
+  if (state.lock) return;
+  if (state.day >= 28) {
+    state.lock = true;
+    ui.workBtn.disabled = true;
+    log("Day 28 trigger: commute blocked.", "warn");
+    await jonesEnding();
+    return;
+  }
+
+  ui.workBtn.disabled = true;
+  const path = [
+    { x: 5, y: 5 }, // front door
+    { x: 5, y: 6 }, // driveway
+    { x: 5, y: 8 }, // public sidewalk
+    { x: 5, y: 9 }, // edge of screen
+  ];
+  await walkPath(path);
+
+  state.capital += 450;
+  state.day += 1;
+  state.search += 4;
+  state.privacy -= 1;
+  log("Work commute logged through public exposure channels.");
+
+  renderStats();
+  renderMarket();
+  ui.workBtn.disabled = false;
+}
+
+async function jonesEnding() {
+  viewport.classList.add("zoom-car");
+  const dot = document.createElement("div");
+  dot.className = "gps-dot";
+  const carPt = toPx(4, 6);
+  dot.style.left = `${carPt.x + 8}px`;
+  dot.style.top = `${carPt.y - 8}px`;
+  viewport.appendChild(dot);
+  await new Promise((r) => setTimeout(r, 2500));
+  endingOverlay.classList.remove("hidden");
+}
+
+function reset() {
+  state.day = 1;
+  state.capital = 2500;
+  state.privacy = 80;
+  state.search = 0;
+  state.lock = false;
+  owned.clear();
+  endingOverlay.classList.add("hidden");
+  viewport.classList.remove("zoom-car");
+  viewport.querySelector(".gps-dot")?.remove();
+  ui.log.innerHTML = "";
+
+  placeEntity(house, 5, 4);
+  placeEntity(car, 4, 6);
+  placeEntity(player, 5, 5);
+  state.playerPos = { x: 5, y: 5 };
+
+  state.agents = [
+    { x: 2, y: 8, angle: 0, el: null, cone: null },
+    { x: 5, y: 8, angle: 0, el: null, cone: null },
+    { x: 8, y: 8, angle: 0, el: null, cone: null }
+  ];
+  buildAgents();
+
+  renderStats();
+  renderMarket();
+  ui.workBtn.disabled = false;
+  log("Simulation rebooted. Curtilage aesthetics loaded.");
+}
+
+ui.workBtn.addEventListener("click", goToWork);
+ui.resetBtn.addEventListener("click", reset);
+
+buildTiles();
+reset();
+window.addEventListener("resize", () => {
+  placeEntity(house, 5, 4);
+  placeEntity(car, 4, 6);
+  placeEntity(player, state.playerPos.x, state.playerPos.y);
+  state.agents.forEach((a) => {
+    placeEntity(a.el, a.x, a.y);
+    placeEntity(a.cone, a.x, a.y);
+  });
+});
