@@ -1,0 +1,70 @@
+:root {
+    --bg: #050508;
+    --panel: #0d0d12;
+    --green: #00ff41;
+    --red: #ff1144;
+    --public: #1a1a22;
+    --yard: #142114;
+    --home: #2a1f18;
+    --terminal-font: 'Courier New', Courier, monospace;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: #fff; font-family: var(--terminal-font); margin: 0; overflow: hidden; }
+
+/* CRT EFFECTS */
+.crt-overlay { position: fixed; inset: 0; background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.15) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); background-size: 100% 3px, 3px 100%; pointer-events: none; z-index: 1000; }
+
+/* HUD STYLING */
+#master-hud { height: 80px; display: flex; gap: 20px; padding: 10px 20px; border-bottom: 1px solid #333; background: var(--panel); }
+.hud-group { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.hud-group.wide { flex: 2; }
+.hud-label { font-size: 0.65rem; color: #666; letter-spacing: 1px; }
+.hud-value { font-size: 1.4rem; font-weight: bold; color: var(--green); text-shadow: 0 0 10px var(--green); }
+.meter-bg { width: 100%; height: 6px; background: #000; border: 1px solid #222; margin: 4px 0; overflow: hidden; }
+.meter-fill { height: 100%; transition: width 0.6s cubic-bezier(0.1, 0.9, 0.2, 1); }
+.meter-fill.green { background: var(--green); box-shadow: 0 0 10px var(--green); }
+.meter-fill.red { background: var(--red); box-shadow: 0 0 10px var(--red); }
+.meter-sub { font-size: 0.6rem; color: #444; }
+
+/* LAYOUT & GRID */
+#main-layout { display: flex; height: calc(100vh - 80px); padding: 20px; gap: 20px; }
+#viewport-container { flex: 2; border: 1px solid #333; position: relative; background: #000; overflow: hidden; }
+#grid-canvas { display: grid; grid-template-columns: repeat(15, 1fr); grid-template-rows: repeat(15, 1fr); height: 100%; width: 100%; }
+
+.tile { border: 0.1px solid #ffffff05; position: relative; }
+.tile.public { background: var(--public); }
+.tile.yard { background: var(--yard); }
+.tile.home { background: var(--home); }
+
+/* ENTITIES */
+.player { width: 60%; height: 60%; background: #fff; border-radius: 50%; position: absolute; top: 20%; left: 20%; box-shadow: 0 0 15px #fff; z-index: 100; transition: all 0.4s ease; }
+.cop { width: 50%; height: 50%; background: #0044ff; position: absolute; top: 25%; left: 25%; z-index: 90; animation: siren 0.4s infinite alternate; border-radius: 2px; }
+@keyframes siren { from { box-shadow: 0 0 5px blue; } to { box-shadow: 0 0 12px red; } }
+
+/* SIDEBAR & SHOP */
+#command-sidebar { width: 400px; display: flex; flex-direction: column; gap: 15px; }
+#tab-controls { display: flex; gap: 5px; }
+.tab-btn { flex: 1; padding: 10px; background: #111; border: 1px solid #333; color: #666; cursor: pointer; }
+.tab-btn.active { color: var(--green); border-color: var(--green); background: #1a1a1a; }
+
+.shop-page { flex: 1; overflow-y: auto; background: #000; border: 1px solid #333; padding: 10px; }
+.item-card { padding: 12px; border-bottom: 1px solid #222; cursor: pointer; transition: background 0.2s; position: relative; }
+.item-card:hover { background: #111; }
+.item-card.bought { opacity: 0.3; pointer-events: none; border-left: 2px solid var(--green); }
+.price { color: var(--green); font-size: 0.8rem; display: block; margin-top: 5px; }
+
+#action-btn { background: var(--green); color: #000; padding: 18px; font-weight: bold; border: none; cursor: pointer; letter-spacing: 2px; }
+#action-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+#system-console { flex: 1; border: 1px solid #333; padding: 10px; font-size: 0.75rem; overflow-y: auto; display: flex; flex-direction: column; }
+#log-flow { display: flex; flex-direction: column-reverse; }
+.log-entry { margin-bottom: 6px; color: #888; border-left: 2px solid #333; padding-left: 8px; }
+
+/* MODAL */
+#audit-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 40px; }
+.audit-box { border: 2px solid var(--red); padding: 40px; background: #080808; max-width: 700px; width: 100%; box-shadow: 0 0 30px var(--red); }
+.red-glow { color: var(--red); text-shadow: 0 0 10px var(--red); font-size: 2rem; }
+.audit-item { display: flex; justify-content: space-between; margin: 10px 0; font-size: 0.9rem; }
+
+.hidden { display: none !important; }
