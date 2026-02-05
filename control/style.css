@@ -392,3 +392,10 @@ button.shop-item {
   background: linear-gradient(90deg, #2bb54a, #6dff8a);
   box-shadow: 0 0 10px #6dff8a;
 }
+
+.workday-payment {
+  min-height: 1.2em;
+  margin-top: 10px;
+  color: #97ffc5;
+  text-shadow: 0 0 8px #6dff8a;
+}
