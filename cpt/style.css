@@ -1,0 +1,201 @@
+:root {
+    --bg-color: #0d0d0d;
+    --panel-color: #1a1a1a;
+    --text-primary: #e0e0e0;
+    --text-accent: #00ff41; /* Matrix/Terminal Green */
+    --danger: #ff3e3e; /* Surveillance Red */
+    --border-style: 1px solid #333;
+    --font-main: 'Courier New', Courier, monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- CRT & SCANLINE EFFECTS --- */
+.scanlines {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%, 
+        rgba(0, 0, 0, 0.1) 50%
+    ), linear-gradient(
+        90deg, 
+        rgba(255, 0, 0, 0.02), 
+        rgba(0, 255, 0, 0.01), 
+        rgba(0, 0, 255, 0.02)
+    );
+    background-size: 100% 3px, 3px 100%;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.crt-glow {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle, rgba(0, 255, 65, 0.05) 0%, rgba(0,0,0,0) 80%);
+    pointer-events: none;
+    z-index: 101;
+    animation: flicker 0.1s infinite;
+}
+
+@keyframes flicker {
+    0% { opacity: 0.97; }
+    50% { opacity: 1; }
+    100% { opacity: 0.98; }
+}
+
+/* --- LAYOUT --- */
+#game-container {
+    width: 90vw;
+    max-width: 1000px;
+    height: 85vh;
+    border: var(--border-style);
+    background: var(--panel-color);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+#hud {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: var(--border-style);
+    margin-bottom: 20px;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    width: 22%;
+}
+
+.label { font-size: 0.7rem; color: #888; margin-bottom: 5px; letter-spacing: 1px; }
+.value { font-size: 1.2rem; color: var(--text-accent); font-weight: bold; }
+
+.bar-container {
+    width: 100%;
+    height: 10px;
+    background: #000;
+    border: 1px solid #444;
+    position: relative;
+}
+
+.bar { height: 100%; background: var(--text-accent); transition: width 0.4s ease; }
+.bar.danger { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+
+/* --- MAIN INTERFACE --- */
+#main-interface {
+    display: flex;
+    flex: 1;
+    gap: 20px;
+    min-height: 0;
+}
+
+#log-console {
+    flex: 1;
+    background: #000;
+    border: var(--border-style);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#log-entries {
+    flex: 1;
+    overflow-y: auto;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.system-msg { color: #888; margin-bottom: 8px; }
+.alert-msg { color: var(--danger); margin-bottom: 8px; font-weight: bold; }
+
+#shop-container {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+}
+
+#item-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.shop-item {
+    background: #222;
+    padding: 12px;
+    border: var(--border-style);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.shop-item:hover { background: #333; }
+.shop-item.owned { border-color: var(--text-accent); opacity: 0.6; cursor: default; }
+
+.item-name { display: block; font-weight: bold; font-size: 0.9rem; }
+.item-cost { color: var(--text-accent); font-size: 0.8rem; }
+
+#next-day-btn {
+    background: var(--text-accent);
+    color: #000;
+    border: none;
+    padding: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#next-day-btn:hover { background: #00cc33; }
+
+/* --- GAME OVER MODAL --- */
+#game-over-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.95);
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.modal-content {
+    max-width: 600px;
+    text-align: center;
+    border: 2px solid var(--danger);
+    padding: 40px;
+    background: #111;
+}
+
+.modal-content h1 { color: var(--danger); margin-bottom: 20px; font-size: 2.5rem; }
+.modal-content p { margin-bottom: 30px; line-height: 1.6; }
+
+.hidden { display: none !important; }
+
+#legal-lore {
+    margin-top: 15px;
+    font-size: 0.7rem;
+    color: #555;
+    text-align: center;
+}
