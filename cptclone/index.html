@@ -8,8 +8,8 @@
       :root {
         --bg: #e6e6e6;
         --paper: #f8f8f8;
-        --text: #5d5d5d;
-        --muted: #9a9a9a;
+        --text: #666;
+        --muted: #8f8f8f;
         --line: #e2e2e2;
         --accent: #1f7f84;
       }
@@ -24,16 +24,16 @@
       }
 
       .page {
-        width: min(900px, calc(100vw - 120px));
-        margin: 120px auto;
+        width: min(910px, calc(100vw - 96px));
+        margin: 86px auto;
         background: var(--paper);
-        padding: 70px 150px 110px;
+        padding: 52px 110px 86px;
         box-sizing: border-box;
       }
 
       .site-title {
         text-align: center;
-        font-size: 58px;
+        font-size: 56px;
         font-weight: 600;
         margin: 0;
         line-height: 1.2;
@@ -41,15 +41,15 @@
 
       .site-subtitle {
         text-align: center;
-        color: #8e8e8e;
-        font-size: 34px;
-        margin: 24px 0 62px;
+        color: var(--muted);
+        font-size: 23px;
+        margin: 14px 0 42px;
       }
 
       .rule {
         border: 0;
         border-top: 4px solid var(--line);
-        margin: 0 0 58px;
+        margin: 0 0 36px;
       }
 
       .menu,
@@ -60,25 +60,26 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 34px;
+        gap: 36px;
         flex-wrap: wrap;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 31px;
+        letter-spacing: 0.9px;
+        font-size: 15px;
+        font-weight: 600;
       }
 
       .menu {
-        margin-bottom: 26px;
+        margin-bottom: 18px;
       }
 
       .menu-bottom {
-        margin-bottom: 56px;
+        margin-bottom: 34px;
       }
 
       .menu a,
       .menu-bottom a {
         text-decoration: none;
-        color: #8c8c8c;
+        color: var(--muted);
       }
 
       .menu a.active {
@@ -86,19 +87,19 @@
       }
 
       .content h1 {
-        font-size: 74px;
-        margin: 0 0 46px;
+        font-size: 62px;
+        margin: 0 0 34px;
         text-align: left;
       }
 
       .content {
         text-align: center;
-        font-size: 46px;
-        line-height: 1.68;
+        font-size: 20px;
+        line-height: 1.55;
       }
 
       .content p {
-        margin: 0 0 20px;
+        margin: 0 0 8px;
       }
 
       .content .bold {
@@ -106,7 +107,7 @@
       }
 
       .readings {
-        margin-top: 14px;
+        margin-top: 8px;
         font-weight: 700;
       }
 
@@ -116,28 +117,56 @@
       }
 
       .section-title {
-        margin-top: 64px;
-        margin-bottom: 28px;
-        font-size: 50px;
+        margin-top: 36px;
+        margin-bottom: 10px;
+        font-size: 38px;
         font-weight: 700;
         text-align: left;
       }
 
-      .case {
+      .section-subtitle {
         text-align: left;
-        font-size: 45px;
-        line-height: 1.65;
+        font-size: 23px;
+        font-weight: 700;
+        margin: 26px 0 8px;
       }
 
-      .case a {
+      .section-note {
+        text-align: left;
+        color: var(--muted);
+        font-style: italic;
+        margin-bottom: 10px;
+      }
+
+      .reading-list {
+        text-align: left;
+        font-size: 17px;
+        line-height: 1.62;
+        margin: 0;
+        padding-left: 28px;
+      }
+
+      .reading-list li {
+        margin: 8px 0;
+      }
+
+      .reading-list a,
+      .explore a {
         color: var(--accent);
+        text-decoration: none;
       }
 
-      @media (max-width: 1200px) {
+      .explore {
+        text-align: left;
+        margin-top: 20px;
+        font-size: 20px;
+      }
+
+      @media (max-width: 1100px) {
         .page {
-          width: min(900px, calc(100vw - 64px));
-          padding: 54px 70px 80px;
-          margin: 60px auto;
+          width: min(910px, calc(100vw - 48px));
+          padding: 42px 52px 66px;
+          margin: 52px auto;
         }
 
         .site-title {
@@ -145,37 +174,23 @@
         }
 
         .site-subtitle {
-          font-size: 28px;
-        }
-
-        .menu,
-        .menu-bottom {
           font-size: 22px;
-          gap: 20px;
         }
 
         .content {
-          font-size: 30px;
+          font-size: 18px;
         }
 
         .content h1 {
-          font-size: 52px;
-        }
-
-        .section-title {
-          font-size: 34px;
-        }
-
-        .case {
-          font-size: 30px;
+          font-size: 48px;
         }
       }
 
       @media (max-width: 700px) {
         .page {
-          width: calc(100vw - 24px);
-          padding: 34px 22px 48px;
-          margin: 24px auto;
+          width: calc(100vw - 18px);
+          padding: 28px 18px 44px;
+          margin: 16px auto;
         }
 
         .site-title {
@@ -183,27 +198,30 @@
         }
 
         .site-subtitle {
-          font-size: 22px;
-          margin-bottom: 30px;
+          font-size: 20px;
         }
 
         .menu,
         .menu-bottom {
-          font-size: 15px;
+          font-size: 14px;
+          gap: 18px;
         }
 
         .content {
-          font-size: 24px;
+          font-size: 17px;
         }
 
         .content h1 {
-          font-size: 44px;
-          text-align: center;
+          font-size: 38px;
         }
 
-        .section-title,
-        .case {
-          font-size: 24px;
+        .section-title {
+          font-size: 30px;
+        }
+
+        .section-subtitle,
+        .explore {
+          font-size: 20px;
         }
       }
     </style>
@@ -244,13 +262,55 @@
           <a href="#">2015</a>, <a href="#">2014</a>, <a href="#">2013</a>, etc.
         </p>
 
-        <p class="section-title">(1) Crazy Laws &amp; Prosecutorial Discretion</p>
+        <p class="section-title">(1) Updated Reading List</p>
 
-        <p class="case">
-          1. Inmates of Attica Correctional Facility v Rockerfeller, 477 F2d 375
-          (2d Cir. 1973):<a href="#"
-            >http://cases.justia.com/us-court-of-appeals/F2/477/375/1514/</a
-          >
+        <p class="section-subtitle">A. Social Media and Employment</p>
+        <p class="section-note">(Note how old some of these workplace-tech readings are.)</p>
+        <ol class="reading-list">
+          <li>
+            <a href="https://www.nytimes.com/2026/03/01/business/bossware-work-surveillance-tools.html" target="_blank" rel="noopener noreferrer"
+              >At Work, the Boss May Be Watching Every Digital Move</a
+            >
+          </li>
+        </ol>
+
+        <p class="section-subtitle">B. Social Media, Police, Passwords, and Courts</p>
+        <ol class="reading-list">
+          <li>
+            <a href="https://www.brennancenter.org/our-work/analysis-opinion/were-suing-nypd-uncover-its-online-surveillance-practices" target="_blank" rel="noopener noreferrer"
+              >We’re Suing the NYPD to Uncover Its Online Surveillance Practices</a
+            >
+          </li>
+          <li>
+            <a href="https://archive.ph/ToXpE" target="_blank" rel="noopener noreferrer"
+              >Archived Reading: Social Media Evidence and Policing Practices</a
+            >
+          </li>
+        </ol>
+
+        <p class="section-subtitle">C. Data Privacy and Marketing</p>
+        <p class="section-note">(Focus especially on the later readings in this section.)</p>
+        <ol class="reading-list">
+          <li>
+            <a href="https://www.lovell.com/femtech-and-privacy-in-a-post-roe-america/" target="_blank" rel="noopener noreferrer"
+              >Femtech and Privacy in a Post-Roe America</a
+            >
+          </li>
+          <li>
+            <a href="https://archive.ph/AXBco" target="_blank" rel="noopener noreferrer"
+              >Archived Reading: Data Privacy and Consumer Profiling</a
+            >
+          </li>
+          <li>
+            <a href="https://www.wired.com/story/i-asked-chatgpt-500-questions-here-are-the-ads-i-saw-most-often/" target="_blank" rel="noopener noreferrer"
+              >I Asked ChatGPT 500 Questions. Here Are the Ads I Saw Most Often.</a
+            >
+          </li>
+        </ol>
+
+        <p class="explore">
+          <strong>Explore this:</strong>
+          <a href="https://incidentdatabase.ai/" target="_blank" rel="noopener noreferrer">AI Incident Database</a>
         </p>
       </section>
     </main>
