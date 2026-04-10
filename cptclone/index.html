@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yale Law Tech – Control, Privacy, & Technology</title>
+    <style>
+      :root {
+        --bg: #e6e6e6;
+        --paper: #f8f8f8;
+        --text: #5d5d5d;
+        --muted: #9a9a9a;
+        --line: #e2e2e2;
+        --accent: #1f7f84;
+      }
 
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .page {
+        width: min(900px, calc(100vw - 120px));
+        margin: 120px auto;
+        background: var(--paper);
+        padding: 70px 150px 110px;
+        box-sizing: border-box;
+      }
+
+      .site-title {
+        text-align: center;
+        font-size: 58px;
+        font-weight: 600;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      .site-subtitle {
+        text-align: center;
+        color: #8e8e8e;
+        font-size: 34px;
+        margin: 24px 0 62px;
+      }
+
+      .rule {
+        border: 0;
+        border-top: 4px solid var(--line);
+        margin: 0 0 58px;
+      }
+
+      .menu,
+      .menu-bottom {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 34px;
+        flex-wrap: wrap;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 31px;
+      }
+
+      .menu {
+        margin-bottom: 26px;
+      }
+
+      .menu-bottom {
+        margin-bottom: 56px;
+      }
+
+      .menu a,
+      .menu-bottom a {
+        text-decoration: none;
+        color: #8c8c8c;
+      }
+
+      .menu a.active {
+        color: var(--accent);
+      }
+
+      .content h1 {
+        font-size: 74px;
+        margin: 0 0 46px;
+        text-align: left;
+      }
+
+      .content {
+        text-align: center;
+        font-size: 46px;
+        line-height: 1.68;
+      }
+
+      .content p {
+        margin: 0 0 20px;
+      }
+
+      .content .bold {
+        font-weight: 700;
+      }
+
+      .readings {
+        margin-top: 14px;
+        font-weight: 700;
+      }
+
+      .readings a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .section-title {
+        margin-top: 64px;
+        margin-bottom: 28px;
+        font-size: 50px;
+        font-weight: 700;
+        text-align: left;
+      }
+
+      .case {
+        text-align: left;
+        font-size: 45px;
+        line-height: 1.65;
+      }
+
+      .case a {
+        color: var(--accent);
+      }
+
+      @media (max-width: 1200px) {
+        .page {
+          width: min(900px, calc(100vw - 64px));
+          padding: 54px 70px 80px;
+          margin: 60px auto;
+        }
+
+        .site-title {
+          font-size: 44px;
+        }
+
+        .site-subtitle {
+          font-size: 28px;
+        }
+
+        .menu,
+        .menu-bottom {
+          font-size: 22px;
+          gap: 20px;
+        }
+
+        .content {
+          font-size: 30px;
+        }
+
+        .content h1 {
+          font-size: 52px;
+        }
+
+        .section-title {
+          font-size: 34px;
+        }
+
+        .case {
+          font-size: 30px;
+        }
+      }
+
+      @media (max-width: 700px) {
+        .page {
+          width: calc(100vw - 24px);
+          padding: 34px 22px 48px;
+          margin: 24px auto;
+        }
+
+        .site-title {
+          font-size: 34px;
+        }
+
+        .site-subtitle {
+          font-size: 22px;
+          margin-bottom: 30px;
+        }
+
+        .menu,
+        .menu-bottom {
+          font-size: 15px;
+        }
+
+        .content {
+          font-size: 24px;
+        }
+
+        .content h1 {
+          font-size: 44px;
+          text-align: center;
+        }
+
+        .section-title,
+        .case {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <h1 class="site-title">Yale Law Tech</h1>
+      <p class="site-subtitle">CPSC 183 (&amp; 184) &amp; 185</p>
+
+      <hr class="rule" />
+
+      <ul class="menu">
+        <li><a href="#">About ▾</a></li>
+        <li><a href="#" class="active">Control, Privacy, &amp; Technology ▾</a></li>
+        <li><a href="#">IP in the Digital Age ▾</a></li>
+      </ul>
+      <ul class="menu-bottom">
+        <li><a href="#">Law, Technology &amp; Culture ▾</a></li>
+      </ul>
+
+      <hr class="rule" />
+
+      <section class="content">
+        <h1>Control, Privacy, &amp; Technology</h1>
+        <p class="bold">CPSC 185: Control, Privacy and Technology</p>
+        <p><span class="bold">Brad Rosen</span> (brad.rosen@yale.edu)</p>
+        <p>&nbsp;</p>
+        <p>Spring 2026</p>
+        <p>&nbsp;</p>
+        <p>TAs: Santiago Tobar-Potes, Nick Jones</p>
+        <p>F, 3:30-5:30, WLH 204 (or Zoom as needed)</p>
+
+        <p class="readings">
+          Course Readings: Please Skim The Syllabi from
+          <a href="#">2024</a>, <a href="#">2023</a>, <a href="#">2022</a>,
+          <a href="#">2021</a>, <a href="#">2020</a>, <a href="#">2019</a>,
+          <a href="#">2018</a>, <a href="#">2017</a>, <a href="#">2016</a>,
+          <a href="#">2015</a>, <a href="#">2014</a>, <a href="#">2013</a>, etc.
+        </p>
+
+        <p class="section-title">(1) Crazy Laws &amp; Prosecutorial Discretion</p>
+
+        <p class="case">
+          1. Inmates of Attica Correctional Facility v Rockerfeller, 477 F2d 375
+          (2d Cir. 1973):<a href="#"
+            >http://cases.justia.com/us-court-of-appeals/F2/477/375/1514/</a
+          >
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
