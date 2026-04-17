@@ -1,6 +1,4 @@
-from pathlib import Path
-
-html = r"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -299,7 +297,7 @@ html = r"""<!DOCTYPE html>
     const finalPlaque = createPlaque(61.5, 1.75, 0.0, {
       title: "Curator’s Note",
       artifact: "Artifact: the inherited baseline of surveillance",
-      body: "Taken together, these rooms suggest that privacy has not simply weakened over time; it has been redefined downward with each technological shift. People may still care deeply about privacy, but modern systems make that concern harder to translate into meaningful control. The speculative fear is not that people will suddenly stop valuing privacy, but that they will inherit so little of it that its loss feels normal."
+      body: "Taken together, these rooms suggest that privacy has not simply weakened over time; it has been redefined downward with each technological shift. People may still care deeply about privacy, but modern structural systems make that concern harder to translate into meaningful control. The shift is from individual control to infrastructure-level decision-making. The speculative fear is not that people will suddenly stop valuing privacy, but that privacy does not disappear — it becomes impossible to act on, and its loss starts to feel normal."
     });
 
     // Plaques per room
@@ -316,12 +314,12 @@ html = r"""<!DOCTYPE html>
     createPlaque(11, 1.75, 8.5, {
       title: "2000s–2020s — The Aggregation Machine",
       artifact: "Artifact: smartphone, cookies, and invisible trackers",
-      body: "This room is the core of the class unit. Data is collected silently across websites, apps, devices, and brokers, then recombined into profiles and predictions. Privacy no longer disappears through one dramatic disclosure; it vanishes through aggregation, inference, and reuse at scale."
+      body: "Data is collected silently across websites, apps, devices, and brokers, then recombined into profiles and predictions. U.S. courts wrestled with this in cases like In re DoubleClick Inc. Privacy Litigation, where tracking and web data practices highlighted gaps between notice and meaningful control. Privacy no longer disappears through one dramatic disclosure; it vanishes through aggregation, inference, and reuse at scale."
     });
     createPlaque(46, 1.75, 8.5, {
       title: "2050 — The Total Profile",
       artifact: "Artifact: a complete digital self",
-      body: "In the speculative future, everything is online by default: movement, purchases, biometrics, attention, even mood. People may still care about privacy, but the practical ability to defend it collapses. Privacy survives as a moral preference more than a social fact."
+      body: "In the speculative future, everything is online by default: movement, purchases, biometrics, attention, even mood. People may still care about privacy, but the practical ability to defend it collapses. Privacy does not disappear; it becomes impossible to act on inside totalizing systems."
     });
 
     // lights above each room
@@ -684,8 +682,3 @@ html = r"""<!DOCTYPE html>
   </script>
 </body>
 </html>
-"""
-
-out = Path("/mnt/data/museum_of_privacy_3d.html")
-out.write_text(html, encoding="utf-8")
-print(f"Saved {out}")
