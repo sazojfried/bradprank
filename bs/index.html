@@ -168,9 +168,26 @@
   </div>
   <div id="footerTag">Museum of Privacy — 3D Browser Build</div>
 
+  <script>
+    window.__museumBootTimeoutMs = 2000;
+    window.__museumBooted = false;
+    window.setTimeout(() => {
+      if (window.__museumBooted) return;
+      const panel = document.getElementById('panel');
+      const overlay = document.getElementById('overlay');
+      if (!panel) return;
+      if (overlay) overlay.style.display = 'flex';
+      panel.innerHTML = `
+        <h1>Module Load Error</h1>
+        <p><strong>Could not load Three.js modules. Ensure internet access to unpkg OR serve local module files.</strong></p>
+        <p class="small">Quick run hint: <code>python3 -m http.server</code> then open <code>http://localhost:8000/bs/</code>.</p>
+      `;
+    }, window.__museumBootTimeoutMs);
+  </script>
   <script type="module">
     import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
     import { PointerLockControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/PointerLockControls.js';
+    window.__museumBooted = true;
 
     const overlay = document.getElementById('overlay');
     const startBtn = document.getElementById('startBtn');
