@@ -191,11 +191,52 @@
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     document.body.appendChild(renderer.domElement);
 
-    const controls = new PointerLockControls(camera, document.body);
+    const controls = new PointerLockControls(camera, renderer.domElement);
 
-    startBtn.addEventListener('click', () => controls.lock());
-    controls.addEventListener('lock', () => overlay.style.display = 'none');
-    controls.addEventListener('unlock', () => overlay.style.display = 'flex');
+    startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true;
+      try {
+        await controls.lock();
+      } catch (err) {
+        overlay.style.display = 'flex';
+        startBtn.disabled = false;
+        const panelMessage = document.createElement('p');
+        panelMessage.className = 'small';
+        panelMessage.textContent = 'Pointer lock failed. Try clicking inside the canvas or run via localhost.';
+        const existingMessage = document.getElementById('pointerLockMessage');
+        if (existingMessage) existingMessage.remove();
+        panelMessage.id = 'pointerLockMessage';
+        document.getElementById('panel').appendChild(panelMessage);
+      }
+    });
+    controls.addEventListener('lock', () => {
+      overlay.style.display = 'none';
+      startBtn.disabled = false;
+    });
+    controls.addEventListener('unlock', () => {
+      overlay.style.display = 'flex';
+      const panel = document.getElementById('panel');
+      const existingMessage = document.getElementById('pointerLockMessage');
+      if (existingMessage) existingMessage.remove();
+      const resumeMessage = document.createElement('p');
+      resumeMessage.className = 'small';
+      resumeMessage.id = 'pointerLockMessage';
+      resumeMessage.textContent = 'Click Enter Museum to resume.';
+      panel.appendChild(resumeMessage);
+      startBtn.disabled = false;
+    });
+    document.addEventListener('pointerlockerror', () => {
+      overlay.style.display = 'flex';
+      startBtn.disabled = false;
+      const panel = document.getElementById('panel');
+      const existingMessage = document.getElementById('pointerLockMessage');
+      if (existingMessage) existingMessage.remove();
+      const errorMessage = document.createElement('p');
+      errorMessage.className = 'small';
+      errorMessage.id = 'pointerLockMessage';
+      errorMessage.textContent = 'Pointer lock failed. Try clicking inside the canvas or run via localhost.';
+      panel.appendChild(errorMessage);
+    });
 
     const hemi = new THREE.HemisphereLight(0xbcd9ff, 0x1a1d22, 1.25);
     scene.add(hemi);
