@@ -3,740 +3,673 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Museum of Privacy — 3D Walkthrough</title>
+  <title>Virtual Museum of Privacy</title>
   <style>
+    :root {
+      --ui-bg: rgba(10, 16, 26, 0.8);
+      --ui-border: rgba(255, 255, 255, 0.16);
+      --ui-text: #ecf2ff;
+      --accent: #8bd6ff;
+    }
+    * { box-sizing: border-box; }
     html, body {
       margin: 0;
+      width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #0b0d10;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #f3f4f6;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background: #02060b;
+      color: var(--ui-text);
     }
-    #overlay {
-      position: absolute;
+    #app {
+      position: fixed;
       inset: 0;
+    }
+    #startOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at center, rgba(20,24,31,0.78), rgba(5,7,10,0.96));
-      z-index: 10;
-      text-align: center;
-      padding: 24px;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(26, 38, 56, 0.7), rgba(5, 8, 14, 0.96));
+      padding: 20px;
     }
-    #panel {
-      max-width: 760px;
-      background: rgba(17, 24, 39, 0.85);
-      border: 1px solid rgba(255,255,255,0.12);
+    .card {
+      width: min(920px, 95vw);
       border-radius: 18px;
-      padding: 28px 26px;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.45);
+      border: 1px solid var(--ui-border);
+      background: rgba(8, 14, 24, 0.82);
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+      padding: 24px;
+      line-height: 1.5;
     }
-    h1 {
-      margin: 0 0 10px 0;
-      font-size: 34px;
+    .card h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 4vw, 40px);
+      color: #fff;
       letter-spacing: 0.4px;
     }
-    p {
-      line-height: 1.5;
-      margin: 10px 0;
-      color: #e5e7eb;
+    .card p { margin: 10px 0; }
+    .tiny {
+      font-size: 13px;
+      color: #c5d0e0;
     }
-    .small {
-      font-size: 14px;
-      color: #cbd5e1;
-    }
-    button {
-      margin-top: 14px;
-      padding: 12px 18px;
-      background: #f8fafc;
-      color: #0f172a;
+    #startBtn {
+      appearance: none;
       border: 0;
-      border-radius: 12px;
-      font-size: 16px;
+      background: linear-gradient(135deg, #d8f2ff, #9fd9ff);
+      color: #0b1b2a;
       font-weight: 700;
+      font-size: 16px;
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-top: 14px;
       cursor: pointer;
     }
+    #startBtn:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
     #hud {
-      position: absolute;
+      position: fixed;
+      z-index: 5;
       top: 14px;
       left: 14px;
-      z-index: 5;
-      background: rgba(15, 23, 42, 0.65);
-      border: 1px solid rgba(255,255,255,0.12);
+      max-width: 390px;
+      border: 1px solid var(--ui-border);
       border-radius: 12px;
-      padding: 10px 12px;
-      max-width: 340px;
-      backdrop-filter: blur(6px);
+      background: var(--ui-bg);
+      backdrop-filter: blur(4px);
       font-size: 13px;
-      line-height: 1.45;
-    }
-    #crosshair {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 12px;
-      height: 12px;
-      transform: translate(-50%, -50%);
-      z-index: 4;
+      padding: 10px 12px;
+      line-height: 1.4;
       pointer-events: none;
     }
-    #crosshair::before, #crosshair::after {
+
+    #crosshair {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      z-index: 6;
+      pointer-events: none;
+    }
+    #crosshair::before,
+    #crosshair::after {
       content: "";
       position: absolute;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 0 10px rgba(139, 214, 255, 0.7);
     }
-    #crosshair::before {
-      left: 5px;
-      top: 0;
-      width: 2px;
-      height: 12px;
-    }
-    #crosshair::after {
-      top: 5px;
-      left: 0;
-      width: 12px;
-      height: 2px;
-    }
-    #note {
-      position: absolute;
+    #crosshair::before { left: 7px; top: 0; width: 2px; height: 16px; }
+    #crosshair::after { left: 0; top: 7px; width: 16px; height: 2px; }
+
+    #infoPanel {
+      position: fixed;
+      z-index: 7;
       right: 14px;
       bottom: 14px;
-      z-index: 5;
-      max-width: 440px;
-      min-height: 120px;
-      padding: 16px 18px;
-      background: rgba(17, 24, 39, 0.78);
-      border: 1px solid rgba(255,255,255,0.12);
+      width: min(530px, calc(100vw - 28px));
+      min-height: 170px;
+      border: 1px solid var(--ui-border);
       border-radius: 14px;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 12px 48px rgba(0,0,0,0.35);
+      background: rgba(7, 12, 20, 0.84);
+      backdrop-filter: blur(5px);
+      padding: 14px 16px;
       display: none;
     }
-    #note h2 {
-      margin: 0 0 8px 0;
+    #infoPanel h2 {
+      margin: 0 0 4px;
       font-size: 22px;
     }
-    #note p {
-      margin: 6px 0;
-      font-size: 15px;
-    }
-    #note .artifact {
+    #artifactName {
+      margin: 0 0 8px;
       font-style: italic;
-      color: #cbd5e1;
-      margin-bottom: 6px;
+      color: #b9d7f2;
     }
-    #footerTag {
-      position: absolute;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 4;
-      font-size: 12px;
-      color: rgba(255,255,255,0.7);
-      letter-spacing: 0.3px;
+    #narrative {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.45;
+      color: #e8eef7;
+    }
+
+    #statusLine {
+      margin-top: 10px;
+      min-height: 18px;
+      color: #ffd6d6;
+      font-size: 13px;
     }
   </style>
 </head>
 <body>
-  <div id="overlay">
-    <div id="panel">
-      <h1>The Museum of Privacy</h1>
-      <p><strong>A 3D walk through the history of losing control.</strong></p>
+  <div id="app"></div>
+
+  <div id="startOverlay">
+    <div class="card">
+      <h1>Museum of Privacy: A Walk Through Time</h1>
       <p>
-        This is a small first-person museum. Walk through four rooms showing how privacy shifts from
-        <em>being left alone</em>, to <em>control over records</em>, to <em>aggregation and profiling</em>,
-        and finally to a speculative future where privacy survives mostly as a feeling.
+        Explore four connected rooms from <strong>1890</strong> to a speculative <strong>future</strong>.
+        This virtual museum traces the shift from privacy as personal seclusion to privacy as a
+        structural problem shaped by data aggregation, inference, and surveillance infrastructures.
       </p>
-      <p class="small">
-        Controls: click to enter • move with <strong>W A S D</strong> • look with mouse • hold <strong>Shift</strong> to move faster • press <strong>Esc</strong> to free the cursor.
+      <p class="tiny">
+        Controls: click <strong>Enter Museum</strong> • move with <strong>W A S D</strong> • mouse to look •
+        <strong>Shift</strong> to walk faster • <strong>Esc</strong> to release cursor.
       </p>
-      <button id="startBtn">Enter Museum</button>
+      <button id="startBtn" type="button">Enter Museum</button>
+      <div id="statusLine"></div>
     </div>
   </div>
 
   <div id="hud">
-    <strong>Walkable exhibit</strong><br/>
-    Move through the rooms from left to right. Stand near a glowing plaque to read it.<br/>
-    Theme: privacy doesn’t simply disappear — it gets redefined downward with each technological shift.
+    <strong>Museum Navigation</strong><br />
+    Walk through the hallway and rooms. Stand near a glowing plaque to read its content.<br />
+    Final thesis: privacy doesn’t disappear — it becomes impossible to act on.
   </div>
   <div id="crosshair"></div>
-  <div id="note">
-    <h2 id="noteTitle"></h2>
-    <div class="artifact" id="noteArtifact"></div>
-    <p id="noteBody"></p>
+
+  <div id="infoPanel">
+    <h2 id="panelTitle"></h2>
+    <p id="artifactName"></p>
+    <p id="narrative"></p>
   </div>
-  <div id="footerTag">Museum of Privacy — 3D Browser Build</div>
 
   <script>
-    window.__museumBootTimeoutMs = 2000;
-    window.__museumBooted = false;
-    window.setTimeout(() => {
-      if (window.__museumBooted) return;
-      const panel = document.getElementById('panel');
-      const overlay = document.getElementById('overlay');
-      if (!panel) return;
-      if (overlay) overlay.style.display = 'flex';
-      panel.innerHTML = `
-        <h1>Module Load Error</h1>
-        <p><strong>Could not load Three.js modules. Ensure internet access to unpkg OR serve local module files.</strong></p>
-        <p class="small">Quick run hint: <code>python3 -m http.server</code> then open <code>http://localhost:8000/bs/</code>.</p>
-      `;
-    }, window.__museumBootTimeoutMs);
-  </script>
-  <script type="module">
-    import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-    import { PointerLockControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/PointerLockControls.js';
-    window.__museumBooted = true;
-
-    const overlay = document.getElementById('overlay');
-    const startBtn = document.getElementById('startBtn');
-    const note = document.getElementById('note');
-    const noteTitle = document.getElementById('noteTitle');
-    const noteArtifact = document.getElementById('noteArtifact');
-    const noteBody = document.getElementById('noteBody');
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0d12);
-    scene.fog = new THREE.Fog(0x0a0d12, 25, 120);
-
-    const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 500);
-    camera.position.set(-58, 2.3, 0);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    document.body.appendChild(renderer.domElement);
-
-    const controls = new PointerLockControls(camera, renderer.domElement);
-
-    startBtn.addEventListener('click', async () => {
-      startBtn.disabled = true;
-      try {
-        await controls.lock();
-      } catch (err) {
-        overlay.style.display = 'flex';
-        startBtn.disabled = false;
-        const panelMessage = document.createElement('p');
-        panelMessage.className = 'small';
-        panelMessage.textContent = 'Pointer lock failed. Try clicking inside the canvas or run via localhost.';
-        const existingMessage = document.getElementById('pointerLockMessage');
-        if (existingMessage) existingMessage.remove();
-        panelMessage.id = 'pointerLockMessage';
-        document.getElementById('panel').appendChild(panelMessage);
-      }
-    });
-    controls.addEventListener('lock', () => {
-      overlay.style.display = 'none';
-      startBtn.disabled = false;
-    });
-    controls.addEventListener('unlock', () => {
-      overlay.style.display = 'flex';
-      const panel = document.getElementById('panel');
-      const existingMessage = document.getElementById('pointerLockMessage');
-      if (existingMessage) existingMessage.remove();
-      const resumeMessage = document.createElement('p');
-      resumeMessage.className = 'small';
-      resumeMessage.id = 'pointerLockMessage';
-      resumeMessage.textContent = 'Click Enter Museum to resume.';
-      panel.appendChild(resumeMessage);
-      startBtn.disabled = false;
-    });
-    document.addEventListener('pointerlockerror', () => {
-      overlay.style.display = 'flex';
-      startBtn.disabled = false;
-      const panel = document.getElementById('panel');
-      const existingMessage = document.getElementById('pointerLockMessage');
-      if (existingMessage) existingMessage.remove();
-      const errorMessage = document.createElement('p');
-      errorMessage.className = 'small';
-      errorMessage.id = 'pointerLockMessage';
-      errorMessage.textContent = 'Pointer lock failed. Try clicking inside the canvas or run via localhost.';
-      panel.appendChild(errorMessage);
-    });
-
-    const hemi = new THREE.HemisphereLight(0xbcd9ff, 0x1a1d22, 1.25);
-    scene.add(hemi);
-
-    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-    dir.position.set(15, 18, 10);
-    scene.add(dir);
-
-    const ambient = new THREE.AmbientLight(0x778899, 0.35);
-    scene.add(ambient);
-
-    const floorTex = makeCheckerTexture('#2d3642', '#202733');
-    floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-    floorTex.repeat.set(16, 6);
-
-    const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(140, 28),
-      new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.95, metalness: 0.02 })
-    );
-    floor.rotation.x = -Math.PI / 2;
-    scene.add(floor);
-
-    const ceiling = new THREE.Mesh(
-      new THREE.PlaneGeometry(140, 28),
-      new THREE.MeshStandardMaterial({ color: 0x11151b, roughness: 1 })
-    );
-    ceiling.position.y = 5.7;
-    ceiling.rotation.x = Math.PI / 2;
-    scene.add(ceiling);
-
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x141a21, roughness: 1 });
-    const trimMat = new THREE.MeshStandardMaterial({ color: 0x242b35, roughness: 0.9 });
-    const glassMat = new THREE.MeshStandardMaterial({ color: 0x88a6c8, transparent: true, opacity: 0.18, roughness: 0.15, metalness: 0.1 });
-    const goldMat = new THREE.MeshStandardMaterial({ color: 0xaa8840, roughness: 0.65 });
-    const whiteMat = new THREE.MeshStandardMaterial({ color: 0xe6e8ec, roughness: 0.9 });
-
-    const colliders = [];
-    const plaques = [];
-
-    function addBox(w, h, d, x, y, z, mat=wallMat, collides=true) {
-      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-      mesh.position.set(x, y, z);
-      scene.add(mesh);
-      if (collides) colliders.push(new THREE.Box3().setFromObject(mesh).expandByScalar(0.15));
-      return mesh;
+    async function loadScript(url) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.async = false;
+        script.onload = resolve;
+        script.onerror = () => reject(new Error(`Failed to load ${url}`));
+        document.head.appendChild(script);
+      });
     }
 
-    // Outer walls
-    addBox(140, 6, 1, 0, 3, -14);
-    addBox(140, 6, 1, 0, 3, 14);
-    addBox(1, 6, 28, -70, 3, 0);
-    addBox(1, 6, 28, 70, 3, 0);
+    async function loadThreeStack() {
+      const stacks = [
+        [
+          './vendor/three.min.js',
+          './vendor/PointerLockControls.js'
+        ],
+        [
+          'https://unpkg.com/three@0.160.0/build/three.min.js',
+          'https://unpkg.com/three@0.160.0/examples/js/controls/PointerLockControls.js'
+        ],
+        [
+          'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js',
+          'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/PointerLockControls.js'
+        ]
+      ];
 
-    // Internal separators with door gaps
-    const roomCenters = [-52.5, -17.5, 17.5, 52.5];
-    const separators = [-35, 0, 35];
-    separators.forEach(x => {
-      addBox(1, 6, 10, x, 3, -9);
-      addBox(1, 6, 10, x, 3, 9);
-      addBox(1, 1, 8, x, 5.1, 0, trimMat, false);
-    });
+      let lastErr = null;
+      for (const urls of stacks) {
+        try {
+          for (const url of urls) {
+            await loadScript(url);
+          }
+          if (window.THREE && window.THREE.PointerLockControls) {
+            return;
+          }
+        } catch (err) {
+          lastErr = err;
+        }
+      }
+      throw lastErr || new Error('Unable to load Three.js and PointerLockControls.');
+    }
 
-    // Header band
-    roomCenters.forEach((x, i) => {
-      const color = [0x556b8d, 0x6f5d8a, 0x7b4f55, 0x6c6f45][i];
-      const band = addBox(29, 0.25, 1.1, x, 5.0, -13.3, new THREE.MeshStandardMaterial({ color }), false);
-      band.castShadow = false;
-    });
+    async function bootMuseum() {
+      const app = document.getElementById('app');
+    const startOverlay = document.getElementById('startOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const statusLine = document.getElementById('statusLine');
+    const infoPanel = document.getElementById('infoPanel');
+    const panelTitle = document.getElementById('panelTitle');
+    const artifactName = document.getElementById('artifactName');
+    const narrative = document.getElementById('narrative');
 
-    // Bench in center hall
-    addBox(8, 0.6, 2, 0, 0.35, 0, trimMat);
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x070b12);
+    scene.fog = new THREE.Fog(0x060a10, 25, 160);
 
-    // Decorative pedestals and objects per room
-    // Room 1: newspaper + camera
-    addPedestal(-55, 0, 4, whiteMat);
-    addFramedPanel(-58, 2.7, -13.35, "1890 — The Right to Be Let Alone", "#f4e7c9", "#2d2419");
-    addNewspaper(-55, 1.25, 0.3);
-    addCamera(-49.5, 1.15, -3.5);
+    const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 350);
+    camera.position.set(-63, 2.1, 0);
 
-    // Room 2: records + punch card
-    addPedestal(-20, 0, -3, whiteMat);
-    addFramedPanel(-22, 2.7, -13.35, "1970s — The Age of Records", "#e6e8f3", "#1d2230");
-    addFileCabinet(-14, 1.4, 3.5);
-    addPunchCard(-20, 1.3, -2.5);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    app.appendChild(renderer.domElement);
 
-    // Room 3: phone + network
-    addPedestal(15, 0, 3.5, whiteMat);
-    addFramedPanel(12, 2.7, -13.35, "2000s–2020s — The Aggregation Machine", "#dceef8", "#162733");
-    addPhone(15, 1.35, 3.7);
-    addNetworkSpheres(23, 2.2, -1.5);
+    const controls = new THREE.PointerLockControls(camera, document.body);
+    scene.add(controls.getObject());
 
-    // Room 4: total profile
-    addPedestal(50, 0, 0, whiteMat);
-    addFramedPanel(48, 2.7, -13.35, "2050 — The Total Profile", "#edf8dd", "#233014");
-    addProfileMonolith(50, 2.05, 0);
+    const colliders = [];
+    const exhibits = [];
 
-    // End wall conclusion
-    addFramedPanel(66.2, 2.8, 0, "Curator’s Note", "#f5f5f5", "#202020", Math.PI / 2, 7.4, 3.5);
-    const finalPlaque = createPlaque(61.5, 1.75, 0.0, {
-      title: "Curator’s Note",
-      artifact: "Artifact: the inherited baseline of surveillance",
-      body: "Taken together, these rooms suggest that privacy has not simply weakened over time; it has been redefined downward with each technological shift. People may still care deeply about privacy, but modern structural systems make that concern harder to translate into meaningful control. The shift is from individual control to infrastructure-level decision-making. The speculative fear is not that people will suddenly stop valuing privacy, but that privacy does not disappear — it becomes impossible to act on, and its loss starts to feel normal."
-    });
-
-    // Plaques per room
-    createPlaque(-59, 1.75, 8.5, {
-      title: "1890 — The Right to Be Let Alone",
-      artifact: "Artifact: newspaper clipping and early camera",
-      body: "Late nineteenth-century privacy anxiety centered on exposure. Warren and Brandeis reacted to yellow journalism and portable photography, imagining privacy as seclusion: the right to be let alone. The fear here is not data analysis but intrusion and public embarrassment."
-    });
-    createPlaque(-24, 1.75, 8.5, {
-      title: "1970s — The Age of Records",
-      artifact: "Artifact: government file folder and punch card",
-      body: "As institutions accumulated records, privacy shifted from seclusion to informational control. The question became less 'who saw me?' and more 'who has my file, and what can they do with it?' Privacy now depends on systems, databases, and bureaucracy."
-    });
-    createPlaque(11, 1.75, 8.5, {
-      title: "2000s–2020s — The Aggregation Machine",
-      artifact: "Artifact: smartphone, cookies, and invisible trackers",
-      body: "Data is collected silently across websites, apps, devices, and brokers, then recombined into profiles and predictions. U.S. courts wrestled with this in cases like In re DoubleClick Inc. Privacy Litigation, where tracking and web data practices highlighted gaps between notice and meaningful control. Privacy no longer disappears through one dramatic disclosure; it vanishes through aggregation, inference, and reuse at scale."
-    });
-    createPlaque(46, 1.75, 8.5, {
-      title: "2050 — The Total Profile",
-      artifact: "Artifact: a complete digital self",
-      body: "In the speculative future, everything is online by default: movement, purchases, biometrics, attention, even mood. People may still care about privacy, but the practical ability to defend it collapses. Privacy does not disappear; it becomes impossible to act on inside totalizing systems."
-    });
-
-    // lights above each room
-    roomCenters.forEach((x, idx) => {
-      const colors = [0xffe8c2, 0xded9ff, 0xc8ecff, 0xe8ffbd];
-      const spot = new THREE.SpotLight(colors[idx], 1.8, 35, Math.PI / 6, 0.45, 1);
-      spot.position.set(x, 5.3, 0);
-      spot.target.position.set(x, 0, 0);
-      scene.add(spot, spot.target);
-    });
-
-    // corridor title
-    const titleSprite = makeTextSprite("Walk the rooms from 1890 → 2050", {
-      fontsize: 62, padding: 20, background: "rgba(12,17,24,0.74)", color: "#f8fafc", border: "rgba(255,255,255,0.18)"
-    });
-    titleSprite.position.set(-58, 4.9, 0);
-    scene.add(titleSprite);
-
-    const clock = new THREE.Clock();
+    const movement = {
+      forward: false,
+      backward: false,
+      left: false,
+      right: false,
+      sprint: false,
+    };
     const velocity = new THREE.Vector3();
     const direction = new THREE.Vector3();
-    const move = { forward: false, backward: false, left: false, right: false, sprint: false };
-    const playerRadius = 0.65;
-    const playerHeight = 2.3;
+    const playerRadius = 0.55;
+    const playerHeight = 2.1;
+    const clock = new THREE.Clock();
 
-    document.addEventListener('keydown', (e) => {
-      switch (e.code) {
-        case 'KeyW': move.forward = true; break;
-        case 'KeyS': move.backward = true; break;
-        case 'KeyA': move.left = true; break;
-        case 'KeyD': move.right = true; break;
-        case 'ShiftLeft':
-        case 'ShiftRight': move.sprint = true; break;
+    setupScene();
+    setupInput();
+    setupPointerLockUI();
+    animate();
+
+    function setupScene() {
+      addLights();
+      addHallwayShell();
+      addRooms();
+      addFloatingLabels();
+    }
+
+    function addLights() {
+      scene.add(new THREE.HemisphereLight(0xb7dcff, 0x1b2230, 0.45));
+      const mainDir = new THREE.DirectionalLight(0xdbeeff, 0.25);
+      mainDir.position.set(18, 24, 8);
+      scene.add(mainDir);
+    }
+
+    function addHallwayShell() {
+      const floorMat = new THREE.MeshStandardMaterial({ color: 0x171d27, roughness: 0.95 });
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(160, 30), floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      scene.add(floor);
+
+      const ceiling = new THREE.Mesh(
+        new THREE.PlaneGeometry(160, 30),
+        new THREE.MeshStandardMaterial({ color: 0x0e141f, roughness: 1 })
+      );
+      ceiling.position.y = 6;
+      ceiling.rotation.x = Math.PI / 2;
+      scene.add(ceiling);
+
+      const wallMat = new THREE.MeshStandardMaterial({ color: 0x121a24, roughness: 1 });
+      box(160, 6, 1, 0, 3, -15, wallMat);
+      box(160, 6, 1, 0, 3, 15, wallMat);
+      box(1, 6, 30, -80, 3, 0, wallMat);
+      box(1, 6, 30, 80, 3, 0, wallMat);
+
+      const separators = [-40, 0, 40];
+      separators.forEach((x) => {
+        box(1, 6, 10, x, 3, -10, wallMat);
+        box(1, 6, 10, x, 3, 10, wallMat);
+      });
+
+      separators.forEach((x) => {
+        const door = new THREE.Mesh(
+          new THREE.BoxGeometry(0.2, 4.5, 8),
+          new THREE.MeshStandardMaterial({
+            color: 0x72c6ff,
+            emissive: 0x11364f,
+            emissiveIntensity: 0.25,
+            transparent: true,
+            opacity: 0.17,
+            roughness: 0.1,
+            metalness: 0.4,
+          })
+        );
+        door.position.set(x, 2.4, 0);
+        scene.add(door);
+      });
+    }
+
+    function addRooms() {
+      const rooms = [
+        {
+          x: -60,
+          title: '1890 — The Right to Be Let Alone',
+          artifact: 'Artifact: Camera and Newspaper',
+          body:
+            'In 1890, privacy was framed as protection from intrusion into domestic life and reputation. Concern focused on yellow journalism and portable photography, where exposure felt immediate and personal. The key idea was seclusion: the right to be let alone. Privacy harm was seen as an event done to an individual, not a system operating continuously in the background.',
+          mood: { color: 0xffdfa8, wall: 0x3d2f1d, plaque: 0xffd899 },
+        },
+        {
+          x: -20,
+          title: '1970s — Records and Databases',
+          artifact: 'Artifact: File Cabinet + Punch Card',
+          body:
+            'By the 1970s, privacy debates shifted toward control over records held by institutions. The question became not only who can see me, but who stores and processes my data. Bureaucratic databases made errors and access rights central concerns. Privacy starts moving from interpersonal boundaries to administrative systems and procedural safeguards.',
+          mood: { color: 0xb8c8d9, wall: 0x222a33, plaque: 0xa5bbcf },
+        },
+        {
+          x: 20,
+          title: 'Present — Aggregation and Tracking',
+          artifact: 'Artifact: Smartphone Profile Graph',
+          body:
+            'Today, data from cookies, apps, location trails, brokers, and ad-tech flows are aggregated into persistent profiles. Inference matters as much as collection: systems predict sensitive traits from seemingly ordinary behavior. Cases like In re DoubleClick Inc. Privacy Litigation reveal how legal concepts struggled with invisible web tracking and consent theater. The center of gravity shifts from individual control toward structural data ecosystems that shape opportunity and risk.',
+          mood: { color: 0x8bd6ff, wall: 0x102a42, plaque: 0x7dd3fc },
+        },
+        {
+          x: 60,
+          title: 'Future — The Total Record',
+          artifact: 'Artifact: Monolith of Continuous Capture',
+          body:
+            'In this speculative future, sensors and models log movement, emotion, speech, and social context by default. Privacy values may survive culturally, but practical resistance fails against totalizing infrastructures. Governance decisions become automated, opaque, and preemptive. Privacy doesn\'t disappear; it becomes impossible to act on in everyday life.',
+          mood: { color: 0xd8f4c9, wall: 0x1a2619, plaque: 0xb7f3a0 },
+        },
+      ];
+
+      for (const room of rooms) {
+        buildRoom(room);
       }
-    });
-    document.addEventListener('keyup', (e) => {
-      switch (e.code) {
-        case 'KeyW': move.forward = false; break;
-        case 'KeyS': move.backward = false; break;
-        case 'KeyA': move.left = false; break;
-        case 'KeyD': move.right = false; break;
-        case 'ShiftLeft':
-        case 'ShiftRight': move.sprint = false; break;
+    }
+
+    function buildRoom(room) {
+      const wallMat = new THREE.MeshStandardMaterial({ color: room.mood.wall, roughness: 0.96 });
+      const floorPatch = new THREE.Mesh(
+        new THREE.PlaneGeometry(34, 26),
+        new THREE.MeshStandardMaterial({ color: darken(room.mood.color, 0.75), roughness: 1 })
+      );
+      floorPatch.rotation.x = -Math.PI / 2;
+      floorPatch.position.set(room.x, 0.01, 0);
+      scene.add(floorPatch);
+
+      box(34, 6, 0.5, room.x, 3, -14.75, wallMat, false);
+      box(34, 6, 0.5, room.x, 3, 14.75, wallMat, false);
+
+      const spotlight = new THREE.SpotLight(room.mood.color, 2.2, 38, Math.PI / 6, 0.5, 1);
+      spotlight.position.set(room.x, 5.6, 0);
+      spotlight.target.position.set(room.x, 0, 0);
+      scene.add(spotlight, spotlight.target);
+
+      const pedestal = box(
+        3,
+        1.0,
+        3,
+        room.x,
+        0.5,
+        0,
+        new THREE.MeshStandardMaterial({ color: 0xe9edf5, roughness: 0.9 }),
+        false
+      );
+
+      createArtifact(room);
+
+      const plaqueMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(1.5, 1.0, 0.12),
+        new THREE.MeshStandardMaterial({
+          color: room.mood.plaque,
+          emissive: room.mood.plaque,
+          emissiveIntensity: 0.35,
+          roughness: 0.45,
+        })
+      );
+      plaqueMesh.position.set(room.x - 6, 1.6, 9.5);
+      scene.add(plaqueMesh);
+
+      const plaqueGlow = new THREE.PointLight(room.mood.color, 1.0, 6, 2);
+      plaqueGlow.position.set(room.x - 6, 2.0, 9.5);
+      scene.add(plaqueGlow);
+
+      const titleSprite = textSprite(room.title, room.mood.color);
+      titleSprite.position.set(room.x, 4.9, -13.6);
+      scene.add(titleSprite);
+
+      exhibits.push({
+        position: plaqueMesh.position.clone(),
+        title: room.title,
+        artifact: room.artifact,
+        body: room.body,
+      });
+    }
+
+    function createArtifact(room) {
+      if (room.x === -60) {
+        const cam = box(1.3, 0.9, 0.9, room.x + 0.8, 1.4, 0.4, mat(0x2c2f36), false);
+        const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.45, 16), mat(0x121417));
+        lens.rotation.z = Math.PI / 2;
+        lens.position.set(room.x + 1.5, 1.4, 0.4);
+        scene.add(lens);
+
+        const paper = box(1.8, 0.08, 1.3, room.x - 0.8, 1.05, -0.2, mat(0xe8dcc2), false);
+        paper.rotation.y = -0.35;
+      } else if (room.x === -20) {
+        box(1.8, 2.6, 1.2, room.x + 1.2, 1.8, -0.4, mat(0x78808a), false);
+        const card = box(1.9, 0.05, 1.1, room.x - 0.9, 1.1, 0.6, mat(0xf0dca9), false);
+        card.rotation.y = 0.28;
+      } else if (room.x === 20) {
+        box(0.95, 1.75, 0.12, room.x, 1.45, 0, mat(0x0f1319), false);
+        box(0.74, 1.3, 0.03, room.x, 1.45, 0.08, new THREE.MeshStandardMaterial({
+          color: 0x72d4ff,
+          emissive: 0x114a6f,
+          emissiveIntensity: 0.55,
+        }), false);
+
+        const points = [[1.8, 1.7, 0.2], [2.7, 2.4, -0.5], [3.8, 1.2, 0.3], [4.6, 2.1, -0.6]];
+        const sphereMat = new THREE.MeshStandardMaterial({ color: 0x98e3ff, emissive: 0x134f73, emissiveIntensity: 0.5 });
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x6bcfff });
+        const linePoints = [];
+
+        points.forEach((p, idx) => {
+          const s = new THREE.Mesh(new THREE.SphereGeometry(0.15, 14, 14), sphereMat);
+          s.position.set(room.x + p[0], p[1], p[2]);
+          scene.add(s);
+          if (idx > 0) {
+            linePoints.push(new THREE.Vector3(room.x + points[idx - 1][0], points[idx - 1][1], points[idx - 1][2]));
+            linePoints.push(new THREE.Vector3(room.x + p[0], p[1], p[2]));
+          }
+        });
+        const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
+        scene.add(new THREE.LineSegments(lineGeo, lineMat));
+      } else {
+        box(1.6, 4.0, 0.45, room.x, 2.1, 0, new THREE.MeshStandardMaterial({
+          color: 0xb0dca0,
+          transparent: true,
+          opacity: 0.35,
+          emissive: 0x30592a,
+          emissiveIntensity: 0.2,
+          roughness: 0.08,
+          metalness: 0.2,
+        }), false);
+
+        for (let i = 0; i < 5; i++) {
+          box(0.17, 0.35 + i * 0.3, 0.07, room.x - 0.45 + i * 0.22, 0.8 + i * 0.22, 0.26,
+            new THREE.MeshStandardMaterial({ color: 0xc6ffad, emissive: 0x4e7e2e, emissiveIntensity: 0.55 }), false);
+        }
       }
-    });
+    }
+
+    function addFloatingLabels() {
+      const welcome = textSprite('Follow the timeline: 1890 → 1970s → Present → Future', 0xb9dcff, true);
+      welcome.position.set(-68, 5.2, 0);
+      scene.add(welcome);
+    }
+
+    function setupInput() {
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'KeyW') movement.forward = true;
+        if (e.code === 'KeyS') movement.backward = true;
+        if (e.code === 'KeyA') movement.left = true;
+        if (e.code === 'KeyD') movement.right = true;
+        if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') movement.sprint = true;
+      });
+
+      document.addEventListener('keyup', (e) => {
+        if (e.code === 'KeyW') movement.forward = false;
+        if (e.code === 'KeyS') movement.backward = false;
+        if (e.code === 'KeyA') movement.left = false;
+        if (e.code === 'KeyD') movement.right = false;
+        if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') movement.sprint = false;
+      });
+
+      window.addEventListener('resize', onResize);
+    }
+
+    function setupPointerLockUI() {
+      startBtn.addEventListener('click', () => {
+        statusLine.textContent = '';
+        startBtn.disabled = true;
+
+        try {
+          controls.lock();
+        } catch (err) {
+          startBtn.disabled = false;
+          statusLine.textContent = 'Pointer lock failed. Serve with localhost and click Enter Museum again.';
+        }
+      });
+
+      controls.addEventListener('lock', () => {
+        startOverlay.style.display = 'none';
+        startBtn.disabled = false;
+      });
+
+      controls.addEventListener('unlock', () => {
+        startOverlay.style.display = 'flex';
+        statusLine.textContent = 'Cursor released. Click Enter Museum to continue.';
+      });
+
+      document.addEventListener('pointerlockerror', () => {
+        startOverlay.style.display = 'flex';
+        startBtn.disabled = false;
+        statusLine.textContent = 'Pointer lock blocked by browser. Try clicking button again on localhost.';
+      });
+    }
 
     function animate() {
       requestAnimationFrame(animate);
-      const delta = Math.min(clock.getDelta(), 0.05);
+      const dt = Math.min(clock.getDelta(), 0.05);
 
-      if (controls.isLocked === true) {
-        velocity.x -= velocity.x * 10.0 * delta;
-        velocity.z -= velocity.z * 10.0 * delta;
+      if (controls.isLocked) {
+        velocity.x -= velocity.x * 9.0 * dt;
+        velocity.z -= velocity.z * 9.0 * dt;
 
-        direction.z = Number(move.forward) - Number(move.backward);
-        direction.x = Number(move.right) - Number(move.left);
+        direction.z = Number(movement.forward) - Number(movement.backward);
+        direction.x = Number(movement.right) - Number(movement.left);
         direction.normalize();
 
-        const speed = move.sprint ? 16 : 10;
-        if (move.forward || move.backward) velocity.z -= direction.z * speed * delta;
-        if (move.left || move.right) velocity.x -= direction.x * speed * delta;
+        const speed = movement.sprint ? 15 : 9;
+        if (movement.forward || movement.backward) velocity.z -= direction.z * speed * dt;
+        if (movement.left || movement.right) velocity.x -= direction.x * speed * dt;
 
         const oldPos = controls.getObject().position.clone();
-        controls.moveRight(-velocity.x * delta);
-        controls.moveForward(-velocity.z * delta);
+        controls.moveRight(-velocity.x * dt);
+        controls.moveForward(-velocity.z * dt);
 
         const pos = controls.getObject().position;
         pos.y = playerHeight;
 
-        if (checkCollision(pos)) {
+        if (hitWall(pos)) {
           controls.getObject().position.copy(oldPos);
+          velocity.multiplyScalar(0.5);
         }
 
-        pos.x = Math.max(-67.5, Math.min(67.5, pos.x));
-        pos.z = Math.max(-11.8, Math.min(11.8, pos.z));
+        pos.x = THREE.MathUtils.clamp(pos.x, -76.5, 76.5);
+        pos.z = THREE.MathUtils.clamp(pos.z, -12.5, 12.5);
 
-        updatePlaqueUI(pos);
+        updateExhibitUI(pos);
       } else {
-        note.style.display = 'none';
+        infoPanel.style.display = 'none';
       }
 
       renderer.render(scene, camera);
     }
 
-    function checkCollision(pos) {
-      const playerBox = new THREE.Box3(
-        new THREE.Vector3(pos.x - playerRadius, 0.1, pos.z - playerRadius),
-        new THREE.Vector3(pos.x + playerRadius, playerHeight, pos.z + playerRadius)
-      );
-      return colliders.some(box => box.intersectsBox(playerBox));
-    }
-
-    function updatePlaqueUI(pos) {
+    function updateExhibitUI(playerPos) {
       let nearest = null;
-      let nearestDist = Infinity;
-      for (const p of plaques) {
-        const d = p.mesh.position.distanceTo(pos);
-        if (d < 4.2 && d < nearestDist) {
-          nearest = p;
-          nearestDist = d;
+      let bestDistance = Infinity;
+      for (const exhibit of exhibits) {
+        const d = exhibit.position.distanceTo(playerPos);
+        if (d < 4.2 && d < bestDistance) {
+          nearest = exhibit;
+          bestDistance = d;
         }
       }
-      if (nearest) {
-        note.style.display = 'block';
-        noteTitle.textContent = nearest.data.title;
-        noteArtifact.textContent = nearest.data.artifact;
-        noteBody.textContent = nearest.data.body;
-      } else {
-        note.style.display = 'none';
+
+      if (!nearest) {
+        infoPanel.style.display = 'none';
+        return;
       }
+
+      infoPanel.style.display = 'block';
+      panelTitle.textContent = nearest.title;
+      artifactName.textContent = nearest.artifact;
+      narrative.textContent = nearest.body;
     }
 
-    function createPlaque(x, y, z, data) {
-      const base = new THREE.Mesh(
-        new THREE.BoxGeometry(1.2, 1.0, 0.08),
-        new THREE.MeshStandardMaterial({
-          color: 0xecd38d,
-          emissive: 0x7b641f,
-          emissiveIntensity: 0.45,
-          roughness: 0.65
-        })
+    function hitWall(position) {
+      const playerBox = new THREE.Box3(
+        new THREE.Vector3(position.x - playerRadius, 0.1, position.z - playerRadius),
+        new THREE.Vector3(position.x + playerRadius, playerHeight, position.z + playerRadius)
       );
-      base.position.set(x, y, z);
-      scene.add(base);
-
-      const label = makeTextSprite("PLAQUE", { fontsize: 38, padding: 12, background: "rgba(236,211,141,0.9)", color: "#271d06" });
-      label.position.set(x, y + 0.95, z);
-      scene.add(label);
-
-      plaques.push({ mesh: base, data });
-      return { mesh: base, label, data };
+      return colliders.some((box) => box.intersectsBox(playerBox));
     }
 
-    function addPedestal(x, y, z, mat) {
-      addBox(3, 1.1, 3, x, y + 0.55, z, mat);
-    }
-
-    function addFramedPanel(x, y, z, text, bg, fg, rotY = 0, w = 9.5, h = 1.9) {
-      const frame = new THREE.Mesh(
-        new THREE.BoxGeometry(w, h, 0.15),
-        goldMat
-      );
-      frame.position.set(x, y, z);
-      frame.rotation.y = rotY;
-      scene.add(frame);
-
-      const art = makeTextSprite(text, {
-        fontsize: 52,
-        padding: 18,
-        background: bg,
-        color: fg,
-        border: "rgba(0,0,0,0.2)"
-      });
-      art.position.set(x, y, z + (rotY === 0 ? 0.11 : 0));
-      art.rotation.y = rotY;
-      if (rotY !== 0) art.position.x += 0.11;
-      scene.add(art);
-    }
-
-    function addNewspaper(x, y, z) {
-      const sheet = new THREE.Mesh(
-        new THREE.BoxGeometry(2.0, 0.08, 1.5),
-        new THREE.MeshStandardMaterial({ color: 0xe8dcc1, roughness: 1 })
-      );
-      sheet.position.set(x, y, z);
-      sheet.rotation.y = -0.3;
-      scene.add(sheet);
-      for (let i=0;i<5;i++) {
-        const line = new THREE.Mesh(
-          new THREE.BoxGeometry(1.4 - i*0.08, 0.01, 0.06),
-          new THREE.MeshStandardMaterial({ color: 0x52493b, roughness: 1 })
-        );
-        line.position.set(x - 0.1, y + 0.05, z - 0.45 + i*0.21);
-        line.rotation.y = -0.3;
-        scene.add(line);
+    function box(w, h, d, x, y, z, material, solid = true) {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+      mesh.position.set(x, y, z);
+      scene.add(mesh);
+      if (solid) {
+        colliders.push(new THREE.Box3().setFromObject(mesh).expandByScalar(0.08));
       }
+      return mesh;
     }
 
-    function addCamera(x, y, z) {
-      const body = addBox(1.2, 0.9, 0.9, x, y, z, trimMat, false);
-      const lens = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.22, 0.22, 0.45, 24),
-        new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4 })
-      );
-      lens.rotation.z = Math.PI / 2;
-      lens.position.set(x + 0.75, y, z);
-      scene.add(lens);
-      const flash = new THREE.Mesh(
-        new THREE.BoxGeometry(0.55, 0.28, 0.2),
-        whiteMat
-      );
-      flash.position.set(x, y + 0.62, z);
-      scene.add(flash);
+    function mat(color) {
+      return new THREE.MeshStandardMaterial({ color, roughness: 0.8, metalness: 0.1 });
     }
 
-    function addFileCabinet(x, y, z) {
-      addBox(2.1, 2.8, 1.5, x, y, z, new THREE.MeshStandardMaterial({ color: 0x6b7280, roughness: 0.9 }), false);
-      for (let i=0;i<3;i++) {
-        const handle = addBox(0.5, 0.08, 0.08, x, y + 0.75 - i*0.9, z + 0.8, goldMat, false);
-      }
+    function darken(hex, ratio = 0.8) {
+      const c = new THREE.Color(hex);
+      c.multiplyScalar(ratio);
+      return c;
     }
 
-    function addPunchCard(x, y, z) {
-      const card = new THREE.Mesh(
-        new THREE.BoxGeometry(2.0, 0.05, 1.2),
-        new THREE.MeshStandardMaterial({ color: 0xf0d9a8, roughness: 1 })
-      );
-      card.position.set(x, y, z);
-      card.rotation.y = 0.2;
-      scene.add(card);
-      for (let r=0;r<3;r++) {
-        for (let c=0;c<6;c++) {
-          const hole = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.05, 0.05, 0.06, 12),
-            new THREE.MeshStandardMaterial({ color: 0x614f2f, roughness: 1 })
-          );
-          hole.rotation.x = Math.PI / 2;
-          hole.position.set(x - 0.65 + c*0.24, y, z - 0.35 + r*0.28);
-          scene.add(hole);
-        }
-      }
-    }
-
-    function addPhone(x, y, z) {
-      const phone = new THREE.Mesh(
-        new THREE.BoxGeometry(0.95, 1.8, 0.12),
-        new THREE.MeshStandardMaterial({ color: 0x12161c, roughness: 0.35, metalness: 0.1 })
-      );
-      phone.position.set(x, y, z);
-      phone.rotation.y = 0.2;
-      scene.add(phone);
-
-      const screen = new THREE.Mesh(
-        new THREE.BoxGeometry(0.8, 1.45, 0.02),
-        new THREE.MeshStandardMaterial({ color: 0x65b4ff, emissive: 0x173858, emissiveIntensity: 0.35 })
-      );
-      screen.position.set(x, y + 0.02, z + 0.07);
-      screen.rotation.y = 0.2;
-      scene.add(screen);
-    }
-
-    function addNetworkSpheres(x, y, z) {
-      const points = [
-        [0,0,0], [1.4,0.9,0.5], [2.5,-0.2,-0.7], [3.8,1.0,0.2], [4.8,-0.9,0.6]
-      ];
-      const mat = new THREE.MeshStandardMaterial({ color: 0x99d8ff, emissive: 0x11384f, emissiveIntensity: 0.5 });
-      const lineMat = new THREE.LineBasicMaterial({ color: 0x5ba6d9 });
-      const positions = [];
-      points.forEach(([px,py,pz]) => {
-        const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), mat);
-        sphere.position.set(x+px, y+py, z+pz);
-        scene.add(sphere);
-        positions.push(x+px, y+py, z+pz);
-      });
-      const geo = new THREE.BufferGeometry();
-      const linePts = [];
-      for (let i=0;i<points.length-1;i++) {
-        linePts.push(new THREE.Vector3(x+points[i][0], y+points[i][1], z+points[i][2]));
-        linePts.push(new THREE.Vector3(x+points[i+1][0], y+points[i+1][1], z+points[i+1][2]));
-      }
-      geo.setFromPoints(linePts);
-      const line = new THREE.LineSegments(geo, lineMat);
-      scene.add(line);
-    }
-
-    function addProfileMonolith(x, y, z) {
-      const monolith = new THREE.Mesh(
-        new THREE.BoxGeometry(1.8, 4.0, 0.45),
-        glassMat
-      );
-      monolith.position.set(x, y, z);
-      scene.add(monolith);
-
-      const bars = [0.2, 0.8, -0.2, 1.3, -1.0];
-      bars.forEach((offset, idx) => {
-        const bar = new THREE.Mesh(
-          new THREE.BoxGeometry(0.18, 0.3 + idx*0.35, 0.07),
-          new THREE.MeshStandardMaterial({ color: 0xb7ff8a, emissive: 0x36591f, emissiveIntensity: 0.4 })
-        );
-        bar.position.set(x - 0.45 + idx*0.22, y - 1.2 + (0.3 + idx*0.35)/2, z + 0.25);
-        scene.add(bar);
-      });
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(0.55, 0.05, 12, 32),
-        new THREE.MeshStandardMaterial({ color: 0xf1f5f9, emissive: 0x394756, emissiveIntensity: 0.2 })
-      );
-      ring.position.set(x, y + 1.1, z + 0.24);
-      scene.add(ring);
-    }
-
-    function makeCheckerTexture(a, b) {
-      const c = document.createElement('canvas');
-      c.width = c.height = 128;
-      const ctx = c.getContext('2d');
-      ctx.fillStyle = a;
-      ctx.fillRect(0, 0, 128, 128);
-      ctx.fillStyle = b;
-      ctx.fillRect(0, 0, 64, 64);
-      ctx.fillRect(64, 64, 64, 64);
-      const tex = new THREE.CanvasTexture(c);
-      tex.colorSpace = THREE.SRGBColorSpace;
-      return tex;
-    }
-
-    function makeTextSprite(text, opts = {}) {
-      const fontsize = opts.fontsize || 44;
-      const padding = opts.padding || 16;
-      const background = opts.background || "rgba(255,255,255,0.9)";
-      const color = opts.color || "#111827";
-      const border = opts.border || "rgba(0,0,0,0)";
+    function textSprite(text, tint = 0xcfe7ff, small = false) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
+      const fontSize = small ? 34 : 42;
+      ctx.font = `700 ${fontSize}px Arial`;
+      const textWidth = Math.ceil(ctx.measureText(text).width);
+      const padding = 20;
+      canvas.width = textWidth + padding * 2;
+      canvas.height = fontSize + padding * 2;
 
-      ctx.font = `700 ${fontsize}px Arial`;
-      const metrics = ctx.measureText(text);
-      const width = Math.ceil(metrics.width + padding * 2);
-      const height = Math.ceil(fontsize * 1.5 + padding * 2);
-
-      canvas.width = width;
-      canvas.height = height;
-      ctx.font = `700 ${fontsize}px Arial`;
-      roundRect(ctx, 0, 0, width, height, 20, background, border);
-      ctx.fillStyle = color;
+      ctx.font = `700 ${fontSize}px Arial`;
+      ctx.fillStyle = 'rgba(8,12,18,0.8)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+      ctx.fillStyle = `#${new THREE.Color(tint).getHexString()}`;
       ctx.textBaseline = 'middle';
-      ctx.fillText(text, padding, height / 2 + fontsize * 0.02);
+      ctx.fillText(text, padding, canvas.height / 2);
 
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
-      const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
-      const sprite = new THREE.Sprite(material);
-      sprite.scale.set(width / 75, height / 75, 1);
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
+      sprite.scale.set(canvas.width / 80, canvas.height / 80, 1);
       return sprite;
     }
 
-    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
-      ctx.beginPath();
-      ctx.moveTo(x+r, y);
-      ctx.arcTo(x+w, y, x+w, y+h, r);
-      ctx.arcTo(x+w, y+h, x, y+h, r);
-      ctx.arcTo(x, y+h, x, y, r);
-      ctx.arcTo(x, y, x+w, y, r);
-      ctx.closePath();
-      ctx.fillStyle = fill;
-      ctx.fill();
-      if (stroke && stroke !== "rgba(0,0,0,0)") {
-        ctx.strokeStyle = stroke;
-        ctx.lineWidth = 3;
-        ctx.stroke();
-      }
-    }
-
-    window.addEventListener('resize', onResize);
     function onResize() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     }
+    }
 
-    animate();
+    loadThreeStack()
+      .then(bootMuseum)
+      .catch((err) => {
+        const status = document.getElementById('statusLine');
+        if (status) status.textContent = 'Could not load Three.js. Add local files in bs/vendor or allow CDN access.';
+        console.error(err);
+      });
   </script>
 </body>
 </html>
