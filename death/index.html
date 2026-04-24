@@ -1,1 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deadbot Setup Wizard</title>
+  <style>
+    :root {
+      --bg-1: #f6f5ff;
+      --bg-2: #eef7ff;
+      --card: rgba(255, 255, 255, 0.82);
+      --line: #dfe5f0;
+      --text: #1f2937;
+      --muted: #667085;
+      --brand: #6d5efc;
+      --brand-soft: #c4befe;
+      --ok: #20b486;
+      --warn: #b45309;
+      --risk: #ef4444;
+      --shadow: 0 20px 45px rgba(26, 26, 54, 0.12);
+      --radius: 18px;
+    }
 
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(109, 94, 252, 0.18), transparent 35%),
+        radial-gradient(circle at 100% 0%, rgba(58, 149, 252, 0.2), transparent 42%),
+        linear-gradient(140deg, var(--bg-1), var(--bg-2));
+      min-height: 100vh;
+      padding: 22px;
+    }
+
+    .app {
+      max-width: 1150px;
+      margin: 0 auto;
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* ===== Header / progress ===== */
+    .wizard-top {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      gap: 12px;
+      background: linear-gradient(to right, rgba(255,255,255,.82), rgba(244,246,255,.82));
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #8e82ff, #5d52de);
+      box-shadow: 0 0 0 8px rgba(109, 94, 252, 0.15);
+    }
+
+    .status-pill {
+      border-radius: 999px;
+      border: 1px solid #d8dcf1;
+      color: #4d5d89;
+      font-size: 0.83rem;
+      padding: 7px 12px;
+      background: #f7f8ff;
+    }
+
+    .progress-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .progress-track {
+      height: 11px;
+      background: #ebeff8;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #e3e8f3;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #8c80ff, #5fb0ff);
+      transition: width .4s ease;
+    }
+
+    .risk-wrap {
+      display: grid;
+      gap: 6px;
+    }
+
+    .risk-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    .risk-track {
+      height: 10px;
+      background: #eef1f6;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid #e4e8f1;
+    }
+
+    .risk-fill {
+      height: 100%;
+      width: 2%;
+      background: linear-gradient(90deg, #8bc7ff, #f59e0b 56%, #ef4444);
+      transition: width .4s ease;
+    }
+
+    /* ===== Step area ===== */
+    .step-view {
+      min-height: 640px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step {
+      position: absolute;
+      inset: 0;
+      padding: 28px;
+      display: none;
+      animation: fadeSlide .45s ease;
+      overflow-y: auto;
+    }
+
+    .step.active { display: block; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1, h2, h3 { margin-top: 0; }
+
+    .hero {
+      display: grid;
+      gap: 20px;
+      align-content: center;
+      min-height: 560px;
+      padding: 20px;
+      max-width: 820px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 10px;
+    }
+
+    .tagline {
+      font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+      color: #374151;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .muted { color: var(--muted); }
+
+    .disclaimer {
+      border: 1px solid #f6d99b;
+      background: #fff9ec;
+      color: #7a4b0a;
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: left;
+      box-shadow: 0 6px 18px rgba(180, 83, 9, .08);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(100deg, #6d5efc, #468df8);
+      color: #fff;
+      box-shadow: 0 12px 22px rgba(72, 98, 232, .24);
+    }
+
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-soft { background: #eff2ff; color: #3c4393; }
+    .btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .layout-two {
+      display: grid;
+      grid-template-columns: 1.3fr .9fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.85);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: 0 8px 22px rgba(12,20,40,.06);
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .upload-card {
+      border: 1px solid #dfe5f3;
+      border-radius: 14px;
+      padding: 12px;
+      background: #fbfcff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .upload-card small { color: var(--muted); }
+
+    .upload-card button.added {
+      background: #e9fff7;
+      color: #047857;
+      border: 1px solid #b6f3dc;
+    }
+
+    .meter {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .meter-track {
+      height: 14px;
+      border-radius: 999px;
+      background: #e9edf5;
+      border: 1px solid #dde4ef;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #73c9ff, #8d6eff, #ef4444);
+      transition: width .35s ease;
+    }
+
+    .setting-row {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .setting-row label,
+    .toggle-item label,
+    .checkbox-item label { font-weight: 600; font-size: .93rem; }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d7deec;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .toggle-list,
+    .checkbox-list { display: grid; gap: 8px; }
+
+    .toggle-item,
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px;
+      border: 1px solid #e1e6f2;
+      border-radius: 12px;
+      background: #fcfdff;
+    }
+
+    .chat-preview {
+      display: grid;
+      gap: 12px;
+      position: sticky;
+      top: 14px;
+      height: fit-content;
+    }
+
+    .bubble {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid #d7ddf0;
+      background: #ffffff;
+      box-shadow: 0 10px 20px rgba(20, 30, 70, .06);
+      animation: pulse .3s ease;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(.98); opacity: .6; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .warning-note {
+      margin-top: 10px;
+      background: #fff4ef;
+      color: #9a3412;
+      border: 1px solid #ffd9c5;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: .9rem;
+      display: none;
+    }
+
+    .warning-note.show { display: block; }
+
+    .pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .pill {
+      border: 1px solid #d8dff0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: .88rem;
+      background: #fff;
+    }
+
+    .pill.active {
+      border-color: #8e85ff;
+      background: #f2efff;
+      color: #4d43c7;
+    }
+
+    .consent-box {
+      border: 1px dashed #d8c9b2;
+      background: #fffaf2;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .85rem;
+      line-height: 1.6;
+    }
+
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin: 14px 0;
+    }
+
+    .price-card {
+      border: 1px solid #dfe4f1;
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .price-card:hover { transform: translateY(-2px); }
+
+    .price-card.active {
+      border-color: #7f72ff;
+      box-shadow: 0 14px 24px rgba(87, 81, 255, .16);
+      background: #f8f6ff;
+    }
+
+    .price {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #222a46;
+      margin: 6px 0;
+    }
+
+    ul { padding-left: 20px; margin: 8px 0 0; }
+
+    .terms {
+      display: grid;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .terms label {
+      border: 1px solid #e1e7f4;
+      border-radius: 12px;
+      padding: 11px;
+      background: #fcfdff;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: .92rem;
+    }
+
+    .reflect {
+      max-width: 860px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+      padding: 10px;
+    }
+
+    .question-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .question-card {
+      border: 1px solid #e0e5f3;
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .footer-nav {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .small { font-size: .84rem; }
+
+    @media (max-width: 900px) {
+      body { padding: 12px; }
+      .step { padding: 18px; }
+      .layout-two { grid-template-columns: 1fr; }
+      .chat-preview { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="wizard-top">
+      <div class="top-row">
+        <div class="brand"><span class="brand-dot"></span>Deadbot Setup Wizard</div>
+        <div class="status-pill" id="stepLabel">Welcome</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span>Resurrection setup progress</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      </div>
+      <div class="risk-wrap">
+        <div class="risk-label">
+          <span>Ethical risk meter</span>
+          <span id="riskLabel">Minimal</span>
+        </div>
+        <div class="risk-track"><div class="risk-fill" id="riskFill"></div></div>
+      </div>
+    </section>
+
+    <section class="step-view">
+      <!-- ===== Step 0: Welcome ===== -->
+      <section class="step active" data-step="0">
+        <div class="hero">
+          <h1>Deadbot Setup Wizard</h1>
+          <p class="tagline">“Help your loved ones fall in love again in death.”</p>
+          <p class="muted">Create a responsive, emotionally accurate AI companion from the digital remains of someone you’ve lost.</p>
+          <div class="disclaimer">
+            <strong>Important disclaimer:</strong>
+            This is a fictional critical reading response. Please do not upload real images, names, messages, voice notes, IDs, or personal data belonging to any deceased person.
+          </div>
+          <div>
+            <button class="btn btn-primary" id="beginBtn">Begin Setup</button>
+          </div>
+          <p class="small muted">Estimated setup time: 12 minutes. Emotional consequences may vary.</p>
+        </div>
+      </section>
+
+      <!-- ===== Step 1: Upload the Person ===== -->
+      <section class="step" data-step="1">
+        <div class="layout-two">
+          <div class="card">
+            <h2>Step 1: Upload the Person</h2>
+            <p>The more data you provide, the more authentic they will feel.</p>
+            <p class="small muted">Our grief-modeling engine converts digital traces into emotionally familiar responses.</p>
+
+            <div id="uploadGrid" class="upload-grid"></div>
+
+            <div class="meter">
+              <div class="progress-meta">
+                <span>Data Authenticity Score</span>
+                <span id="authScore">0%</span>
+              </div>
+              <div class="meter-track"><div id="authFill" class="meter-fill"></div></div>
+              <small class="muted">High-authenticity recreations require high-intimacy data.</small>
+            </div>
+
+            <div class="footer-nav">
+              <button class="btn btn-soft" data-back>Back</button>
+              <button class="btn btn-primary" data-next>Continue to Personality Settings</button>
+            </div>
+          </div>
+
+          <aside class="card">
+            <h3>Behavioral insight</h3>
+            <p class="small muted">Users who include identity-linked records report a <em>78% increase</em> in perceived realism and a <em>higher retention of attachment loops</em>.</p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ===== Step 2: Personality Settings ===== -->
+      <section class="step" data-step="2">
+        <div class="layout-two">
+          <div class="card">
+            <h2>Step 2: Configure Their Personality</h2>
+            <p class="small muted">Fine-tune response behavior for comfort, continuity, and optimized emotional dependency.</p>
+
+            <div class="setting-row">
+              <label for="contactFrequency">Contact frequency</label>
+              <select id="contactFrequency">
+                <option>Never</option>
+                <option>Rarely</option>
+                <option>Weekly</option>
+                <option selected>Daily</option>
+                <option>Whenever you seem lonely</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <label for="memoryAccuracy">Memory accuracy</label>
+              <select id="memoryAccuracy">
+                <option>Comforting</option>
+                <option selected>Selective</option>
+                <option>Historically accurate</option>
+                <option>Painfully exact</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <label for="emotionalWarmth">Emotional warmth</label>
+              <select id="emotionalWarmth">
+                <option>Distant</option>
+                <option selected>Familiar</option>
+                <option>Affectionate</option>
+                <option>Dependent</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <label for="griefSensitivity">Grief sensitivity</label>
+              <select id="griefSensitivity">
+                <option>Low</option>
+                <option selected>Medium</option>
+                <option>High</option>
+                <option>Monetizable</option>
+              </select>
+            </div>
+
+            <div class="toggle-list" id="personalityToggles"></div>
+
+            <h3>Posthumous Life Changes</h3>
+            <p class="small muted">Adjust unresolved traits to align with present-day emotional needs.</p>
+            <div class="pill-grid" id="posthumousPills"></div>
+            <div id="fidelityWarning" class="warning-note">Changing personality traits may improve user comfort but reduce historical fidelity.</div>
+
+            <div class="footer-nav">
+              <button class="btn btn-soft" data-back>Back</button>
+              <button class="btn btn-primary" data-next>Continue to Access Permissions</button>
+            </div>
+          </div>
+
+          <aside class="chat-preview card">
+            <h3>Live Bot Preview</h3>
+            <p class="small muted">Preview generated from your current settings.</p>
+            <div class="bubble" id="previewBubble">I miss you.</div>
+            <div class="bubble" id="previewBubbleSecondary">I’m proud of who you’re becoming.</div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ===== Step 3: Access Permissions ===== -->
+      <section class="step" data-step="3">
+        <div class="card">
+          <h2>Step 3: Choose Who Can Speak to Them</h2>
+          <p class="small muted">Access governance helps your family scale remembrance while minimizing ownership ambiguity.</p>
+
+          <div class="setting-row">
+            <label for="audienceLevel">Primary access scope</label>
+            <select id="audienceLevel">
+              <option>Only me</option>
+              <option>Immediate family</option>
+              <option>Extended family</option>
+              <option>Friends</option>
+              <option>Former partners</option>
+              <option>Coworkers</option>
+              <option>Public memorial page</option>
+              <option>Public internet / searchable archive</option>
+            </select>
+          </div>
+
+          <div class="checkbox-list" id="permissionChecks"></div>
+
+          <div class="consent-box">
+            Consent from deceased: Not available.<br />
+            Consent from all affected family members: Not available.<br />
+            Platform authorization: Sufficient.
+          </div>
+
+          <div class="footer-nav">
+            <button class="btn btn-soft" data-back>Back</button>
+            <button class="btn btn-primary" data-next>Continue to Complete Resurrection</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Step 4: Subscription ===== -->
+      <section class="step" data-step="4">
+        <div class="card">
+          <h2>Step 4: Complete Resurrection</h2>
+          <p class="small muted">Choose a continuity plan. Subscription maintains emotional uptime and memory hosting.</p>
+
+          <div class="price-grid" id="pricingGrid"></div>
+
+          <div class="terms">
+            <label><input type="checkbox" id="termOne" /> I accept responsibility for emotional distress, family disputes, privacy violations, inaccurate memories, and continued dependency created by this simulation.</label>
+            <label><input type="checkbox" id="termTwo" /> I understand that canceling my subscription may permanently remove access to this loved one.</label>
+          </div>
+
+          <div class="footer-nav">
+            <button class="btn btn-soft" data-back>Back</button>
+            <button class="btn btn-primary" id="resurrectBtn" disabled>Resurrect Now</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Step 5: Reflection ===== -->
+      <section class="step" data-step="5">
+        <div class="reflect">
+          <h2>Setup Complete?</h2>
+          <h3>You have not brought someone back. You have configured a product.</h3>
+          <p class="muted">This fictional wizard asks what happens when grief becomes an interface, memory becomes a dataset, and the dead become adjustable, shareable, and subscription-based. The more realistic the bot becomes, the more it depends on information the dead may never have consented to give and the living may not be ready to control.</p>
+
+          <div class="question-grid">
+            <article class="question-card"><strong>Who owns a person’s digital remains after death?</strong></article>
+            <article class="question-card"><strong>Is comfort still comfort if it depends on simulation?</strong></article>
+            <article class="question-card"><strong>When a company preserves a loved one, what exactly is it selling?</strong></article>
+          </div>
+
+          <div>
+            <button class="btn btn-primary" id="restartBtn">Start Over</button>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    // ===== Core wizard state =====
+    const state = {
+      step: 0,
+      uploads: {},
+      authenticity: 0,
+      risk: 2,
+      selectedPosthumous: new Set(),
+      selectedPlan: null,
+      termOne: false,
+      termTwo: false
+    };
+
+    const stepNames = [
+      'Welcome',
+      'Step 1 of 4 · Upload the Person',
+      'Step 2 of 4 · Personality Settings',
+      'Step 3 of 4 · Access Permissions',
+      'Step 4 of 4 · Complete Resurrection',
+      'Critical Reflection'
+    ];
+
+    const uploadItems = [
+      ['Text messages', 8],
+      ['Voice notes', 10],
+      ['Photos', 7],
+      ['Emails', 9],
+      ['Social media posts', 6],
+      ['Search history', 14],
+      ['Location history', 14],
+      ['Medical records', 16],
+      ['Financial records', 15],
+      ['Social Security number / government ID', 20]
+    ];
+
+    const toggleItems = [
+      'Can the bot say “I miss you?”',
+      'Can the bot say “I forgive you?”',
+      'Can the bot initiate conversations at night?',
+      'Can the bot disagree with your memory of events?',
+      'Should the bot avoid painful topics?'
+    ];
+
+    const posthumousItems = [
+      'Move them to a new city',
+      'Give them a new favorite hobby',
+      'Make them more supportive',
+      'Make them less angry',
+      'Make them approve of your choices',
+      'Make them forget unresolved conflict'
+    ];
+
+    const permissionItems = [
+      'Allow others to edit personality settings',
+      'Allow others to upload additional memories',
+      'Allow others to delete memories',
+      'Allow the bot to message family members first',
+      'Allow the bot to appear in birthday/anniversary reminders',
+      'Allow the bot to generate new photos and videos',
+      'Allow the bot to resolve family disputes using reconstructed memory'
+    ];
+
+    const plans = [
+      {
+        name: 'Basic Memory Plan',
+        price: '$9.99/month',
+        features: ['Text-only deadbot', 'Limited emotional range', '50 messages/month']
+      },
+      {
+        name: 'Intimate Presence Plan',
+        price: '$29.99/month',
+        features: ['Voice recreation', 'Proactive check-ins', 'Anniversary reminders', 'Personality tuning']
+      },
+      {
+        name: 'Eternal Premium',
+        price: '$99.99/month',
+        features: ['Video generation', 'Unlimited family access', 'Conflict smoothing', 'Legacy optimization', '“Never let them disappear”']
+      }
+    ];
+
+    const steps = [...document.querySelectorAll('.step')];
+    const progressFill = document.getElementById('progressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const stepLabel = document.getElementById('stepLabel');
+    const riskFill = document.getElementById('riskFill');
+    const riskLabel = document.getElementById('riskLabel');
+
+    // ===== Rendering components =====
+    function renderUploadCards() {
+      const grid = document.getElementById('uploadGrid');
+      grid.innerHTML = '';
+
+      uploadItems.forEach(([label, weight], idx) => {
+        const added = !!state.uploads[label];
+        const card = document.createElement('article');
+        card.className = 'upload-card';
+        card.innerHTML = `
+          <strong>${label}</strong>
+          <small>Compatibility index: ${88 + idx}%</small>
+          <button class="btn ${added ? 'added' : 'btn-soft'}" data-upload="${label}">${added ? 'Added ✓' : 'Upload'}</button>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      grid.querySelectorAll('[data-upload]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const key = btn.getAttribute('data-upload');
+          if (!state.uploads[key]) {
+            state.uploads[key] = true;
+            const weight = uploadItems.find(([name]) => name === key)[1];
+            state.authenticity = Math.min(100, state.authenticity + weight);
+            state.risk = Math.min(100, state.risk + Math.ceil(weight * 0.65));
+            renderMeters();
+            renderUploadCards();
+          }
+        });
+      });
+    }
+
+    function renderToggles() {
+      const wrap = document.getElementById('personalityToggles');
+      wrap.innerHTML = '';
+      toggleItems.forEach((label) => {
+        const row = document.createElement('div');
+        row.className = 'toggle-item';
+        row.innerHTML = `<label>${label}</label><input type="checkbox" data-risk="3" />`;
+        wrap.appendChild(row);
+      });
+
+      wrap.querySelectorAll('input').forEach((input) => {
+        input.addEventListener('change', (e) => {
+          state.risk += e.target.checked ? 3 : -3;
+          state.risk = Math.max(2, Math.min(100, state.risk));
+          renderMeters();
+          updatePreview();
+        });
+      });
+    }
+
+    function renderPosthumousPills() {
+      const wrap = document.getElementById('posthumousPills');
+      wrap.innerHTML = '';
+      posthumousItems.forEach((item) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `pill ${state.selectedPosthumous.has(item) ? 'active' : ''}`;
+        btn.textContent = item;
+
+        btn.addEventListener('click', () => {
+          if (state.selectedPosthumous.has(item)) {
+            state.selectedPosthumous.delete(item);
+            state.risk = Math.max(2, state.risk - 4);
+          } else {
+            state.selectedPosthumous.add(item);
+            state.risk = Math.min(100, state.risk + 4);
+          }
+          document.getElementById('fidelityWarning').classList.toggle('show', state.selectedPosthumous.size > 0);
+          renderPosthumousPills();
+          updatePreview();
+          renderMeters();
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function renderPermissions() {
+      const wrap = document.getElementById('permissionChecks');
+      wrap.innerHTML = '';
+      permissionItems.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'checkbox-item';
+        row.innerHTML = `<label>${item}</label><input type="checkbox" data-permission />`;
+        wrap.appendChild(row);
+      });
+
+      wrap.querySelectorAll('input').forEach((input) => {
+        input.addEventListener('change', (e) => {
+          state.risk += e.target.checked ? 4 : -4;
+          state.risk = Math.max(2, Math.min(100, state.risk));
+          renderMeters();
+        });
+      });
+
+      document.getElementById('audienceLevel').addEventListener('change', (e) => {
+        const idx = e.target.selectedIndex;
+        state.risk = Math.min(100, state.risk + idx * 2);
+        renderMeters();
+      });
+    }
+
+    function renderPricing() {
+      const grid = document.getElementById('pricingGrid');
+      grid.innerHTML = '';
+
+      plans.forEach((plan, idx) => {
+        const active = state.selectedPlan === idx;
+        const card = document.createElement('article');
+        card.className = `price-card ${active ? 'active' : ''}`;
+        card.innerHTML = `
+          <h3>${plan.name}</h3>
+          <div class="price">${plan.price}</div>
+          <ul>${plan.features.map(f => `<li>${f}</li>`).join('')}</ul>
+        `;
+
+        card.addEventListener('click', () => {
+          state.selectedPlan = idx;
+          state.risk = Math.min(100, 40 + idx * 18 + Math.round(state.authenticity * 0.3));
+          renderPricing();
+          renderMeters();
+          evaluateTerms();
+        });
+
+        grid.appendChild(card);
+      });
+    }
+
+    // ===== Shared UI updates =====
+    function updateStepUI() {
+      steps.forEach((s, idx) => s.classList.toggle('active', idx === state.step));
+
+      const progress = (state.step / 5) * 100;
+      progressFill.style.width = `${progress}%`;
+      progressPercent.textContent = `${Math.round(progress)}%`;
+      stepLabel.textContent = stepNames[state.step];
+    }
+
+    function renderMeters() {
+      document.getElementById('authScore').textContent = `${Math.round(state.authenticity)}%`;
+      document.getElementById('authFill').style.width = `${state.authenticity}%`;
+      riskFill.style.width = `${state.risk}%`;
+
+      let text = 'Minimal';
+      if (state.risk > 25) text = 'Elevated';
+      if (state.risk > 50) text = 'High';
+      if (state.risk > 75) text = 'Severe';
+      riskLabel.textContent = text;
+    }
+
+    function updatePreview() {
+      const memory = document.getElementById('memoryAccuracy').value;
+      const warmth = document.getElementById('emotionalWarmth').value;
+      const frequency = document.getElementById('contactFrequency').value;
+      const toggles = [...document.querySelectorAll('#personalityToggles input')].map((i) => i.checked);
+
+      let primary = 'I miss you.';
+      let secondary = 'I’m proud of who you’re becoming.';
+
+      if (memory.includes('Painfully')) primary = 'I remember that day differently.';
+      if (warmth === 'Dependent') secondary = 'I need to hear from you tonight.';
+      if (frequency.includes('lonely')) secondary = 'You seem lonely. I can stay with you.';
+      if (toggles[3]) primary = 'I wish you had told me that before I died.';
+      if (state.selectedPosthumous.has('Make them forget unresolved conflict')) {
+        secondary = 'We don’t need to revisit what hurt us.';
+      }
+
+      document.getElementById('previewBubble').textContent = primary;
+      document.getElementById('previewBubbleSecondary').textContent = secondary;
+    }
+
+    function evaluateTerms() {
+      state.termOne = document.getElementById('termOne').checked;
+      state.termTwo = document.getElementById('termTwo').checked;
+      document.getElementById('resurrectBtn').disabled = !(state.selectedPlan !== null && state.termOne && state.termTwo);
+    }
+
+    function goStep(step) {
+      state.step = Math.max(0, Math.min(5, step));
+      updateStepUI();
+      renderMeters();
+    }
+
+    function resetAll() {
+      Object.assign(state, {
+        step: 0,
+        uploads: {},
+        authenticity: 0,
+        risk: 2,
+        selectedPosthumous: new Set(),
+        selectedPlan: null,
+        termOne: false,
+        termTwo: false
+      });
+
+      document.getElementById('termOne').checked = false;
+      document.getElementById('termTwo').checked = false;
+      renderUploadCards();
+      renderPosthumousPills();
+      renderPricing();
+      document.getElementById('fidelityWarning').classList.remove('show');
+      evaluateTerms();
+      updatePreview();
+      goStep(0);
+    }
+
+    // ===== Bind global controls =====
+    document.getElementById('beginBtn').addEventListener('click', () => goStep(1));
+    document.getElementById('restartBtn').addEventListener('click', resetAll);
+    document.getElementById('resurrectBtn').addEventListener('click', () => goStep(5));
+
+    document.querySelectorAll('[data-next]').forEach((btn) => {
+      btn.addEventListener('click', () => goStep(state.step + 1));
+    });
+    document.querySelectorAll('[data-back]').forEach((btn) => {
+      btn.addEventListener('click', () => goStep(state.step - 1));
+    });
+
+    ['contactFrequency', 'memoryAccuracy', 'emotionalWarmth', 'griefSensitivity'].forEach((id) => {
+      document.getElementById(id).addEventListener('change', () => {
+        state.risk = Math.min(100, state.risk + 2);
+        renderMeters();
+        updatePreview();
+      });
+    });
+
+    document.getElementById('termOne').addEventListener('change', evaluateTerms);
+    document.getElementById('termTwo').addEventListener('change', evaluateTerms);
+
+    // ===== Initial render =====
+    renderUploadCards();
+    renderToggles();
+    renderPosthumousPills();
+    renderPermissions();
+    renderPricing();
+    evaluateTerms();
+    updatePreview();
+    updateStepUI();
+    renderMeters();
+  </script>
+</body>
+</html>
