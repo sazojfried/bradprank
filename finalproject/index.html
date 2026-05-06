@@ -10,103 +10,343 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --ring-blue: #189bd7;
+      --ink: #24495a;
+      --muted: #657b83;
+      --field: #6f8589;
+      --panel: #edf6f5;
+    }
+
     body {
+      min-height: 100vh;
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: #ffffff;
-      color: #3d3d3d;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 72%, rgba(55, 26, 16, 0.78) 0 18%, transparent 34%),
+        radial-gradient(circle at 72% 73%, rgba(122, 72, 43, 0.72) 0 22%, transparent 38%),
+        linear-gradient(120deg, #50321f 0%, #2b575f 54%, #94a6a1 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        linear-gradient(72deg, transparent 0 50%, rgba(255, 255, 255, 0.1) 50% 51%, transparent 51% 100%),
+        linear-gradient(138deg, transparent 0 58%, rgba(255, 227, 170, 0.16) 58% 59%, transparent 59% 100%);
+      filter: blur(7px);
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    .scene {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 18px;
+      position: relative;
+    }
+
+    .phone {
+      width: min(390px, 92vw);
+      min-height: 780px;
+      border: 13px solid #102229;
+      border-radius: 42px;
+      background: #0f2428;
+      box-shadow: 0 34px 80px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+      position: relative;
+      transform: rotate(10deg);
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 108px;
+      height: 20px;
+      border-radius: 0 0 17px 17px;
+      background: #102229;
+      transform: translateX(-50%);
+      z-index: 5;
     }
 
     .screen {
-      min-height: 100vh;
-      width: 100%;
-      max-width: 430px;
-      margin: 0 auto;
-      padding: 38px 26px 26px;
+      min-height: 754px;
+      background: var(--panel);
       position: relative;
-      background: white;
       overflow: hidden;
     }
 
-    .field-group {
-      margin-bottom: 42px;
-    }
-
-    label {
-      display: block;
-      font-size: 30px;
+    .topbar {
+      height: 54px;
+      display: grid;
+      place-items: center;
+      padding: 0 52px;
+      color: #557984;
+      font-size: 16px;
       font-weight: 800;
-      color: #707070;
-      margin-bottom: 18px;
-      letter-spacing: -0.5px;
+      letter-spacing: 0.01em;
+      background: rgba(238, 248, 247, 0.94);
+      position: relative;
     }
 
-    input,
-    textarea {
+    .close {
+      position: absolute;
+      right: 19px;
+      top: 8px;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      background: transparent;
+      color: #1a668a;
+      font-size: 43px;
+      font-weight: 200;
+      line-height: 30px;
+      transform: rotate(45deg);
+      cursor: default;
+    }
+
+    .photo-wrap {
+      position: relative;
+      height: 254px;
+      background: linear-gradient(135deg, #2b6b42, #a9c7a6);
+      overflow: hidden;
+    }
+
+    .photo-preview {
       width: 100%;
-      border: 2px solid #6f6f6f;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .photo-placeholder {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      text-align: center;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.3) 0 9%, transparent 10%),
+        linear-gradient(135deg, rgba(17, 73, 39, 0.86), rgba(116, 156, 111, 0.82));
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+    }
+
+    .photo-placeholder strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 25px;
+    }
+
+    .photo-placeholder span {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .photo-picker {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      z-index: 2;
+    }
+
+    .photo-picker input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .photo-picker label {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      background: rgba(10, 37, 47, 0.58);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+
+    .form-panel {
+      padding: 20px 24px 126px;
+      background: linear-gradient(#edf6f5, #e4f1f0);
+    }
+
+    .field-group {
+      margin-bottom: 20px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .text-field {
+      width: 100%;
+      border: 2px solid var(--field);
       border-radius: 8px;
-      padding: 24px 22px;
-      font-size: 42px;
-      font-weight: 400;
-      color: #333;
+      padding: 17px 17px;
+      background: rgba(255, 255, 255, 0.34);
+      color: #3d535b;
+      font: 400 21px/1.25 Arial, Helvetica, sans-serif;
       outline: none;
-      background: white;
-      font-family: inherit;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
-    textarea {
+    .text-field:focus {
+      border-color: #176fa0;
+      box-shadow: 0 0 0 2px rgba(24, 116, 169, 0.12);
+    }
+
+    textarea.text-field {
+      min-height: 78px;
       resize: none;
-      height: 122px;
-      line-height: 1.15;
     }
 
-    .spacer {
-      height: 190px;
+    .bottom-input {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid #2c77a5;
+      border-radius: 8px;
+      padding: 13px 15px;
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .bottom-input span {
+      flex: 1;
+      min-height: 24px;
+    }
+
+    .clear-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #6c8d9a;
+      color: white;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .preview-button {
+      width: 100%;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 2px;
+      padding: 17px 20px;
+      background: #177fca;
+      color: white;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.13);
+    }
+
+    .keyboard {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 122px;
+      padding: 8px 9px 12px;
+      display: grid;
+      gap: 7px;
+      background: rgba(213, 230, 233, 0.92);
+      border-top: 1px solid rgba(98, 131, 140, 0.32);
+    }
+
+    .keys {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .key {
+      min-width: 28px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: #f8fbfb;
+      color: #425960;
+      font-size: 18px;
+      box-shadow: 0 2px 0 rgba(70, 91, 99, 0.2);
+    }
+
+    .key.wide {
+      min-width: 75px;
+      background: #b7d2dc;
+      font-size: 14px;
+    }
+
+    .key.space {
+      min-width: 145px;
+      font-size: 13px;
     }
 
     .ring-logo {
-      position: absolute;
-      left: 26px;
-      bottom: 42px;
-      font-size: 42px;
+      position: fixed;
+      left: max(24px, calc(50vw - 560px));
+      bottom: 54px;
+      color: #fff;
+      font-size: 56px;
       font-weight: 300;
-      letter-spacing: -3px;
-      color: #3f3f3f;
+      letter-spacing: -4px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
     }
 
     .ring-logo::before {
       content: "";
       position: absolute;
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
-      background: #159bd7;
-      top: -4px;
-      left: 17px;
+      background: var(--ring-blue);
+      top: 1px;
+      left: 23px;
     }
 
     .search-party {
-      position: absolute;
-      right: 22px;
-      bottom: 44px;
+      position: fixed;
+      right: max(22px, calc(50vw - 595px));
+      bottom: 64px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      background: #179ddd;
-      color: white;
+      gap: 16px;
+      padding: 14px 28px 14px 20px;
       border-radius: 999px;
-      padding: 11px 18px 11px 14px;
-      font-size: 21px;
+      background: var(--ring-blue);
+      color: white;
+      font-size: clamp(22px, 3vw, 43px);
       font-weight: 800;
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.12);
+      line-height: 1;
+      box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.12), 0 12px 34px rgba(0, 0, 0, 0.25);
       white-space: nowrap;
     }
 
     .icon {
-      width: 32px;
-      height: 32px;
-      border: 3px solid white;
+      width: 46px;
+      height: 46px;
+      border: 4px solid white;
       border-radius: 50%;
       position: relative;
       flex: 0 0 auto;
@@ -115,74 +355,148 @@
     .icon::after {
       content: "";
       position: absolute;
-      width: 13px;
-      height: 4px;
+      right: -14px;
+      bottom: -8px;
+      width: 20px;
+      height: 6px;
+      border-radius: 6px;
       background: white;
-      border-radius: 4px;
       transform: rotate(45deg);
-      right: -9px;
-      bottom: -5px;
     }
 
     .sparkle {
       position: absolute;
+      left: 8px;
+      top: 3px;
       color: white;
-      font-size: 18px;
-      font-weight: bold;
-      left: 6px;
-      top: 2px;
+      font-size: 25px;
+      font-weight: 800;
     }
 
     .small-ring {
-      position: absolute;
-      right: 10px;
-      bottom: 20px;
-      font-size: 16px;
-      color: #8a8a8a;
-      letter-spacing: -1px;
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.48);
+      color: rgba(40, 40, 40, 0.64);
+      font-size: 22px;
+      letter-spacing: -2px;
     }
 
-    @media (max-width: 380px) {
+    @media (max-width: 760px) {
+      .scene {
+        padding-bottom: 120px;
+      }
+
+      .phone {
+        min-height: 720px;
+        transform: rotate(4deg);
+      }
+
       .screen {
-        padding: 32px 22px 24px;
-      }
-
-      label {
-        font-size: 27px;
-      }
-
-      input,
-      textarea {
-        font-size: 36px;
-        padding: 22px 20px;
-      }
-
-      .search-party {
-        font-size: 18px;
-        padding: 10px 15px 10px 12px;
-        right: 16px;
+        min-height: 694px;
       }
 
       .ring-logo {
-        font-size: 38px;
+        font-size: 42px;
+        left: 24px;
+        bottom: 34px;
+      }
+
+      .search-party {
+        right: 16px;
+        bottom: 38px;
+        gap: 10px;
+        padding: 11px 17px 11px 14px;
+        font-size: 20px;
+      }
+
+      .icon {
+        width: 33px;
+        height: 33px;
+        border-width: 3px;
+      }
+
+      .sparkle {
+        left: 5px;
+        top: 0;
+        font-size: 19px;
+      }
+
+      .small-ring {
+        display: none;
       }
     }
   </style>
 </head>
 
 <body>
-  <main class="screen">
-    <div class="field-group">
-      <label for="pet-name">Pet Name</label>
-      <input id="pet-name" value="Milo" />
-    </div>
+  <main class="scene" aria-label="Search Party mockup scene">
+    <section class="phone" aria-label="Phone preview">
+      <div class="screen">
+        <header class="topbar">
+          <span>Missing Pet</span>
+          <button class="close" type="button" aria-label="Close">+</button>
+        </header>
 
-    <div class="field-group">
-      <label for="description">Description</label>
-      <textarea id="description">Milo our yellow lab is missing!</textarea>
-    </div>
+        <div class="photo-wrap">
+          <!--
+            To make a photo show automatically, create finalproject/images/ex-photo.jpg
+            and replace the empty src below with: images/ex-photo.jpg
+          -->
+          <img class="photo-preview" id="photo-preview" src="" alt="Uploaded preview" hidden />
+          <div class="photo-placeholder" id="photo-placeholder">
+            <div>
+              <strong>Add your photo</strong>
+              <span>Click “Choose photo” below, or add images/ex-photo.jpg and set the img src to that path.</span>
+            </div>
+          </div>
+          <div class="photo-picker">
+            <input id="photo-input" type="file" accept="image/*" />
+            <label for="photo-input">Choose photo</label>
+          </div>
+        </div>
 
-    <div class="spacer"></div>
+        <form class="form-panel">
+          <div class="field-group">
+            <label class="field-label" for="ex-name">Ex's Name</label>
+            <input class="text-field" id="ex-name" value="Brad" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="description">Description</label>
+            <textarea class="text-field" id="description">Brad was last seen dodging accountability!</textarea>
+          </div>
+
+          <div class="bottom-input" aria-label="extra text entry mockup">
+            <span></span>
+            <span class="clear-dot">×</span>
+          </div>
+
+          <button class="preview-button" type="button">Preview Post</button>
+        </form>
+
+        <div class="keyboard" aria-hidden="true">
+          <div class="keys">
+            <span class="key">q</span><span class="key">w</span><span class="key">e</span><span class="key">r</span><span class="key">t</span><span class="key">y</span><span class="key">u</span><span class="key">i</span><span class="key">o</span><span class="key">p</span>
+          </div>
+          <div class="keys">
+            <span class="key">a</span><span class="key">s</span><span class="key">d</span><span class="key">f</span><span class="key">g</span><span class="key">h</span><span class="key">j</span><span class="key">k</span><span class="key">l</span>
+          </div>
+          <div class="keys">
+            <span class="key wide">123</span><span class="key">z</span><span class="key">x</span><span class="key">c</span><span class="key">v</span><span class="key">b</span><span class="key">n</span><span class="key">m</span>
+          </div>
+          <div class="keys">
+            <span class="key wide">😊</span><span class="key space">space</span><span class="key wide">return</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <div class="ring-logo">ring</div>
 
@@ -195,5 +509,26 @@
 
     <div class="small-ring">ring</div>
   </main>
+
+  <script>
+    const photoInput = document.querySelector('#photo-input');
+    const photoPreview = document.querySelector('#photo-preview');
+    const photoPlaceholder = document.querySelector('#photo-placeholder');
+
+    photoInput.addEventListener('change', () => {
+      const [file] = photoInput.files;
+
+      if (!file) {
+        photoPreview.hidden = true;
+        photoPreview.removeAttribute('src');
+        photoPlaceholder.hidden = false;
+        return;
+      }
+
+      photoPreview.src = URL.createObjectURL(file);
+      photoPreview.hidden = false;
+      photoPlaceholder.hidden = true;
+    });
+  </script>
 </body>
 </html>
