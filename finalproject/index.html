@@ -101,6 +101,7 @@
     }
 
     .photo-wrap.has-photo .photo-placeholder,
+    .photo-wrap.has-photo .photo-picker,
     .photo-preview[hidden],
     .photo-placeholder[hidden] {
       display: none !important;
@@ -154,30 +155,30 @@
     }
 
     .form-panel {
-      padding: 20px clamp(18px, 5vw, 48px) 32px;
+      padding: 16px clamp(18px, 5vw, 48px) 30px;
       background: linear-gradient(#edf6f5, #e6f2f1);
     }
 
     .field-group {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .field-label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
       color: var(--muted);
-      font-size: clamp(20px, 5vw, 34px);
+      font-size: clamp(18px, 4.5vw, 28px);
       font-weight: 900;
     }
 
     .text-field {
       width: 100%;
-      border: 3px solid var(--field);
-      border-radius: 10px;
-      padding: 20px 18px;
-      background: rgba(255, 255, 255, 0.34);
+      border: 2px solid var(--field);
+      border-radius: 9px;
+      padding: 14px 15px;
+      background: rgba(255, 255, 255, 0.4);
       color: #3d535b;
-      font: 400 clamp(26px, 7vw, 48px)/1.2 Arial, Helvetica, sans-serif;
+      font: 400 clamp(23px, 6vw, 39px)/1.15 Arial, Helvetica, sans-serif;
       outline: none;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
     }
@@ -188,7 +189,7 @@
     }
 
     textarea.text-field {
-      min-height: 114px;
+      min-height: 92px;
       resize: none;
     }
 
@@ -196,12 +197,12 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      min-height: 68px;
+      min-height: 58px;
       margin-bottom: 14px;
-      border: 3px solid #2a7eac;
-      border-radius: 10px;
-      padding: 13px 16px;
-      background: rgba(255, 255, 255, 0.25);
+      border: 2px solid #2a7eac;
+      border-radius: 9px;
+      padding: 11px 14px;
+      background: rgba(255, 255, 255, 0.32);
     }
 
     .bottom-input span:first-child {
