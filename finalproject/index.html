@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search Party Mockup</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #ffffff;
+      color: #3d3d3d;
+    }
+
+    .screen {
+      min-height: 100vh;
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      padding: 38px 26px 26px;
+      position: relative;
+      background: white;
+      overflow: hidden;
+    }
+
+    .field-group {
+      margin-bottom: 42px;
+    }
+
+    label {
+      display: block;
+      font-size: 30px;
+      font-weight: 800;
+      color: #707070;
+      margin-bottom: 18px;
+      letter-spacing: -0.5px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 2px solid #6f6f6f;
+      border-radius: 8px;
+      padding: 24px 22px;
+      font-size: 42px;
+      font-weight: 400;
+      color: #333;
+      outline: none;
+      background: white;
+      font-family: inherit;
+    }
+
+    textarea {
+      resize: none;
+      height: 122px;
+      line-height: 1.15;
+    }
+
+    .spacer {
+      height: 190px;
+    }
+
+    .ring-logo {
+      position: absolute;
+      left: 26px;
+      bottom: 42px;
+      font-size: 42px;
+      font-weight: 300;
+      letter-spacing: -3px;
+      color: #3f3f3f;
+    }
+
+    .ring-logo::before {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #159bd7;
+      top: -4px;
+      left: 17px;
+    }
+
+    .search-party {
+      position: absolute;
+      right: 22px;
+      bottom: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #179ddd;
+      color: white;
+      border-radius: 999px;
+      padding: 11px 18px 11px 14px;
+      font-size: 21px;
+      font-weight: 800;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.12);
+      white-space: nowrap;
+    }
+
+    .icon {
+      width: 32px;
+      height: 32px;
+      border: 3px solid white;
+      border-radius: 50%;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .icon::after {
+      content: "";
+      position: absolute;
+      width: 13px;
+      height: 4px;
+      background: white;
+      border-radius: 4px;
+      transform: rotate(45deg);
+      right: -9px;
+      bottom: -5px;
+    }
+
+    .sparkle {
+      position: absolute;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      left: 6px;
+      top: 2px;
+    }
+
+    .small-ring {
+      position: absolute;
+      right: 10px;
+      bottom: 20px;
+      font-size: 16px;
+      color: #8a8a8a;
+      letter-spacing: -1px;
+    }
+
+    @media (max-width: 380px) {
+      .screen {
+        padding: 32px 22px 24px;
+      }
+
+      label {
+        font-size: 27px;
+      }
+
+      input,
+      textarea {
+        font-size: 36px;
+        padding: 22px 20px;
+      }
+
+      .search-party {
+        font-size: 18px;
+        padding: 10px 15px 10px 12px;
+        right: 16px;
+      }
+
+      .ring-logo {
+        font-size: 38px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="screen">
+    <div class="field-group">
+      <label for="pet-name">Pet Name</label>
+      <input id="pet-name" value="Milo" />
+    </div>
+
+    <div class="field-group">
+      <label for="description">Description</label>
+      <textarea id="description">Milo our yellow lab is missing!</textarea>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="ring-logo">ring</div>
+
+    <div class="search-party">
+      <div class="icon">
+        <span class="sparkle">✦</span>
+      </div>
+      <span>Introducing Search Party</span>
+    </div>
+
+    <div class="small-ring">ring</div>
+  </main>
+</body>
+</html>
