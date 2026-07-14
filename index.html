@@ -17,7 +17,7 @@
       --blue: #3ba7ff;
       --blue-dark: #0d6efd;
       --gold: #ffd166;
-      --wheel-size: min(78vw, 620px);
+      --wheel-size: min(82vw, 700px);
     }
 
     * { box-sizing: border-box; }
@@ -56,7 +56,7 @@
       max-width: 720px;
       margin: 14px auto 0;
       color: var(--muted);
-      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-size: clamp(1.15rem, 2.2vw, 1.45rem);
     }
 
     .stage {
@@ -70,22 +70,23 @@
     }
 
     .pointer {
+      --pointer-angle: 0deg;
       position: absolute;
-      top: -2px;
-      left: 50%;
-      transform: translateX(-50%);
+      inset: 0;
       z-index: 4;
-      width: clamp(42px, 8vw, 66px);
-      height: clamp(74px, 13vw, 104px);
       display: grid;
       justify-items: center;
       pointer-events: none;
+      transform: rotate(var(--pointer-angle));
+      transition: transform 3s cubic-bezier(0.11, 0.77, 0.16, 1);
     }
+
+    .pointer.spinning { transition-property: transform; }
 
     .pointer::before {
       content: "";
-      width: 28%;
-      height: 38%;
+      width: clamp(16px, 2.8vw, 26px);
+      height: clamp(28px, 5vw, 44px);
       border-radius: 999px 999px 10px 10px;
       background: linear-gradient(180deg, #f8fafc, #cbd5e1);
       box-shadow: inset 0 -5px 10px rgba(0, 0, 0, 0.22), 0 5px 12px rgba(0, 0, 0, 0.32);
@@ -95,9 +96,9 @@
       content: "";
       width: 0;
       height: 0;
-      border-left: clamp(18px, 4vw, 30px) solid transparent;
-      border-right: clamp(18px, 4vw, 30px) solid transparent;
-      border-top: clamp(42px, 8vw, 66px) solid var(--gold);
+      border-left: clamp(24px, 4.8vw, 40px) solid transparent;
+      border-right: clamp(24px, 4.8vw, 40px) solid transparent;
+      border-top: clamp(54px, 9vw, 82px) solid var(--gold);
       filter: drop-shadow(0 5px 0 #9f6a00) drop-shadow(0 12px 14px rgba(0, 0, 0, 0.38));
       margin-top: -2px;
     }
@@ -117,7 +118,6 @@
         inset 0 0 0 2px rgba(15, 23, 42, 0.22),
         inset 0 0 45px rgba(59, 130, 246, 0.18),
         0 0 0 9px rgba(59, 167, 255, 0.16);
-      transition: transform 3s cubic-bezier(0.11, 0.77, 0.16, 1);
     }
 
     .wheel.spinning { cursor: wait; }
@@ -160,7 +160,7 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 3px;
+      width: 4px;
       height: 100%;
       transform: translate(-50%, -50%) rotate(var(--angle));
     }
@@ -168,10 +168,10 @@
     .tick::before {
       content: "";
       position: absolute;
-      top: 5.5%;
+      top: 4%;
       left: 50%;
-      width: 3px;
-      height: 8%;
+      width: 5px;
+      height: 9%;
       border-radius: 10px;
       background: #111827;
       transform: translateX(-50%);
@@ -180,10 +180,10 @@
     .degree {
       position: absolute;
       left: 50%;
-      top: 9%;
+      top: 11.5%;
       color: var(--red);
-      font-weight: 900;
-      font-size: clamp(0.66rem, 2.25vw, 1.08rem);
+      font-weight: 1000;
+      font-size: clamp(1.05rem, 3.1vw, 1.75rem);
       text-shadow: 0 1px 0 #fff, 0 0 12px rgba(255, 255, 255, 0.7);
       transform: translate(-50%, -50%) rotate(calc(-1 * var(--angle)));
       white-space: nowrap;
@@ -191,7 +191,7 @@
 
     .center-label {
       position: absolute;
-      inset: 37%;
+      inset: 35%;
       display: grid;
       place-items: center;
       border-radius: 50%;
@@ -200,7 +200,7 @@
       color: #0f172a;
       font-weight: 900;
       letter-spacing: -0.04em;
-      font-size: clamp(1.2rem, 4vw, 2.45rem);
+      font-size: clamp(1.55rem, 4.8vw, 3.15rem);
     }
 
     .controls, .result-card {
@@ -250,7 +250,7 @@
     .fraction .bottom { padding-top: 0.08em; }
 
     @media (max-width: 700px) {
-      :root { --wheel-size: min(91vw, 520px); }
+      :root { --wheel-size: min(91vw, 560px); }
       .stage { width: min(100%, calc(var(--wheel-size) + 18px)); }
       .controls, .result-card { border-radius: 20px; }
     }
@@ -260,7 +260,7 @@
   <main class="app">
     <header class="hero">
       <h1>Unit Circle Spin Wheel</h1>
-      <p>Click the classic unit circle or press SPIN. The wheel always lands exactly on a standard classroom angle.</p>
+      <p>Click the classic unit circle or press SPIN to send the arrow around the unit circle.</p>
     </header>
 
     <section class="stage" aria-label="Interactive unit circle spin wheel">
@@ -298,12 +298,13 @@
         300: frac("5π", "3"), 315: frac("7π", "4"), 330: frac("11π", "6")
       };
 
+      const pointer = document.querySelector(".pointer");
       const wheel = document.getElementById("wheel");
       const spinButton = document.getElementById("spinButton");
       const revealButton = document.getElementById("revealButton");
       const degreeResult = document.getElementById("degreeResult");
       const radianResult = document.getElementById("radianResult");
-      let currentRotation = 0;
+      let currentPointerRotation = 0;
       let winningAngle = null;
       let isSpinning = false;
       let audioContext;
@@ -369,23 +370,24 @@
         revealButton.disabled = true;
         spinButton.disabled = true;
 
-        const pointerAngle = 90;
-        const currentMod = ((currentRotation % 360) + 360) % 360;
-        const targetMod = (winningAngle - pointerAngle + 360) % 360;
+        const currentMod = ((currentPointerRotation % 360) + 360) % 360;
+        const targetMod = (90 - winningAngle + 360) % 360;
         const offset = (targetMod - currentMod + 360) % 360;
         const fullRotations = 360 * (5 + Math.floor(Math.random() * 3));
-        currentRotation += fullRotations + offset;
+        currentPointerRotation += fullRotations + offset;
 
         const duration = 2200 + Math.random() * 650;
+        pointer.classList.add("spinning");
         wheel.classList.add("spinning");
-        wheel.style.transitionDuration = `${duration}ms`;
-        wheel.style.transform = `rotate(${currentRotation}deg)`;
+        pointer.style.transitionDuration = `${duration}ms`;
+        pointer.style.setProperty("--pointer-angle", `${currentPointerRotation}deg`);
         scheduleTicks(duration);
       }
 
-      wheel.addEventListener("transitionend", (event) => {
+      pointer.addEventListener("transitionend", (event) => {
         if (event.propertyName !== "transform") return;
         isSpinning = false;
+        pointer.classList.remove("spinning");
         wheel.classList.remove("spinning");
         spinButton.disabled = false;
         revealButton.disabled = false;
